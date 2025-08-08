@@ -46,7 +46,7 @@ interface CMSContextType {
   
   // Clients
   clients: Client[];
-  addClient: (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addClient: (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => Client;
   updateClient: (id: string, client: Partial<Client>) => void;
   deleteClient: (id: string) => void;
   
@@ -556,7 +556,7 @@ export function CMSProvider({ children }: { children: ReactNode }) {
   };
 
   // Client methods
-  const addClient = (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addClient = (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>): Client => {
     const newClient: Client = {
       ...client,
       id: generateId(),
@@ -564,6 +564,7 @@ export function CMSProvider({ children }: { children: ReactNode }) {
       updatedAt: getCurrentTimestamp()
     };
     setClients(prev => [...prev, newClient]);
+    return newClient;
   };
 
   const updateClient = (id: string, updates: Partial<Client>) => {
@@ -576,17 +577,7 @@ export function CMSProvider({ children }: { children: ReactNode }) {
     setClients(prev => prev.filter(client => client.id !== id));
   };
 
-  // Modified addClient to return the created client
-  const addClientWithReturn = (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>): Client => {
-    const newClient: Client = {
-      ...client,
-      id: generateId(),
-      createdAt: getCurrentTimestamp(),
-      updatedAt: getCurrentTimestamp()
-    };
-    setClients(prev => [...prev, newClient]);
-    return newClient;
-  };
+  // Deprecated shim removed; addClient already returns Client
 
   // Day Template methods
   const addDayTemplate = (template: Omit<DayTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -618,7 +609,7 @@ export function CMSProvider({ children }: { children: ReactNode }) {
       guides, addGuide, updateGuide, deleteGuide,
       activities, addActivity, updateActivity, deleteActivity,
       gifts, addGift, updateGift, deleteGift,
-      clients, addClient: addClientWithReturn, updateClient, deleteClient,
+      clients, addClient, updateClient, deleteClient,
       dayTemplates, addDayTemplate, updateDayTemplate, deleteDayTemplate
     }}>
       {children}
