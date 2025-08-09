@@ -18,8 +18,20 @@ type OfferEssentials = {
   landServices: DayService[];
 };
 
-export function useExpenses(cms: CMSEntities, offer: OfferEssentials, expensesModalOpen: boolean) {
-  const { hotels, activities, restaurants, guides, translators, transports, gifts } = cms;
+export function useExpenses(
+  cms: CMSEntities,
+  offer: OfferEssentials,
+  expensesModalOpen: boolean
+) {
+  const {
+    hotels,
+    activities,
+    restaurants,
+    guides,
+    translators,
+    transports,
+    gifts,
+  } = cms;
   const [detectedEntities, setDetectedEntities] = useState<ExpenseEntry[]>([]);
   const [expenses, setExpenses] = useState<ExpenseEntry[]>([]);
 
@@ -47,28 +59,37 @@ export function useExpenses(cms: CMSEntities, offer: OfferEssentials, expensesMo
       offer.landServices.forEach((day) => {
         day.services.forEach((service) => {
           let entityName = "";
-          let entityId = service.serviceId;
+          const entityId = service.serviceId;
           switch (service.serviceType) {
             case "activity":
-              entityName = activities.find((a) => a.id === service.serviceId)?.name || "";
+              entityName =
+                activities.find((a) => a.id === service.serviceId)?.name || "";
               break;
             case "restaurant":
-              entityName = restaurants.find((r) => r.id === service.serviceId)?.name || "";
+              entityName =
+                restaurants.find((r) => r.id === service.serviceId)?.name || "";
               break;
             case "guide":
-              entityName = guides.find((g) => g.id === service.serviceId)?.name || "";
+              entityName =
+                guides.find((g) => g.id === service.serviceId)?.name || "";
               break;
             case "translator":
-              entityName = translators.find((t) => t.id === service.serviceId)?.name || "";
+              entityName =
+                translators.find((t) => t.id === service.serviceId)?.name || "";
               break;
             case "transport":
-              entityName = transports.find((t) => t.id === service.serviceId)?.name || "";
+              entityName =
+                transports.find((t) => t.id === service.serviceId)?.name || "";
               break;
             case "gift":
-              entityName = gifts.find((g) => g.id === service.serviceId)?.name || "";
+              entityName =
+                gifts.find((g) => g.id === service.serviceId)?.name || "";
               break;
           }
-          if (entityName && !addedIds.has(`${service.serviceType}-${entityId}`)) {
+          if (
+            entityName &&
+            !addedIds.has(`${service.serviceType}-${entityId}`)
+          ) {
             results.push({
               id: `${service.serviceType}-${entityId}`,
               entityType: service.serviceType,
@@ -91,10 +112,18 @@ export function useExpenses(cms: CMSEntities, offer: OfferEssentials, expensesMo
       setDetectedEntities(getDetectedEntities());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expensesModalOpen, offer.hotels, offer.landServices, offer.accommodationEnabled, offer.landServicesEnabled]);
+  }, [
+    expensesModalOpen,
+    offer.hotels,
+    offer.landServices,
+    offer.accommodationEnabled,
+    offer.landServicesEnabled,
+  ]);
 
   const updateDetectedEntity = (id: string, updates: Partial<ExpenseEntry>) => {
-    setDetectedEntities((prev) => prev.map((e) => (e.id === id ? { ...e, ...updates } : e)));
+    setDetectedEntities((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
   };
 
   const handleAddCustomExpense = () => {
@@ -111,7 +140,9 @@ export function useExpenses(cms: CMSEntities, offer: OfferEssentials, expensesMo
   };
 
   const handleUpdateExpense = (id: string, updates: Partial<ExpenseEntry>) => {
-    setExpenses((prev) => prev.map((e) => (e.id === id ? { ...e, ...updates } : e)));
+    setExpenses((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
   };
 
   const handleRemoveExpense = (id: string) => {
@@ -119,7 +150,10 @@ export function useExpenses(cms: CMSEntities, offer: OfferEssentials, expensesMo
   };
 
   const totalExpenses = useMemo(() => {
-    return [...detectedEntities, ...expenses].reduce((sum, e) => sum + (e.costAmount || 0), 0);
+    return [...detectedEntities, ...expenses].reduce(
+      (sum, e) => sum + (e.costAmount || 0),
+      0
+    );
   }, [detectedEntities, expenses]);
 
   return {
@@ -134,5 +168,3 @@ export function useExpenses(cms: CMSEntities, offer: OfferEssentials, expensesMo
     totalExpenses,
   };
 }
-
-

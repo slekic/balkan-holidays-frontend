@@ -1,7 +1,15 @@
 import React from "react";
-import { OfferFormData } from "../../../../types/offer";
-import { Building2, FileText, MapPin, Users, Calendar, Plus, AlertCircle } from "lucide-react";
-import { Client } from "../../../../types/cms";
+import { OfferFormData } from "../../types/offer";
+import {
+  Building2,
+  FileText,
+  MapPin,
+  Users,
+  Calendar,
+  Plus,
+  AlertCircle,
+} from "lucide-react";
+import { Client } from "../../types/cms";
 
 type Props = {
   formData: OfferFormData;
@@ -11,7 +19,13 @@ type Props = {
   onOpenNewClient: () => void;
 };
 
-export function GeneralInfoSection({ formData, errors, clients, onChange, onOpenNewClient }: Props) {
+export function GeneralInfoSection({
+  formData,
+  errors,
+  clients,
+  onChange,
+  onOpenNewClient,
+}: Props) {
   const selectedClient = clients.find((c) => c.id === formData.clientId);
 
   return (
@@ -19,7 +33,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center">
           <FileText className="w-6 h-6 text-blue-600 mr-3" />
-          <h2 className="text-xl font-semibold text-gray-900">Opšte informacije</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Opšte informacije
+          </h2>
         </div>
       </div>
 
@@ -33,7 +49,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
               type="text"
               value={formData.offerName}
               onChange={(e) => onChange("offerName", e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.offerName ? "border-red-300" : "border-gray-300"}`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.offerName ? "border-red-300" : "border-gray-300"
+              }`}
               placeholder="npr. Beogradsko kulturno iskustvo"
             />
             {errors.offerName && (
@@ -52,7 +70,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
               type="text"
               value={formData.offerCode}
               onChange={(e) => onChange("offerCode", e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.offerCode ? "border-red-300" : "border-gray-300"}`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.offerCode ? "border-red-300" : "border-gray-300"
+              }`}
               placeholder="npr. BEL-2024-001"
             />
             {errors.offerCode && (
@@ -71,7 +91,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
               <select
                 value={formData.clientId}
                 onChange={(e) => onChange("clientId", e.target.value)}
-                className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.clientId ? "border-red-300" : "border-gray-300"}`}
+                className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.clientId ? "border-red-300" : "border-gray-300"
+                }`}
               >
                 <option value="">Izaberi klijenta...</option>
                 {clients.map((client) => (
@@ -100,7 +122,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
                 <div className="flex items-center text-sm text-blue-700">
                   <Building2 className="w-4 h-4 mr-2" />
                   <span className="font-medium">{selectedClient.name}</span>
-                  <span className="ml-2 text-blue-600">PIB: {selectedClient.pib}</span>
+                  <span className="ml-2 text-blue-600">
+                    PIB: {selectedClient.pib}
+                  </span>
                 </div>
               </div>
             )}
@@ -116,7 +140,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
                 type="text"
                 value={formData.location}
                 onChange={(e) => onChange("location", e.target.value)}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.location ? "border-red-300" : "border-gray-300"}`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.location ? "border-red-300" : "border-gray-300"
+                }`}
                 placeholder="npr. Belgrade, Serbia"
               />
             </div>
@@ -138,8 +164,12 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
                 type="number"
                 min={1}
                 value={formData.numberOfPersons}
-                onChange={(e) => onChange("numberOfPersons", parseInt(e.target.value) || 1)}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.numberOfPersons ? "border-red-300" : "border-gray-300"}`}
+                onChange={(e) =>
+                  onChange("numberOfPersons", parseInt(e.target.value) || 1)
+                }
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.numberOfPersons ? "border-red-300" : "border-gray-300"
+                }`}
               />
             </div>
             {errors.numberOfPersons && (
@@ -160,7 +190,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => onChange("startDate", e.target.value)}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.startDate ? "border-red-300" : "border-gray-300"}`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.startDate ? "border-red-300" : "border-gray-300"
+                }`}
               />
             </div>
             {errors.startDate && (
@@ -181,7 +213,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => onChange("endDate", e.target.value)}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.endDate ? "border-red-300" : "border-gray-300"}`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.endDate ? "border-red-300" : "border-gray-300"
+                }`}
               />
             </div>
             {errors.endDate && (
@@ -193,7 +227,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Broj dana</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Broj dana
+            </label>
             <div className="relative">
               <input
                 type="number"
@@ -208,7 +244,9 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
           </div>
 
           <div className="lg:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Opcija (Dodatne napomene)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Opcija (Dodatne napomene)
+            </label>
             <textarea
               value={formData.option}
               onChange={(e) => onChange("option", e.target.value)}
@@ -224,5 +262,3 @@ export function GeneralInfoSection({ formData, errors, clients, onChange, onOpen
 }
 
 export default GeneralInfoSection;
-
-

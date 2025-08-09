@@ -4,7 +4,6 @@ import LoginPage from "./components/Auth/LoginPage";
 import MainLayout from "./components/Layout/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import OfferCreation from "./pages/OfferCreation";
 import CMSLayout from "./components/CMS/CMSLayout";
 import Hotels from "./pages/CMS/Hotels";
 import Restaurants from "./pages/CMS/Restaurants";
@@ -23,6 +22,7 @@ import Expenses from "./pages/Finance/Expenses";
 import Payments from "./pages/Finance/Payments";
 import Debts from "./pages/Finance/Debts";
 import UserManagement from "./pages/UserManagement";
+import OfferCreation from "./pages/OfferCreation/OfferCreation";
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();

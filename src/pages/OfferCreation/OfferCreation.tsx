@@ -1,18 +1,18 @@
 import React from "react";
-import { useCMS } from "../contexts/CMSContext";
-import { useOfferForm } from "../features/offers/OfferCreation/hooks/useOfferForm";
-import { useExpenses } from "../features/offers/OfferCreation/hooks/useExpenses";
-import { useSlides } from "../features/offers/OfferCreation/hooks/useSlides";
-import GeneralInfoSection from "../features/offers/OfferCreation/components/GeneralInfoSection";
-import AccommodationSection from "../features/offers/OfferCreation/components/AccommodationSection";
-import LandServicesSection from "../features/offers/OfferCreation/components/LandServicesSection";
-import StickySummaryBar from "../features/offers/OfferCreation/components/StickySummaryBar";
-import ExpensesModal from "../features/offers/OfferCreation/components/ExpensesModal";
-import SlidesModal from "../features/offers/OfferCreation/components/SlidesModal";
-import AddSlideModal from "../features/offers/OfferCreation/components/AddSlideModal";
-import EditSlideModal from "../features/offers/OfferCreation/components/EditSlideModal";
-import NewClientModal from "../features/offers/OfferCreation/components/NewClientModal";
-import { getServiceTypeName } from "../features/offers/OfferCreation/utils/constants";
+import { useCMS } from "../../contexts/CMSContext";
+import { useOfferForm } from "./hooks/useOfferForm";
+import { useExpenses } from "./hooks/useExpenses";
+import { useSlides } from "./hooks/useSlides";
+import GeneralInfoSection from "./GeneralInfoSection";
+import AccommodationSection from "./AccommodationSection";
+import LandServicesSection from "./LandServicesSection";
+import StickySummaryBar from "./StickySummaryBar";
+import ExpensesModal from "./ExpensesModal";
+import SlidesModal from "./SlidesModal";
+import AddSlideModal from "./AddSlideModal";
+import EditSlideModal from "./EditSlideModal";
+import NewClientModal from "./NewClientModal";
+import { getServiceTypeName } from "./utils/constants";
 
 export default function OfferCreation() {
   const cms = useCMS();
@@ -41,7 +41,8 @@ export default function OfferCreation() {
     pricePerPerson,
   } = useOfferForm(cms as any);
 
-  const [accommodationExpanded, setAccommodationExpanded] = React.useState(true);
+  const [accommodationExpanded, setAccommodationExpanded] =
+    React.useState(true);
   const [landServicesExpanded, setLandServicesExpanded] = React.useState(true);
   const [expensesModalOpen, setExpensesModalOpen] = React.useState(false);
   const [showNewClientModal, setShowNewClientModal] = React.useState(false);
@@ -94,8 +95,12 @@ export default function OfferCreation() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Kreiraj novu ponudu</h1>
-          <p className="text-gray-600 mt-1">Kreiraj detaljnu turističku ponudu za klijenta</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Kreiraj novu ponudu
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Kreiraj detaljnu turističku ponudu za klijenta
+          </p>
         </div>
       </div>
 
@@ -119,7 +124,9 @@ export default function OfferCreation() {
         updateRoomType={updateRoomType}
         removeRoomType={removeRoomType}
         canAddRoomType={canAddRoomType}
-        setAccommodationEnabled={(enabled) => handleInputChange("accommodationEnabled", enabled)}
+        setAccommodationEnabled={(enabled) =>
+          handleInputChange("accommodationEnabled", enabled)
+        }
       />
 
       <LandServicesSection
@@ -127,7 +134,9 @@ export default function OfferCreation() {
         stats={landServicesStats}
         expanded={landServicesExpanded}
         onToggle={() => setLandServicesExpanded((v) => !v)}
-        setLandServicesEnabled={(enabled) => handleInputChange("landServicesEnabled", enabled)}
+        setLandServicesEnabled={(enabled) =>
+          handleInputChange("landServicesEnabled", enabled)
+        }
         updateDayService={updateDayService}
         addServiceToDay={addServiceToDay}
         updateService={updateService}
@@ -194,10 +203,10 @@ export default function OfferCreation() {
       <NewClientModal
         open={showNewClientModal}
         onClose={() => setShowNewClientModal(false)}
-        onCreated={(client) => setFormData((prev: any) => ({ ...prev, clientId: client.id }))}
+        onCreated={(client) =>
+          setFormData((prev: any) => ({ ...prev, clientId: client.id }))
+        }
       />
     </div>
   );
 }
-
-
