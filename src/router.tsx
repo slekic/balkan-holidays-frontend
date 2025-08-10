@@ -21,7 +21,7 @@ import FinanceArchive from "./pages/Finance/Archive";
 import Expenses from "./pages/Finance/Expenses";
 import Payments from "./pages/Finance/Payments";
 import Debts from "./pages/Finance/Debts";
-import UserManagement from "./pages/UserManagement";
+import UserManagement from "./pages/UserManagement/UserManagement";
 import OfferCreation from "./pages/OfferCreation/OfferCreation";
 
 const AppRoutes = () => {
