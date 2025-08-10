@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { PaymentOffer } from '../utils/types';
 import { ITEMS_PER_PAGE } from '../utils/constants';
 
@@ -22,7 +22,7 @@ export const usePaymentPagination = (filteredOffers: PaymentOffer[]) => {
   };
 
   // Reset to first page when filtered results change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [filteredOffers.length]);
 
@@ -36,3 +36,4 @@ export const usePaymentPagination = (filteredOffers: PaymentOffer[]) => {
     goToPreviousPage
   };
 };
+

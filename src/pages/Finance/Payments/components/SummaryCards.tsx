@@ -62,3 +62,4 @@ export default function SummaryCards({ offers }: SummaryCardsProps) {
     </div>
   );
 }
+

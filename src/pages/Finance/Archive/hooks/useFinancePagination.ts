@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FinanceOffer } from "../utils/types";
 import { ITEMS_PER_PAGE } from "../utils/constants";
 
@@ -34,7 +34,7 @@ export function useFinancePagination(filteredOffers: FinanceOffer[]) {
   };
 
   // Reset to first page when filtered results change
-  useMemo(() => {
+  useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(1);
     }

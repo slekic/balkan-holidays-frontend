@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { FinanceOffer } from "../utils/types";
 import { mockFinanceOffers } from "../utils/constants";
 
@@ -21,9 +21,9 @@ export function useFinanceOffers() {
     return totalValue - totalPaid;
   }, [totalValue, totalPaid]);
 
-  const updateFilteredOffers = (newFilteredOffers: FinanceOffer[]) => {
+  const updateFilteredOffers = useCallback((newFilteredOffers: FinanceOffer[]) => {
     setFilteredOffers(newFilteredOffers);
-  };
+  }, []);
 
   return {
     offers,

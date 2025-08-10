@@ -5,3 +5,4 @@ export { ExpensesTable } from "./ExpensesTable";
 export { EmptyState } from "./EmptyState";
 export { Pagination } from "./Pagination";
 export { default as Expenses } from "../Expenses";
+

@@ -117,3 +117,4 @@ export const ExpensesTable: React.FC<ExpensesTableProps> = ({
     </div>
   );
 };
+

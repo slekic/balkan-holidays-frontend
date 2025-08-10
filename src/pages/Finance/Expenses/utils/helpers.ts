@@ -78,3 +78,4 @@ export const paginateExpenses = (
     startIndex,
   };
 };
+

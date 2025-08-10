@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DebtOffer } from "../utils/types";
 import { ITEMS_PER_PAGE } from "../utils/constants";
 
@@ -30,7 +30,7 @@ export function useDebtPagination(filteredOffers: DebtOffer[]) {
   };
 
   // Reset to first page when filtered offers change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [filteredOffers.length]);
 
@@ -47,3 +47,4 @@ export function useDebtPagination(filteredOffers: DebtOffer[]) {
     goToLastPage,
   };
 }
+

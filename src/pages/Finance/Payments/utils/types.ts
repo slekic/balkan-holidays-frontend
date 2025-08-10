@@ -41,3 +41,4 @@ export interface PaginationState {
   totalPages: number;
   startIndex: number;
 }
+

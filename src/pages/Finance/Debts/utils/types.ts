@@ -41,3 +41,4 @@ export interface DebtSummary {
   totalReceivable: number;
   collectionRate: number;
 }
+

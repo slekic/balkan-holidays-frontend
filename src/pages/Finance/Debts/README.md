@@ -148,3 +148,4 @@ The module is used exactly the same way as before - simply import from `src/page
 - Create debt analytics dashboard
 - Add bulk actions for multiple debts
 - Implement debt aging reports
+

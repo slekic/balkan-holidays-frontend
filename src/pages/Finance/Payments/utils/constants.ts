@@ -36,3 +36,4 @@ export const getPaymentProgressColor = (percentage: number) => {
   if (percentage > 0) return 'bg-yellow-500';
   return 'bg-red-500';
 };
+

@@ -41,3 +41,4 @@ export interface ExpenseSummary {
   totalCount: number;
   averageAmount: number;
 }
+

@@ -42,3 +42,4 @@ export const useExpensePagination = (expenses: Expense[]) => {
     resetPagination,
   };
 };
+

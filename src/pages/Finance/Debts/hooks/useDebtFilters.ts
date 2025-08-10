@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DebtOffer, DebtFilters } from "../utils/types";
 import { filterOptions } from "../utils/constants";
 
@@ -67,7 +67,7 @@ export function useDebtFilters(
   };
 
   // Update filtered offers whenever filters change
-  useMemo(() => {
+  useEffect(() => {
     updateFilteredOffers(filteredOffers);
   }, [filteredOffers, updateFilteredOffers]);
 
@@ -83,3 +83,4 @@ export function useDebtFilters(
     toggleFilters,
   };
 }
+

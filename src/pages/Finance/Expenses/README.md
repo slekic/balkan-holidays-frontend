@@ -125,3 +125,4 @@ import Expenses from "./Expenses";
 4. **Testability**: Individual components and hooks can be tested in isolation
 5. **Scalability**: Easy to add new features or modify existing ones
 6. **Consistency**: Follows the same pattern as other modules in the app
+

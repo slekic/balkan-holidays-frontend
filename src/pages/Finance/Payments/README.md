@@ -141,3 +141,4 @@ import Payments from './Payments';
 - ✅ Responsive design
 - ✅ TypeScript support
 - ✅ Modular architecture
+

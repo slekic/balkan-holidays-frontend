@@ -5,3 +5,4 @@ export { default as PaymentsTable } from './PaymentsTable';
 export { default as AddPaymentModal } from './AddPaymentModal';
 export { default as PaymentHistoryModal } from './PaymentHistoryModal';
 export { default as Pagination } from './Pagination';
+

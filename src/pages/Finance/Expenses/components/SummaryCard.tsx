@@ -33,3 +33,4 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ summary }) => {
     </div>
   );
 };
+

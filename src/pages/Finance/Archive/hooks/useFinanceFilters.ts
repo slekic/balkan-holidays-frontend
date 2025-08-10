@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FinanceOffer, FinanceFilters } from "../utils/types";
 import { filterOptions } from "../utils/constants";
 
@@ -74,9 +74,9 @@ export function useFinanceFilters(offers: FinanceOffer[], updateFilteredOffers: 
     return filtered;
   }, [offers, searchTerm, filters]);
 
-  const updateFilteredOffersEffect = useMemo(() => {
+  // Use useEffect to update filtered offers when they change
+  useEffect(() => {
     updateFilteredOffers(filteredOffers);
-    return filteredOffers;
   }, [filteredOffers, updateFilteredOffers]);
 
   const handleFilterChange = (key: keyof FinanceFilters, value: string) => {
@@ -108,7 +108,7 @@ export function useFinanceFilters(offers: FinanceOffer[], updateFilteredOffers: 
     setSearchTerm,
     showFilters,
     filters,
-    filteredOffers: updateFilteredOffersEffect,
+    filteredOffers,
     filterOptions,
     handleFilterChange,
     clearFilters,

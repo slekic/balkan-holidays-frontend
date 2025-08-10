@@ -66,3 +66,4 @@ export const formatCurrency = (amount: number) => {
 export const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString();
 };
+

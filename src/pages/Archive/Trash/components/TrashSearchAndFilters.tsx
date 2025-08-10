@@ -129,3 +129,4 @@ export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
     </div>
   );
 };
+
