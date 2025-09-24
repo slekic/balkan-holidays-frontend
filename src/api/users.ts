@@ -1,13 +1,14 @@
+import { BACKEND_URL } from "../config";
 import { KorisnikResponse, KreirajKorisnikaRequest } from "./responses";
 
 export async function getAllUsers(only_active: boolean): Promise<KorisnikResponse[]> {
-  const res = await fetch(`http://localhost:8000/korisnici?only_active=${only_active}`);
+  const res = await fetch(`${BACKEND_URL}/korisnici?only_active=${only_active}`);
   if (!res.ok) throw new Error("Failed to fetch users");
   return res.json();
 }
 
 export async function createUser(user: KreirajKorisnikaRequest): Promise<KorisnikResponse> {
-  const res = await fetch("http://localhost:8000/korisnici/", {
+  const res = await fetch(`${BACKEND_URL}/korisnici/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,7 +28,7 @@ export async function updateUser(
   userId: number,
   user: KreirajKorisnikaRequest
 ): Promise<KorisnikResponse> {
-  const res = await fetch(`http://localhost:8000/korisnici/${userId}`, {
+  const res = await fetch(`${BACKEND_URL}/korisnici/${userId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +45,7 @@ export async function updateUser(
 }
 
 export async function deactivateUser(userId: number): Promise<KorisnikResponse> {
-  const res = await fetch(`http://localhost:8000/korisnici/${userId}/deactivate`, {
+  const res = await fetch(`${BACKEND_URL}/korisnici/${userId}/deactivate`, {
     method: "PUT",
   });
 
@@ -57,7 +58,7 @@ export async function deactivateUser(userId: number): Promise<KorisnikResponse> 
 }
 
 export async function deleteUserApi(userId: number): Promise<KorisnikResponse> {
-  const res = await fetch(`http://localhost:8000/korisnici/${userId}`, {
+  const res = await fetch(`${BACKEND_URL}/korisnici/${userId}`, {
     method: "DELETE",
   });
 

@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../config";
 import { LoginResponse } from "./responses";
 
 export async function loginRequest(email: string, password: string): Promise<LoginResponse> {
@@ -5,7 +6,7 @@ export async function loginRequest(email: string, password: string): Promise<Log
   formData.append('username', email);
   formData.append('password', password);
 
-  const res = await fetch('http://localhost:8000/login', {
+  const res = await fetch(`${BACKEND_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: formData.toString(),

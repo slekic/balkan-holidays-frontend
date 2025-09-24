@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ExpenseEntry, DayService, HotelEntry } from "../../../types/offer";
 import { RashodResponse } from "../../../api/responses";
 import { entityTypeMapper } from "../../../utils/cms_response_mappers";
+import { BACKEND_URL } from "../../../config";
 
 type CMSEntities = {
   hotels: { id: string; name: string }[];
@@ -48,7 +49,7 @@ export function useExpenses(
 
     if (offer && offer.offerId) {
       try {
-        const res = await fetch(`http://localhost:8000/finansije/rashodi/ponuda/${offer.offerId}`);
+        const res = await fetch(`${BACKEND_URL}/finansije/rashodi/ponuda/${offer.offerId}`);
         if (res.ok) existingRashodi = await res.json();
       } catch (err) {
         console.error("Failed to fetch existing rashodi", err);

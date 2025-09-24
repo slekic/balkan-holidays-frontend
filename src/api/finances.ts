@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../config";
 import { PaymentOffer } from "../pages/Finance/Payments/utils";
 import { FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
 
@@ -13,7 +14,7 @@ export async function getAllFinanceOffers(
   });
 
   const res = await fetch(
-    `http://localhost:8000/finansije/all?${queryParams.toString()}`
+    `${BACKEND_URL}/finansije/all?${queryParams.toString()}`
   );
 
   if (!res.ok) throw new Error("Failed to fetch finance offers");
@@ -34,7 +35,7 @@ export async function getAllFinanceOffersWithPayments(
   });
 
   const res = await fetch(
-    `http://localhost:8000/finansije/all/payments?${queryParams.toString()}`
+    `${BACKEND_URL}/finansije/all/payments?${queryParams.toString()}`
   );
 
   if (!res.ok) throw new Error("Failed to fetch finance offers with payments");
@@ -55,7 +56,7 @@ export async function getAllExpenses(
   });
 
   const res = await fetch(
-    `http://localhost:8000/finansije/all/rashodi?${queryParams.toString()}`
+    `${BACKEND_URL}/finansije/all/rashodi?${queryParams.toString()}`
   );
 
   if (!res.ok) throw new Error("Failed to fetch expenses");
@@ -75,7 +76,7 @@ export async function createPayment(
 
   console.log("Request body for createPayment:", JSON.stringify(body));
 
-  const res = await fetch(`http://localhost:8000/finansije/uplata`, {
+  const res = await fetch(`${BACKEND_URL}/finansije/uplata`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -111,7 +112,7 @@ export async function createRashodiBatch(
     });
   }
 
-  const res = await fetch("http://localhost:8000/finansije/rashodi/batch/", {
+  const res = await fetch(`${BACKEND_URL}/finansije/rashodi/batch/`, {
     method: "POST",
     body: formData, 
   });

@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../config";
 import { Slide } from "../pages/OfferCreation/utils/constants";
 import { OfferResponse, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
 
@@ -17,7 +18,7 @@ export async function getAllOffers(
     queryParams.append("max_days_since_update", max_days_since_update.toString());
   }
 
-  const res = await fetch(`http://localhost:8000/ponuda/all?${queryParams.toString()}`);
+  const res = await fetch(`${BACKEND_URL}/ponuda/all?${queryParams.toString()}`);
 
   if (!res.ok) throw new Error("Failed to fetch offers");
   return res.json();
@@ -27,7 +28,7 @@ export async function getOffer(
   id: string
 ): Promise<OfferResponse> {
 
-  const res = await fetch(`http://localhost:8000/ponuda/${Number(id)}`);
+  const res = await fetch(`${BACKEND_URL}/ponuda/${Number(id)}`);
 
   if (!res.ok) throw new Error("Failed to fetch offer");
   return res.json();
@@ -37,7 +38,7 @@ export async function getSlides(
   id: string
 ): Promise<SlajdResponse[]> {
 
-  const res = await fetch(`http://localhost:8000/ponuda/slides/${Number(id)}`);
+  const res = await fetch(`${BACKEND_URL}/ponuda/slides/${Number(id)}`);
 
   if (!res.ok) throw new Error("Failed to fetch offer slides");
   return res.json();
@@ -48,7 +49,7 @@ export async function saveSlides(
   slajdovi: SlajdGenerateRequest[]
 ): Promise<SlajdIdRedniMap> {
   const res = await fetch(
-    `http://localhost:8000/ponuda/save-slides/${Number(ponudaId)}`,
+    `${BACKEND_URL}/ponuda/save-slides/${Number(ponudaId)}`,
     {
       method: "POST",
       headers: {
@@ -82,7 +83,7 @@ export async function updateOfferStatusAPI({
     const mappedStatus = STATUS_MAP_REQ_RES[newStatus] || newStatus;
 
     console.log(JSON.stringify({ status: mappedStatus }))
-    const response = await fetch(`http://localhost:8000/ponuda/${offerId}/status`, {
+    const response = await fetch(`${BACKEND_URL}/ponuda/${offerId}/status`, {
       method: "PATCH", 
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +106,7 @@ export async function updateOfferStatusAPI({
 }
 
 export async function deleteOfferApi(id: string) {
-  const res = await fetch(`http://localhost:8000/ponuda/${Number(id)}`, {
+  const res = await fetch(`${BACKEND_URL}/ponuda/${Number(id)}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete offer");
@@ -113,7 +114,7 @@ export async function deleteOfferApi(id: string) {
 }
 
 export async function restoreOfferApi(id: string) {
-  const res = await fetch(`http://localhost:8000/ponuda/${Number(id)}/vrati`, {
+  const res = await fetch(`${BACKEND_URL}/ponuda/${Number(id)}/vrati`, {
     method: "PATCH",
   });
   if (!res.ok) throw new Error("Failed to restore offer");
@@ -121,7 +122,7 @@ export async function restoreOfferApi(id: string) {
 }
 
 export async function duplicateOfferApi(id: string) {
-  const res = await fetch(`http://localhost:8000/ponuda/${Number(id)}/dupliraj`, {
+  const res = await fetch(`${BACKEND_URL}/ponuda/${Number(id)}/dupliraj`, {
     method: "POST",
   });
   if (!res.ok) throw new Error("Failed to duplicate offer");

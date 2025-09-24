@@ -1,7 +1,9 @@
+import { BACKEND_URL } from "../config";
+
 export async function exportOffer(ponudaId: number) {
     console.log("PONUDA za export " + ponudaId)
   try {
-    const response = await fetch(`http://localhost:8000/export/offer?ponuda_id=${ponudaId}`, {
+    const response = await fetch(`${BACKEND_URL}/export/offer?ponuda_id=${ponudaId}`, {
       method: "POST",
     });
 
@@ -42,7 +44,7 @@ export async function exportOffer(ponudaId: number) {
 export async function exportOfferProforma(ponudaId: number) {
     console.log("PONUDA proforma za export " + ponudaId)
   try {
-    const response = await fetch(`http://localhost:8000/export/offer/proforma?ponuda_id=${ponudaId}`, {
+    const response = await fetch(`${BACKEND_URL}/export/offer/proforma?ponuda_id=${ponudaId}`, {
       method: "POST",
     });
 

@@ -16,6 +16,7 @@ import { getServiceTypeName } from "./utils/constants";
 import { useLocation, useNavigate } from "react-router-dom";
 import { mapOffer, mapOfferToForm } from "../../utils/offer_response_mappers";
 import { exportOffer } from "../../api/export";
+import { BACKEND_URL } from "../../config";
 
 export default function OfferCreation() {
   const cms = useCMS();
@@ -163,8 +164,8 @@ export default function OfferCreation() {
   try {
     const method = isEdit ? "PUT" : "POST";
     const url = isEdit && editOfferId
-    ? `http://localhost:8000/ponuda/${editOfferId}`
-    : "http://localhost:8000/ponuda";
+    ? `${BACKEND_URL}/ponuda/${editOfferId}`
+    : `${BACKEND_URL}/ponuda`;
 
 
     const res = await fetch(url, {

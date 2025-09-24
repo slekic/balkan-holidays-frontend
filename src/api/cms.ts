@@ -1,14 +1,15 @@
+import { BACKEND_URL } from "../config";
 import { dataURLtoFile } from "../utils/image_converter";
 import { HotelResponse, KlijentResponse, PaginatedHotels, PaginatedUsluge, PaginatedKlijent, UslugaResponse, SablonDanaResponse, PaginatedSablonDana } from "./responses";
 
 export async function getAllHotels(page: number = 1, pageSize: number = 100): Promise<PaginatedHotels> {
-  const res = await fetch(`http://localhost:8000/cms/hotel/all?page=${page}&page_size=${pageSize}`);
+  const res = await fetch(`${BACKEND_URL}/cms/hotel/all?page=${page}&page_size=${pageSize}`);
   if (!res.ok) throw new Error("Failed to fetch hotels");
   return res.json();
 }
 
 export async function createHotel(hotel: Omit<HotelResponse, 'id' | 'createdAt' | 'updatedAt'>): Promise<HotelResponse> {
-  const res = await fetch("http://localhost:8000/cms/hotel", {
+  const res = await fetch(`${BACKEND_URL}/cms/hotel`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(hotel)
@@ -25,7 +26,7 @@ export async function updateHotelApi(
   hotel: Partial<Omit<HotelResponse, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<HotelResponse> {
  
-  const res = await fetch(`http://localhost:8000/cms/hotel/${Number(id)}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/hotel/${Number(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(hotel)
@@ -51,7 +52,7 @@ export async function uploadImages(
   tipovi.forEach(tip => formData.append("tip_slike", tip));
   zaUklanjanje.forEach(path => formData.append("remove_paths", path));
 
-  const res = await fetch("http://localhost:8000/upload", {
+  const res = await fetch(`${BACKEND_URL}/upload`, {
     method: "POST",
     body: formData
   });
@@ -65,7 +66,7 @@ export async function uploadImages(
   if (data.slike?.length > 0) {
     data.slike = data.slike.map((slika: { putanja: string }) => ({
       ...slika,
-      putanja: `http://localhost:8000/${slika.putanja}`
+      putanja: `${BACKEND_URL}/${slika.putanja}`
     }));
   }
 
@@ -92,7 +93,7 @@ export async function uploadMultipleEntitiesImages(
     formData.append("tip_slike", tipovi[index]);
   });
 
-  const res = await fetch("http://localhost:8000/upload-multiple", {
+  const res = await fetch(`${BACKEND_URL}/upload-multiple`, {
     method: "POST",
     body: formData
   });
@@ -104,7 +105,7 @@ export async function uploadMultipleEntitiesImages(
   if (data.slike?.length > 0) {
     data.slike = data.slike.map((slika: { putanja: string }) => ({
       ...slika,
-      putanja: `http://localhost:8000/${slika.putanja}`
+      putanja: `${BACKEND_URL}/${slika.putanja}`
     }));
   }
 
@@ -112,7 +113,7 @@ export async function uploadMultipleEntitiesImages(
 }
 
 export async function deleteHotelApi(id: string) {
-  const res = await fetch(`http://localhost:8000/hotel/${Number(id)}`, {
+  const res = await fetch(`${BACKEND_URL}/hotel/${Number(id)}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete hotel");
@@ -124,7 +125,7 @@ export async function getAllUsluge(
   page: number = 1,
   pageSize: number = 100
 ): Promise<PaginatedUsluge> {
-  const url = `http://localhost:8000/cms/usluga/${tip}/all?page=${page}&page_size=${pageSize}`;
+  const url = `${BACKEND_URL}/cms/usluga/${tip}/all?page=${page}&page_size=${pageSize}`;
   
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch usluge");
@@ -136,7 +137,7 @@ export async function createUsluga(
   usluga: Omit<UslugaResponse, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<UslugaResponse> {
   console.log(JSON.stringify(usluga))
-  const res = await fetch(`http://localhost:8000/cms/usluga/${tip}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/usluga/${tip}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(usluga),
@@ -150,7 +151,7 @@ export async function updateUslugaApi(
   id: number,
   usluga: Partial<UslugaResponse>
 ): Promise<UslugaResponse> {
-  const res = await fetch(`http://localhost:8000/cms/usluga/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/usluga/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(usluga),
@@ -161,7 +162,7 @@ export async function updateUslugaApi(
 }
 
 export async function deleteUslugaApi(id: number) {
-  const res = await fetch(`http://localhost:8000/cms/usluga/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/usluga/${id}`, {
     method: "DELETE",
   });
 
@@ -170,13 +171,13 @@ export async function deleteUslugaApi(id: number) {
 }
 
 export async function fetchClients(): Promise<PaginatedKlijent> {
-  const res = await fetch(`http://localhost:8000/cms/klijent/all?page=1&page_size=100`);
+  const res = await fetch(`${BACKEND_URL}/cms/klijent/all?page=1&page_size=100`);
   if (!res.ok) throw new Error("Failed to fetch clients");
   return res.json(); 
 }
 
 export async function createClient(client: Omit<KlijentResponse, "id" | "createdAt" | "updatedAt">): Promise<KlijentResponse> {
-  const res = await fetch(`http://localhost:8000/cms/klijent`, {
+  const res = await fetch(`${BACKEND_URL}/cms/klijent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -189,7 +190,7 @@ export async function createClient(client: Omit<KlijentResponse, "id" | "created
 }
 
 export async function updateClientApi(id: number, client: Partial<KlijentResponse>): Promise<KlijentResponse> {
-  const res = await fetch(`http://localhost:8000/cms/klijent/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/klijent/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -202,18 +203,18 @@ export async function updateClientApi(id: number, client: Partial<KlijentRespons
 }
 
 export async function deleteClientApi(id: number): Promise<void> {
-  const res = await fetch(`http://localhost:8000/cms/klijent/${id}`, { method: "DELETE" });
+  const res = await fetch(`${BACKEND_URL}/cms/klijent/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Failed to delete client");
 }
 
 export async function getAllSabloni(page = 1, pageSize = 100): Promise<PaginatedSablonDana> {
-  const res = await fetch(`http://localhost:8000/cms/sablon/all?page=${page}&page_size=${pageSize}`);
+  const res = await fetch(`${BACKEND_URL}/cms/sablon/all?page=${page}&page_size=${pageSize}`);
   if (!res.ok) throw new Error("Failed to fetch sabloni");
   return res.json();
 }
 
 export async function createSablon(sablon: Omit<SablonDanaResponse, 'id' | 'slike'>): Promise<SablonDanaResponse> {
-  const res = await fetch(`http://localhost:8000/cms/sablon`, {
+  const res = await fetch(`${BACKEND_URL}/cms/sablon`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sablon),
@@ -223,7 +224,7 @@ export async function createSablon(sablon: Omit<SablonDanaResponse, 'id' | 'slik
 }
 
 export async function updateSablonApi(id: number, sablon: Partial<SablonDanaResponse>): Promise<SablonDanaResponse> {
-  const res = await fetch(`http://localhost:8000/cms/sablon/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/sablon/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sablon),
@@ -233,7 +234,7 @@ export async function updateSablonApi(id: number, sablon: Partial<SablonDanaResp
 }
 
 export async function deleteSablonApi(id: number) {
-  const res = await fetch(`http://localhost:8000/cms/sablon/${id}`, { method: "DELETE" });
+  const res = await fetch(`${BACKEND_URL}/cms/sablon/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Failed to delete sablon");
   return res.json();
 }

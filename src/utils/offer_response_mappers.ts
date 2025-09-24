@@ -1,4 +1,5 @@
 import { AccommodationResponse, DailyServiceResponse, OfferResponse, PonudaAllResponse, SlajdResponse, SlikeResponse } from "../api/responses";
+import { BACKEND_URL } from "../config";
 import { Accommodation, DailyService, Offer, OfferDetailed } from "../pages/Archive/AllOffers/types";
 import { FollowUpOffer } from "../pages/Archive/FollowUpOffers/types";
 import { DeletedOffer } from "../pages/Archive/Trash/types";
@@ -256,12 +257,12 @@ export function mapSlajdResponseToSlide(apiSlide: SlajdResponse): Slide {
   const images: string[] = [];
 
   sadrzaj.slike?.forEach((s: string) => {
-      images.push("http://localhost:8000/"+extractRelativePath(s));
+      images.push(`${BACKEND_URL}/`+extractRelativePath(s));
   });
 
   let logoObj = ""
   if (sadrzaj.logo) {
-    logoObj = "http://localhost:8000/"+extractRelativePath(sadrzaj.logo);
+    logoObj = `${BACKEND_URL}/`+extractRelativePath(sadrzaj.logo);
   }
 
   return {

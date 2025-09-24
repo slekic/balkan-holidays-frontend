@@ -1,4 +1,5 @@
 import { HotelResponse, KlijentResponse, SablonDanaResponse, UslugaResponse } from '../api/responses';
+import { BACKEND_URL } from '../config';
 import { Activity, Client, DayTemplate, Gift, Guide, Hotel, Restaurant, Translator, Transport, VATGroup } from '../types/cms';
 
 export const entityTypeMapper: Record<string, string> = {
@@ -33,7 +34,7 @@ export function mapHotelResponse(apiHotel: HotelResponse): Hotel {
     createdAt: new Date().toISOString(), 
     updatedAt: new Date().toISOString(), 
     logo: apiHotel.slike && apiHotel.slike.length > 0 
-      ? `http://localhost:8000/${apiHotel.slike[0].url}` 
+      ? `${BACKEND_URL}/${apiHotel.slike[0].url}` 
       : undefined
   };
 }
@@ -76,7 +77,7 @@ export function mapUslugaToRestaurant(apiRestaurant: UslugaResponse): Restaurant
     websiteLink: apiRestaurant.link_sajta || '',
     description: apiRestaurant.sadrzaj || '',
     vatGroup: mapVATGroup(apiRestaurant.pdv_grupa),
-    images: apiRestaurant.slike?.map((s: any) => `http://localhost:8000/${s.url}`) || [],
+    images: apiRestaurant.slike?.map((s: any) => `${BACKEND_URL}/${s.url}`) || [],
     createdAt: new Date().toISOString(), 
     updatedAt: new Date().toISOString(),
   };
@@ -167,7 +168,7 @@ export function mapUslugaToGift(apiGift: UslugaResponse): Gift {
     price: apiGift.cena || 0,
     whatsIncluded: apiGift.sadrzaj || '',
     image: apiGift.slike && apiGift.slike.length > 0 
-      ? `http://localhost:8000/${apiGift.slike[0].url}` 
+      ? `${BACKEND_URL}/${apiGift.slike[0].url}` 
       : undefined,
     vatGroup: mapVATGroup(apiGift.pdv_grupa),
     createdAt: new Date().toISOString(), 
@@ -195,11 +196,11 @@ export function mapUslugaToActivity(apiGift: UslugaResponse): Activity {
     defaultComment: apiGift.komentar || '',
     description: apiGift.opis || '',
     backgroundImage: apiGift.slike.find(s => s.tip === 'logo')
-      ? `http://localhost:8000/${apiGift.slike.find(s => s.tip === 'logo')!.url}`
+      ? `${BACKEND_URL}/${apiGift.slike.find(s => s.tip === 'logo')!.url}`
       : undefined,
     images: apiGift.slike
       ?.filter(s => s.tip === 'slika')
-      .map(s => `http://localhost:8000/${s.url}`) || [],
+      .map(s => `${BACKEND_URL}/${s.url}`) || [],
     vatGroup: mapVATGroup(apiGift.pdv_grupa),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -251,8 +252,8 @@ export function mapSablonDanaToDayTemplate(api: SablonDanaResponse): DayTemplate
     id: api.id.toString(),
     title: api.naslov,
     description: api.opis || '',
-    backgroundImage: api.slike.find(s => s.tip === 'logo') ? `http://localhost:8000/${api.slike.find(s => s.tip === 'logo')!.url}` : undefined,
-    galleryImages: api.slike.filter(s => s.tip === 'slika').map(s => `http://localhost:8000/${s.url}`) || [],
+    backgroundImage: api.slike.find(s => s.tip === 'logo') ? `${BACKEND_URL}/${api.slike.find(s => s.tip === 'logo')!.url}` : undefined,
+    galleryImages: api.slike.filter(s => s.tip === 'slika').map(s => `${BACKEND_URL}/${s.url}`) || [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
