@@ -1,86 +1,144 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Restaurant } from '../types/cms';
-import { BaseEntityContext, BaseProviderProps, generateId, getCurrentTimestamp } from './base';
+import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
+import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
+import { mapRestaurantToRequest, mapUslugaToRestaurant } from '../utils/cms_response_mappers';
+import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
+
 
 interface RestaurantContextType extends BaseEntityContext<Restaurant> {
   restaurants: Restaurant[];
-  addRestaurant: (restaurant: Omit<Restaurant, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateRestaurant: (id: string, restaurant: Partial<Restaurant>) => void;
-  deleteRestaurant: (id: string) => void;
+  addRestaurant: (restaurant: Omit<Restaurant, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateRestaurant: (id: string, restaurant: Partial<Restaurant>) => Promise<void>;
+  deleteRestaurant: (id: string) => Promise<void>;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
-// Mock data
-const mockRestaurants: Restaurant[] = [
-  {
-    id: '1',
-    name: 'Restoran Tri Šešira',
-    defaultComment: 'Traditional Serbian cuisine',
-    websiteLink: 'https://trisesira.rs',
-    description: 'Authentic Serbian restaurant in Skadarlija',
-    images: [
-      'https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
-      'https://images.pexels.com/photos/941861/pexels-photo-941861.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop'
-    ],
-    vatGroup: '20%',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    name: 'Manufaktura',
-    defaultComment: 'Modern Serbian gastronomy',
-    websiteLink: 'https://manufaktura.rs',
-    description: 'Contemporary restaurant with traditional Serbian dishes',
-    images: [
-      'https://images.pexels.com/photos/1581384/pexels-photo-1581384.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
-      'https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
-      'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop'
-    ],
-    vatGroup: '20%',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-14'
-  },
-  {
-    id: '3',
-    name: 'Lorenzo & Kakalamba',
-    defaultComment: 'Italian cuisine with Serbian twist',
-    websiteLink: 'https://lorenzo-kakalamba.com',
-    description: 'Unique fusion restaurant with eclectic decor',
-    images: [
-      'https://images.pexels.com/photos/1199957/pexels-photo-1199957.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
-      'https://images.pexels.com/photos/1126728/pexels-photo-1126728.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
-      'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
-      'https://images.pexels.com/photos/1484516/pexels-photo-1484516.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop'
-    ],
-    vatGroup: '20%',
-    createdAt: '2024-01-09',
-    updatedAt: '2024-01-11'
-  }
-];
-
 export function RestaurantProvider({ children }: BaseProviderProps) {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 
-  const addRestaurant = (restaurant: Omit<Restaurant, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newRestaurant: Restaurant = {
-      ...restaurant,
-      id: generateId(),
-      createdAt: getCurrentTimestamp(),
-      updatedAt: getCurrentTimestamp()
-    };
-    setRestaurants(prev => [...prev, newRestaurant]);
+  // Load all restaurants on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAllUsluge("restoran");
+        setRestaurants(data.items.map(mapUslugaToRestaurant));
+      } catch (err) {
+        console.error("Failed to load restaurants:", err);
+      }
+    })();
+  }, []);
+
+  const addRestaurant = async (restaurant: Omit<Restaurant, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const created = await createUsluga("restoran", mapRestaurantToRequest(restaurant));
+      const mapped = mapUslugaToRestaurant(created);
+
+      if (restaurant.images && restaurant.images.length > 0) {
+          const data: File[] = [];
+          const img_types: string[] = [];
+
+          for (let i = 0; i < restaurant.images.length; i++) {
+              const img = restaurant.images[i];
+              // Only convert Base64 images to files
+              data.push(dataURLtoFile(img, `restaurant-image-${mapped.id}-${i}`));
+              img_types.push("slika");  
+          }
+      
+            
+          const res = await uploadImages(
+              Number(mapped.id),
+              "usluga",
+              data,
+              img_types,
+              []
+          );
+
+          mapped.images = res.slike.map((s: { putanja: string }) => s.putanja) ?? mapped.images;
+      } 
+      setRestaurants(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
+    } catch (err) {
+      console.error("Failed to add restaurant:", err);
+    }
   };
 
-  const updateRestaurant = (id: string, updates: Partial<Restaurant>) => {
-    setRestaurants(prev => prev.map(restaurant => 
-      restaurant.id === id ? { ...restaurant, ...updates, updatedAt: getCurrentTimestamp() } : restaurant
-    ));
+  const updateRestaurant = async (id: string, updates: Partial<Restaurant>) => {
+    try {
+      console.log("Updates" + updates)
+      const updated = await updateUslugaApi(Number(id), {
+        naziv: updates.name,
+        komentar: updates.defaultComment,
+        link_sajta: updates.websiteLink,
+        sadrzaj: updates.description,
+        pdv_grupa: updates.vatGroup
+      });
+      const mappedRestaurant = mapUslugaToRestaurant(updated);
+
+      const restaurant = restaurants.find(r => r.id === id);
+      if (!restaurant) throw new Error("Restaurant not found");
+
+     // 2. Upload logo if provided
+      if (updates.images || restaurant.images.length > 0) {
+        console.log("Restoran " + restaurant.images)
+        console.log("Update img "  + updates.images)
+        const diff = (!updates.images || updates.images.length === 0)
+                    ? restaurant.images
+                    : restaurant.images.filter(existing => !updates.images?.includes(existing));
+        const keep = (!updates.images || updates.images.length === 0)
+                    ? []
+                    : restaurant.images.filter(existing => updates.images?.includes(existing));
+        const pathsToRemove = diff.map(img => extractRelativePath(img));
+
+        console.log("za brisanje ", pathsToRemove)
+        if (pathsToRemove.length == 0 && restaurant.images.length == updates.images?.length) {
+          mappedRestaurant.images = restaurant.images
+        } else {
+          const data: File[] = [];
+          const img_types: string[] = [];
+
+          const newImages = updates.images?.filter(img => !restaurant.images.includes(img)) || [];
+        // 3. Pripremi fajlove za upload samo za nove slike (Base64)
+          if (newImages.length > 0) {
+            for (let i = 0; i < newImages.length; i++) {
+              const img = newImages[i];
+
+              // Only convert Base64 (new) images to files
+              
+              data.push(dataURLtoFile(img, `restaurant-image-${id}-${i}`));
+              img_types.push("slika");
+              }
+                
+          }
+      
+          console.log("Uploading images:", data, img_types, pathsToRemove);
+
+            // 4. Upload novih slika
+          const res = await uploadImages(
+              Number(id),
+              "usluga",
+              data,
+              img_types,
+              pathsToRemove
+          );
+          mappedRestaurant.images = keep.concat(res?.slike?.map((s: { putanja: string }) => s.putanja) ?? []);
+        }
+      } 
+      setRestaurants(prev =>
+        prev.map(r => r.id === id ? { ...mappedRestaurant, updatedAt: getCurrentTimestamp() } : r)
+      );
+    } catch (err) {
+      console.error("Failed to update restaurant:", err);
+    }
   };
 
-  const deleteRestaurant = (id: string) => {
-    setRestaurants(prev => prev.filter(restaurant => restaurant.id !== id));
+  const deleteRestaurant = async (id: string) => {
+    try {
+      await deleteUslugaApi(Number(id));
+      setRestaurants(prev => prev.filter(r => r.id !== id));
+    } catch (err) {
+      console.error("Failed to delete restaurant:", err);
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "./Header";
 import SummaryCards from "./SummaryCards";
 import SearchFilterBar from "./SearchFilterBar";
@@ -6,10 +6,10 @@ import UsersTable from "./UsersTable";
 import AddUserModal from "./AddUserModal";
 import EditUserModal from "./EditUserModal";
 import { useUserState } from "./hooks/useUserState";
+import { User } from "../../types/user"; // TAČAN IMPORT
 
 export default function UserManagement() {
   const {
-    users,
     filteredUsers,
     searchTerm,
     setSearchTerm,
@@ -22,10 +22,10 @@ export default function UserManagement() {
     toggleStatus,
   } = useUserState();
 
-  const [showFilters, setShowFilters] = React.useState(false);
-  const [showAddModal, setShowAddModal] = React.useState(false);
-  const [showEditModal, setShowEditModal] = React.useState(false);
-  const [editingUser, setEditingUser] = React.useState<any>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null); // TIP-SIGURNO
 
   return (
     <div className="space-y-6">
@@ -40,17 +40,17 @@ export default function UserManagement() {
         setSearchTerm={setSearchTerm}
         showFilters={showFilters}
         setShowFilters={setShowFilters}
-        filters={filters as any}
-        setFilters={setFilters as any}
+        filters={filters}
+        setFilters={setFilters}
       />
       <UsersTable
         users={filteredUsers}
-        onEdit={(u) => {
-          setEditingUser(u);
+        onEdit={(user) => {
+          setEditingUser(user);
           setShowEditModal(true);
         }}
         onToggleStatus={toggleStatus}
-        onDelete={(id) => deleteUser(id)}
+        onDelete={deleteUser}
       />
       <AddUserModal
         open={showAddModal}
@@ -61,8 +61,8 @@ export default function UserManagement() {
         open={showEditModal}
         user={editingUser}
         onClose={() => setShowEditModal(false)}
-        onSave={(u) => {
-          updateUser(u);
+        onSave={(user) => {
+          updateUser(user);
           setShowEditModal(false);
         }}
       />

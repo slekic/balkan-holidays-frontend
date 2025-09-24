@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { DebtFilters } from "../utils/types";
-import { filterOptions } from "../utils/constants";
+import { useCMS } from "../../../../contexts/CMSContext";
+
+// Definiši ovde ili u constants.ts
+export const urgencyLevels = [
+  { label: "High", value: "High" },
+  { label: "Medium", value: "Medium" },
+  { label: "Low", value: "Low" },
+];
 
 interface SearchAndFiltersProps {
   searchTerm: string;
@@ -22,8 +29,17 @@ export default function SearchAndFilters({
   onFilterChange,
   onClearFilters,
 }: SearchAndFiltersProps) {
+  const { clients } = useCMS();
+  const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
+
+  const handleClientSelect = (name: string) => {
+    onFilterChange("client", name);
+    setClientDropdownVisible(false);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      {/* Search i toggle button */}
       <div className="flex items-center space-x-4 mb-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -35,6 +51,7 @@ export default function SearchAndFilters({
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+
         <button
           onClick={onToggleFilters}
           className={`flex items-center px-4 py-2 border rounded-lg transition-colors ${
@@ -46,6 +63,7 @@ export default function SearchAndFilters({
           <Filter className="w-4 h-4 mr-2" />
           Filteri
         </button>
+
         {showFilters && (
           <button
             onClick={onClearFilters}
@@ -61,24 +79,42 @@ export default function SearchAndFilters({
       {showFilters && (
         <div className="border-t border-gray-200 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
+            {/* Klijent autocomplete */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Klijent
               </label>
-              <select
-                value={filters.client}
-                onChange={(e) => onFilterChange("client", e.target.value)}
+              <input
+                type="text"
+                placeholder="Pretraži klijenta..."
+                value={filters.client || ""}
+                onChange={(e) => {
+                  onFilterChange("client", e.target.value);
+                  setClientDropdownVisible(true);
+                }}
+                onFocus={() => setClientDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Svi klijenti</option>
-                {filterOptions.clients.map((client) => (
-                  <option key={client} value={client}>
-                    {client}
-                  </option>
-                ))}
-              </select>
+              />
+              {clientDropdownVisible && filters.client && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {clients
+                    .filter((c) =>
+                      c.name.toLowerCase().includes(filters.client!.toLowerCase())
+                    )
+                    .map((c) => (
+                      <li
+                        key={c.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => handleClientSelect(c.name)}
+                      >
+                        {c.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
 
+            {/* Nivo hitnosti */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nivo hitnosti
@@ -89,14 +125,15 @@ export default function SearchAndFilters({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi nivoi</option>
-                {filterOptions.urgencyLevels.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
+                {urgencyLevels.map((level) => (
+                  <option key={level.value} value={level.value}>
+                    {level.label}
                   </option>
                 ))}
               </select>
             </div>
 
+            {/* Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -107,14 +144,13 @@ export default function SearchAndFilters({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi statusi</option>
-                {filterOptions.statuses.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
+                <option value="Pending">Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Overdue">Overdue</option>
               </select>
             </div>
 
+            {/* Raspon neplaćenog iznosa */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Raspon neplaćenog iznosa
@@ -142,4 +178,3 @@ export default function SearchAndFilters({
     </div>
   );
 }
-

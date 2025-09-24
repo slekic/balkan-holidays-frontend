@@ -37,6 +37,19 @@ type Props = {
   setAccommodationEnabled: (value: boolean) => void;
 };
 
+const calculateRoomTotal = (
+  pricePerNight: number,
+  numberOfPersons: number,
+  checkIn?: string,
+  checkOut?: string
+) => {
+  if (!checkIn || !checkOut) return 0;
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const nights = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+  return pricePerNight * numberOfPersons * nights;
+};
+
 export default function AccommodationSection(props: Props) {
   const {
     formData,
@@ -302,6 +315,7 @@ export default function AccommodationSection(props: Props) {
                                     onChange={(e) =>
                                       updateRoomType(hotel.id, roomType.id, {
                                         roomTypeId: e.target.value,
+                                        roomTypeName: selectedRoomType?.name,
                                       })
                                     }
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"

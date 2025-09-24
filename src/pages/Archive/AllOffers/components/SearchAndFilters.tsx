@@ -1,6 +1,8 @@
-import React from "react";
-import { Search, Filter } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Search, Filter, X } from "lucide-react";
 import { OfferFilters } from "../types";
+import { useClients } from "../../../../contexts";
+import { useUsers } from "../../../UserManagement/UserContext";
 
 interface SearchAndFiltersProps {
   searchTerm: string;
@@ -19,8 +21,41 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   filters,
   onFilterChange,
 }) => {
+  const [localSearch, setLocalSearch] = useState(searchTerm);
+  const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
+  const [userDropdownVisible, setUserDropdownVisible] = useState(false);
+
+  const { clients } = useClients();
+  const { users } = useUsers();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onSearchChange(localSearch);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [localSearch, onSearchChange]);
+
   const handleFilterChange = (key: keyof OfferFilters, value: string) => {
     onFilterChange({ ...filters, [key]: value });
+  };
+
+  const handleResetFilters = () => {
+    onFilterChange({
+      client: "",
+      entity: "",
+      createdBy: "",
+      status: "",
+      personsMin: "",
+      personsMax: "",
+      priceMin: "",
+      priceMax: "",
+      dateFrom: "",
+      dateTo: "",
+    });
+    setLocalSearch("");
+    onSearchChange("");
+    setClientDropdownVisible(false);
+    setUserDropdownVisible(false);
   };
 
   return (
@@ -31,8 +66,8 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           <input
             type="text"
             placeholder="Pretraži po nazivu ponude ili šifri..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -47,32 +82,58 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           <Filter className="w-4 h-4 mr-2" />
           Filteri
         </button>
+        <button
+          onClick={handleResetFilters}
+          className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+        >
+          <X className="w-4 h-4 mr-2" />
+          Resetuj
+        </button>
       </div>
 
-      {/* Advanced Filters */}
       {showFilters && (
         <div className="border-t border-gray-200 pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto">
+
+            {/* Klijent */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Klijent
               </label>
-              <select
+              <input
+                type="text"
+                placeholder="Pretraži klijenta..."
                 value={filters.client}
-                onChange={(e) => handleFilterChange("client", e.target.value)}
+                onChange={(e) => {
+                  handleFilterChange("client", e.target.value);
+                  setClientDropdownVisible(true);
+                }}
+                onFocus={() => setClientDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Svi klijenti</option>
-                <option value="ABC Travel Agency">ABC Travel Agency</option>
-                <option value="European Tours Ltd.">
-                  European Tours Ltd.
-                </option>
-                <option value="Global Adventures Inc.">
-                  Global Adventures Inc.
-                </option>
-              </select>
+              />
+              {clientDropdownVisible && filters.client && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {clients
+                    .filter((c) =>
+                      c.name.toLowerCase().includes(filters.client.toLowerCase())
+                    )
+                    .map((c) => (
+                      <li
+                        key={c.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => {
+                          handleFilterChange("client", c.name);
+                          setClientDropdownVisible(false);
+                        }}
+                      >
+                        {c.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
 
+            {/* Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -90,21 +151,45 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
               </select>
             </div>
 
-            <div>
+            {/* Kreirao */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Kreirao
               </label>
-              <select
+              <input
+                type="text"
+                placeholder="Pretraži korisnika..."
                 value={filters.createdBy}
-                onChange={(e) => handleFilterChange("createdBy", e.target.value)}
+                onChange={(e) => {
+                  handleFilterChange("createdBy", e.target.value);
+                  setUserDropdownVisible(true);
+                }}
+                onFocus={() => setUserDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Svi korisnici</option>
-                <option value="Admin User">Admin</option>
-                <option value="Operations Manager">Operations Manager</option>
-              </select>
+              />
+              {userDropdownVisible && filters.createdBy && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {users
+                    .filter((u) =>
+                      u.name.toLowerCase().includes(filters.createdBy.toLowerCase())
+                    )
+                    .map((u) => (
+                      <li
+                        key={u.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => {
+                          handleFilterChange("createdBy", u.name);
+                          setUserDropdownVisible(false);
+                        }}
+                      >
+                        {u.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
 
+            {/* Entitet */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Entitet u ponudi
@@ -118,6 +203,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
               />
             </div>
 
+            {/* Opseg osoba */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Opseg osoba
@@ -140,6 +226,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
               </div>
             </div>
 
+            {/* Opseg cene */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Opseg cene (€)
@@ -162,6 +249,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
               </div>
             </div>
 
+            {/* Datum putovanja */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Datum putovanja
@@ -181,6 +269,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 />
               </div>
             </div>
+
           </div>
         </div>
       )}

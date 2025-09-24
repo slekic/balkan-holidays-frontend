@@ -1,68 +1,38 @@
-import { useMemo, useState } from "react";
-import { User, UserRole, UserStatus } from "../types";
-import { generateId } from "../utils";
-
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "Admin User",
-    email: "admin@balkanhol.com",
-    role: "Admin",
-    status: "Active",
-    createdAt: "2024-01-01",
-    lastLogin: "2024-02-28",
-  },
-  {
-    id: "2",
-    name: "Operations Manager",
-    email: "ops@balkanhol.com",
-    role: "Operation",
-    status: "Active",
-    createdAt: "2024-01-05",
-    lastLogin: "2024-02-27",
-  },
-  {
-    id: "3",
-    name: "Finance Manager",
-    email: "finance@balkanhol.com",
-    role: "Finance",
-    status: "Active",
-    createdAt: "2024-01-10",
-    lastLogin: "2024-02-26",
-  },
-  {
-    id: "4",
-    name: "John Operations",
-    email: "john.ops@balkanhol.com",
-    role: "Operation",
-    status: "Active",
-    createdAt: "2024-01-15",
-    lastLogin: "2024-02-25",
-  },
-  {
-    id: "5",
-    name: "Sarah Finance",
-    email: "sarah.finance@balkanhol.com",
-    role: "Finance",
-    status: "Inactive",
-    createdAt: "2024-01-20",
-    lastLogin: "2024-02-20",
-  },
-];
+import { useMemo, useState, useEffect } from "react";
+import { User, UserRole, UserStatus } from "../../../types/user";
+import { createUser, getAllUsers, deactivateUser, updateUser as updateUserApi, deleteUserApi } from "../../../api/users";
 
 export function useUserState() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState<{
-    role: "" | UserRole;
-    status: "" | UserStatus;
-  }>({ role: "", status: "" });
+  const [filters, setFilters] = useState<{ role: "" | UserRole; status: "" | UserStatus }>({ role: "", status: "" });
+
+  // Fetch users on mount
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const data = await getAllUsers(false);
+        const mappedUsers: User[] = data.map((u: any) => ({
+          id: u.id.toString(),
+          name: u.korisnicko_ime,
+          email: u.email,
+          role: u.uloga as UserRole,
+          status: u.aktivan ? "Active" : "Inactive",
+          createdAt: u.kreirano || new Date().toISOString().split("T")[0],
+          lastLogin: "",
+        }));
+        setUsers(mappedUsers);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      }
+    }
+
+    fetchUsers();
+  }, []);
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
-      const matchesSearch = `${u.name} ${u.email}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      const matchesSearch = `${u.name} ${u.email}`.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRole = !filters.role || u.role === filters.role;
       const matchesStatus = !filters.status || u.status === filters.status;
       return matchesSearch && matchesRole && matchesStatus;
@@ -80,39 +50,86 @@ export function useUserState() {
     };
   }, [users]);
 
-  const addUser = (
-    name: string,
-    email: string,
-    password: string,
-    role: UserRole
-  ) => {
-    const user: User = {
-      id: generateId(),
-      name,
-      email,
-      role,
-      status: "Active",
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    setUsers((prev) => [...prev, user]);
+  const addUser = async (name: string, email: string, password: string, role: UserRole) => {
+    try {
+      const createdUser = await createUser({
+        korisnicko_ime: name,
+        email,
+        lozinka: password,
+        uloga: role,
+      });
+
+      const newUser: User = {
+        id: createdUser.id.toString(),
+        name: createdUser.korisnicko_ime,
+        email: createdUser.email,
+        role: createdUser.uloga as UserRole,
+        status: createdUser.aktivan ? "Active" : "Inactive",
+        createdAt: createdUser.kreirano || new Date().toISOString().split("T")[0],
+        lastLogin: "",
+      };
+
+      setUsers((prev) => [...prev, newUser]);
+    } catch (error) {
+      console.error("Failed to create user:", error);
+    }
   };
 
-  const updateUser = (user: User) => {
-    setUsers((prev) => prev.map((u) => (u.id === user.id ? user : u)));
+  const updateUser = async (updatedData: User) => {
+    try {
+      const updatedUserFromBackend = await updateUserApi(Number(updatedData.id), {
+        korisnicko_ime: updatedData.name!,
+        email: updatedData.email!,
+        lozinka: "", // optional, only if changing password
+        uloga: updatedData.role!,
+      });
+
+      const updatedUser: User = {
+        id: updatedUserFromBackend.id.toString(),
+        name: updatedUserFromBackend.korisnicko_ime,
+        email: updatedUserFromBackend.email,
+        role: updatedUserFromBackend.uloga as UserRole,
+        status: updatedUserFromBackend.aktivan ? "Active" : "Inactive",
+        createdAt: updatedUserFromBackend.kreirano || new Date().toISOString().split("T")[0],
+        lastLogin: "",
+      };
+
+      setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+    } catch (err) {
+      console.error("Failed to update user:", err);
+    }
   };
 
-  const deleteUser = (id: string) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+  const deleteUser = async (id: string) => {
+    try {
+      await deleteUserApi(Number(id));
+
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+    }
   };
 
-  const toggleStatus = (id: string) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === id
-          ? { ...u, status: u.status === "Active" ? "Inactive" : "Active" }
-          : u
-      )
-    );
+  const toggleStatus = async (id: string) => {
+    try {
+      const updatedUserFromBackend = await deactivateUser(Number(id));
+
+      const updatedUser: User = {
+        id: updatedUserFromBackend.id.toString(),
+        name: updatedUserFromBackend.korisnicko_ime,
+        email: updatedUserFromBackend.email,
+        role: updatedUserFromBackend.uloga as UserRole,
+        status: updatedUserFromBackend.aktivan ? "Active" : "Inactive",
+        createdAt: updatedUserFromBackend.kreirano || new Date().toISOString().split("T")[0],
+        lastLogin: "",
+      };
+
+      setUsers((prev) =>
+        prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+      );
+    } catch (err) {
+      console.error("Failed to toggle user status:", err);
+    }
   };
 
   return {

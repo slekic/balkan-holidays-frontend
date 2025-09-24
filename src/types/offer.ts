@@ -59,6 +59,7 @@ export interface HotelEntry {
 export interface RoomTypeEntry {
   id: string;
   roomTypeId: string;
+  roomTypeName: string
   numberOfPersons: number;
   pricePerNightPerPerson: number;
   comment: string;
@@ -86,4 +87,9 @@ export interface OfferExpenses {
   totalExpenses: number;
   createdAt: string;
   updatedAt: string;
+}
+
+interface SlideFile {
+  file: File;
+  slideIndex: number;
 }

@@ -49,8 +49,8 @@ export default function FinanceOfferCard({ offer, onAction }: FinanceOfferCardPr
               offer.paymentStatus
             )}`}
           >
-            {offer.paymentStatus === "Not Paid" ? "Nije Plaćeno" :
-             offer.paymentStatus === "Partially Paid" ? "Delimično Plaćeno" : "Uplaćeno"}
+            {offer.paymentStatus === "Not Paid" ? "Neplaćeno" :
+             offer.paymentStatus === "Partially Paid" ? "Delimično Plaćeno" : "Plaćeno"}
           </span>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function FinanceOfferCard({ offer, onAction }: FinanceOfferCardPr
           <div className="flex items-center text-gray-600">
             <Euro className="w-4 h-4 mr-2" />
             <span className="font-semibold text-lg text-gray-900">
-              {formatCurrency(offer.totalPrice)}
+              {offer.totalPrice.toLocaleString()}
             </span>
           </div>
           <div className="text-right">

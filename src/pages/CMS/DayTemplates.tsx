@@ -164,11 +164,10 @@ export default function DayTemplates() {
             label="Slike"
             multiple
             values={formData.galleryImages || []}
-            onMultipleChange={(images) =>
-              setFormData({ ...formData, galleryImages: images })
-            }
-            maxImages={3}
-          />
+            onMultipleChange={(images) => setFormData({ ...formData, galleryImages: images })}
+            maxImages={3} onChange={function (value: string): void {
+              throw new Error("Function not implemented.");
+            } }          />
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button

@@ -11,6 +11,7 @@ import SearchAndFilters from "./components/SearchAndFilters";
 import OffersGrid from "./components/OffersGrid";
 import EmptyState from "./components/EmptyState";
 import Pagination from "./components/Pagination";
+import { UserProvider } from "../../UserManagement/UserContext";
 
 export default function FinanceArchive() {
   const { offers, filteredOffers, totalFilteredOffers, updateFilteredOffers } =
@@ -44,6 +45,7 @@ export default function FinanceArchive() {
       <Header onExportToExcel={handleExportToExcel} />
 
       {/* Search and Filter Bar */}
+      <UserProvider>
       <SearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -53,6 +55,7 @@ export default function FinanceArchive() {
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
       />
+      </UserProvider>
 
       {/* Offers Grid */}
       <OffersGrid offers={currentOffers} onAction={handleAction} />

@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DeletedOffer, TrashFilters } from "../types";
-import { mockDeletedOffers } from "../data/mockData";
+import { fetchOffers } from "../data/mockData";
+import { restoreOfferApi } from "../../../../api/offer";
 
 export const useTrash = () => {
-  const [offers] = useState<DeletedOffer[]>(mockDeletedOffers);
+  const [offers, setOffers] = useState<DeletedOffer[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +18,20 @@ export const useTrash = () => {
   });
 
   const itemsPerPage = 6;
+
+  // Fetch deleted offers on mount
+  useEffect(() => {
+    const loadDeletedOffers = async () => {
+      try {
+        const data = await fetchOffers(); 
+        setOffers(data);
+      } catch (error) {
+        console.error("Failed to fetch deleted offers:", error);
+      }
+    };
+
+    loadDeletedOffers();
+  }, []);
 
   // Filter offers based on search term and filters
   const filteredOffers = useMemo(() => {
@@ -32,7 +47,13 @@ export const useTrash = () => {
       const matchesCreatedBy = filters.createdBy === "" || offer.createdBy === filters.createdBy;
       const matchesDeletedBy = filters.deletedBy === "" || offer.deletedBy === filters.deletedBy;
 
-      return matchesSearch && matchesClient && matchesStatus && matchesCreatedBy && matchesDeletedBy;
+      return (
+        matchesSearch &&
+        matchesClient &&
+        matchesStatus &&
+        matchesCreatedBy &&
+        matchesDeletedBy
+      );
     });
   }, [offers, searchTerm, filters]);
 
@@ -58,15 +79,25 @@ export const useTrash = () => {
     setShowFilters(!showFilters);
   };
 
-  const handleRestore = (offerId: string) => {
+  const handleRestore = async (offerId: string) => {
     if (
       confirm(
         "Are you sure you want to restore this offer? It will be moved back to All Offers."
       )
     ) {
-      console.log(`Restoring offer ${offerId}`);
+      try {
+        await restoreOfferApi(offerId);
+
+        setOffers((prev) => prev?.filter((offer) => offer.id !== offerId));
+
+        alert("Ponuda je uspešno vraćena.");
+      } catch (error) {
+        console.error("Failed to restore offer:", error);
+        alert("Vraćanje ponude nije uspelo.");
+      }
     }
   };
+
 
   const handlePermanentDelete = (offerId: string) => {
     if (
@@ -101,4 +132,3 @@ export const useTrash = () => {
     handleToggleFilters,
   };
 };
-

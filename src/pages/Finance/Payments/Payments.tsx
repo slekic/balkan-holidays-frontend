@@ -15,6 +15,7 @@ import {
   Pagination,
 } from './components';
 import { ITEMS_PER_PAGE } from './utils/constants';
+import { UserProvider } from '../../UserManagement/UserContext';
 
 export default function Payments() {
   const { offers, addPayment } = usePayments();
@@ -74,6 +75,7 @@ export default function Payments() {
       <SummaryCards offers={filteredOffers} />
 
       {/* Search and Filter Bar */}
+      <UserProvider>
       <SearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -83,6 +85,7 @@ export default function Payments() {
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
       />
+      </UserProvider>
 
       {/* Payments Table */}
       <PaymentsTable

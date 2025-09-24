@@ -2,9 +2,13 @@ import React from "react";
 import { ExpenseEntry } from "../../types/offer";
 import { Euro, Upload, X, Trash2 } from "lucide-react";
 import { getEntityTypeColor } from "./utils/constants";
+import { RashodCreate } from "../../api/responses";
+import { createRashodiBatch } from "../../api/finances";
+import { toast } from "react-toastify";
 
 type Props = {
   open: boolean;
+  offerId: string | null;
   onClose: () => void;
   detectedEntities: ExpenseEntry[];
   updateDetectedEntity: (id: string, updates: Partial<ExpenseEntry>) => void;
@@ -16,6 +20,7 @@ type Props = {
 
 export default function ExpensesModal({
   open,
+  offerId,
   onClose,
   detectedEntities,
   updateDetectedEntity,
@@ -25,6 +30,46 @@ export default function ExpensesModal({
   onRemoveExpense,
 }: Props) {
   if (!open) return null;
+
+  const handleSaveRashodi = async () => {
+    try {
+      const files: File[] = [];
+      const rashodiToSave: RashodCreate[] = [];
+
+      let fajl_index = -1;
+      const pushRashod = (e: ExpenseEntry, ponuda_id: number) => {
+        let i = 0;
+        if (e.uploadedFile) {
+          files.push(e.uploadedFile);
+          fajl_index = i;
+          i++;
+        }else {
+          fajl_index = -1;
+        }
+        rashodiToSave.push({
+          ponuda_id,
+          entitet_id: Number(e.entityId),
+          entitet_tip: e.entityType,
+          cena_troska: e.costAmount || 0,
+          komentar: e.comment || "",
+          fajl_index,
+          naziv: e.entityName,
+        });
+      };
+
+      detectedEntities.forEach((e) => pushRashod(e, Number(offerId)));
+      expenses.forEach((e) => pushRashod(e, Number(offerId)));
+
+      const saved = await createRashodiBatch(rashodiToSave, files);
+
+      toast.success("Rashodi su uspešno sačuvani");
+    
+      onClose();
+    } catch (err) {
+      console.error("Failed to save rashodi:", err);
+    }
+  };
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -306,7 +351,7 @@ export default function ExpensesModal({
                 Otkaži
               </button>
               <button
-                onClick={onClose}
+                onClick={handleSaveRashodi}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Sačuvaj rashode

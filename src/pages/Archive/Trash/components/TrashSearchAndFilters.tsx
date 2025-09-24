@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Search, Filter } from "lucide-react";
-import { TrashFilters } from "../types";
+import type { TrashFilters } from "../types";
+import { useClients } from "../../../../contexts";
+import { useUsers } from "../../../UserManagement/UserContext";
 
 interface TrashSearchAndFiltersProps {
   searchTerm: string;
@@ -19,6 +21,28 @@ export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
   filters,
   onFilterChange,
 }) => {
+  const { clients } = useClients();
+  const { users } = useUsers();
+
+  const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
+  const [creatorDropdownVisible, setCreatorDropdownVisible] = useState(false);
+  const [deleterDropdownVisible, setDeleterDropdownVisible] = useState(false);
+
+  const handleClientSelect = (name: string) => {
+    onFilterChange({ client: name });
+    setClientDropdownVisible(false);
+  };
+
+  const handleCreatorSelect = (name: string) => {
+    onFilterChange({ createdBy: name });
+    setCreatorDropdownVisible(false);
+  };
+
+  const handleDeleterSelect = (name: string) => {
+    onFilterChange({ deletedBy: name });
+    setDeleterDropdownVisible(false);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="flex items-center space-x-4 mb-4">
@@ -45,41 +69,53 @@ export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
         </button>
       </div>
 
-      {/* Advanced Filters */}
       {showFilters && (
         <div className="border-t border-gray-200 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
+
+            {/* Klijent */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Klijent
               </label>
-              <select
-                value={filters.client}
-                onChange={(e) =>
-                  onFilterChange({ client: e.target.value })
-                }
+              <input
+                type="text"
+                placeholder="Pretraži klijenta..."
+                value={filters.client || ""}
+                onChange={(e) => {
+                  onFilterChange({ client: e.target.value });
+                  setClientDropdownVisible(true);
+                }}
+                onFocus={() => setClientDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Svi klijenti</option>
-                <option value="Tech Solutions Inc.">
-                  Tech Solutions Inc.
-                </option>
-                <option value="Family Vacations Ltd.">
-                  Family Vacations Ltd.
-                </option>
-                <option value="Music Lovers Group">Music Lovers Group</option>
-              </select>
+              />
+              {clientDropdownVisible && filters.client && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {clients
+                    .filter((c) =>
+                      c.name.toLowerCase().includes(filters.client!.toLowerCase())
+                    )
+                    .map((c) => (
+                      <li
+                        key={c.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => handleClientSelect(c.name)}
+                      >
+                        {c.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
 
+            {/* Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
                 value={filters.status}
-                onChange={(e) =>
-                  onFilterChange({ status: e.target.value })
-                }
+                onChange={(e) => onFilterChange({ status: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi statusi</option>
@@ -90,43 +126,79 @@ export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
               </select>
             </div>
 
-            <div>
+            {/* Kreirao */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Kreirao
               </label>
-              <select
-                value={filters.createdBy}
-                onChange={(e) =>
-                  onFilterChange({ createdBy: e.target.value })
-                }
+              <input
+                type="text"
+                placeholder="Pretraži korisnika..."
+                value={filters.createdBy || ""}
+                onChange={(e) => {
+                  onFilterChange({ createdBy: e.target.value });
+                  setCreatorDropdownVisible(true);
+                }}
+                onFocus={() => setCreatorDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Svi korisnici</option>
-                <option value="Admin User">Admin User</option>
-                <option value="Operations Manager">Operations Manager</option>
-              </select>
+              />
+              {creatorDropdownVisible && filters.createdBy && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {users
+                    .filter((u) =>
+                      u.name.toLowerCase().includes(filters.createdBy!.toLowerCase())
+                    )
+                    .map((u) => (
+                      <li
+                        key={u.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => handleCreatorSelect(u.name)}
+                      >
+                        {u.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
 
-            <div>
+            {/* Obrisao */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Obrisao
               </label>
-              <select
-                value={filters.deletedBy}
-                onChange={(e) =>
-                  onFilterChange({ deletedBy: e.target.value })
-                }
+              <input
+                type="text"
+                placeholder="Pretraži korisnika..."
+                value={filters.deletedBy || ""}
+                onChange={(e) => {
+                  onFilterChange({ deletedBy: e.target.value });
+                  setDeleterDropdownVisible(true);
+                }}
+                onFocus={() => setDeleterDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Svi korisnici</option>
-                <option value="Admin User">Admin User</option>
-                <option value="Operations Manager">Operations Manager</option>
-              </select>
+              />
+              {deleterDropdownVisible && filters.deletedBy && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {users
+                    .filter((u) =>
+                      u.name.toLowerCase().includes(filters.deletedBy!.toLowerCase())
+                    )
+                    .map((u) => (
+                      <li
+                        key={u.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => handleDeleterSelect(u.name)}
+                      >
+                        {u.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
+
           </div>
         </div>
       )}
     </div>
   );
 };
-

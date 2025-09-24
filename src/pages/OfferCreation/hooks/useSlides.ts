@@ -1,42 +1,59 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Slide, SlideType, slideTypeLabels } from "../utils/constants";
+import { getSlides, saveSlides } from "../../../api/offer";
+import { mapSlajdResponseToSlide } from "../../../utils/offer_response_mappers";
+import { uploadMultipleEntitiesImages } from "../../../api/cms";
 
-export function useSlides() {
-  const [slides, setSlides] = useState<Slide[]>([
-    {
-      id: "1",
-      type: "general",
-      title: "Welcome to Belgrade",
-      content: {
-        description:
-          "Discover the vibrant capital of Serbia with our expertly crafted tour experience.",
-        logo: "https://images.pexels.com/photos/3573382/pexels-photo-3573382.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop",
-      },
-    },
-    {
-      id: "2",
-      type: "what-to-expect",
-      title: "What to Expect from Us",
-      content: {},
-    },
-  ]);
+export interface SlideFile {
+  file: File;
+  fileIndex: number;
+  preview?: string; // za prikaz u UI
+}
 
+export function useSlides(offerId: string | null) {
+  const [slides, setSlides] = useState<Slide[]>([]);
   const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
   const [showAddSlideModal, setShowAddSlideModal] = useState(false);
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [newSlideType, setNewSlideType] = useState<SlideType>("general");
   const [draggedSlide, setDraggedSlide] = useState<string | null>(null);
 
+  const fetchSlides = useCallback(async () => {
+    if (!offerId) return;
+    try {
+      const slidesData = await getSlides(offerId);
+      const mappedSlides = slidesData.map(mapSlajdResponseToSlide);
+      console.log("ucitaniiiiiii " + JSON.stringify(mappedSlides))
+      setSlides(mappedSlides);
+    } catch (err) {
+      console.error("Failed to fetch slides:", err);
+    }
+  }, [offerId]);
+
+  useEffect(() => {
+    fetchSlides();
+  }, [fetchSlides]);
+
+  // Reorder slides i regeneri redni broj
   const handleSlideReorder = (dragIndex: number, hoverIndex: number) => {
     const dragged = slides[dragIndex];
     const next = [...slides];
     next.splice(dragIndex, 1);
     next.splice(hoverIndex, 0, dragged);
+
+    // regeneriši num/index
+    next.forEach((s, idx) => {
+      s.num = idx + 1;
+    });
+
     setSlides(next);
   };
 
   const handleDeleteSlide = (slideId: string) => {
-    if (typeof window === "undefined" || window.confirm("Are you sure you want to delete this slide?")) {
+    if (
+      typeof window === "undefined" ||
+      window.confirm("Are you sure you want to delete this slide?")
+    ) {
       setSlides((prev) => prev.filter((s) => s.id !== slideId));
     }
   };
@@ -47,10 +64,75 @@ export function useSlides() {
       type: newSlideType,
       title: `New ${slideTypeLabels[newSlideType]}`,
       content: {},
+      num: slides.length + 1,
     };
     setSlides((prev) => [...prev, newSlide]);
     setShowAddSlideModal(false);
     setEditingSlide(newSlide);
+  };
+
+  const saveSlidesHandler = async () => {
+    if (!offerId) return;
+
+    try {
+      const slajdoviPayload = slides.map((slide) => ({
+        naslov: slide.title,
+        tip: slide.type,
+        sadrzaj: { ...slide.content },
+        redni_broj: slide.num,
+      }));
+
+      console.log("SLIII  " + JSON.stringify(slajdoviPayload))
+
+      // 2️⃣ Pošalji slajdove i dobij mapu redni_broj -> id
+      const redniIdMap = await saveSlides(offerId, slajdoviPayload)
+
+      console.log("Redni -> ID mapa:", redniIdMap);
+
+      const entityIds: number[] = [];
+      const entityTypes: string[] = [];
+      const filesArr: string[] = [];
+      const tipoviArr: string[] = [];
+
+      slides.forEach((slide) => {
+        const slideId = redniIdMap[slide.num];
+        const content = slide.content || {};
+
+        if (content.backgroundImage) {
+          filesArr.push(content.backgroundImage);
+          tipoviArr.push("logo");
+          entityIds.push(slideId);
+          entityTypes.push("slajd");
+        }
+
+        content.images?.forEach((img: string) => {
+          if (img) {
+            filesArr.push(img);
+            tipoviArr.push("slika");
+            entityIds.push(slideId);
+            entityTypes.push("slajd");
+          }
+        });
+
+      });
+
+      console.log("JEBENO " + JSON.stringify(filesArr))
+
+      // 4️⃣ Pozovi batch upload funkciju
+      if (entityIds.length > 0) {
+        const uploadRes = await uploadMultipleEntitiesImages(
+          entityIds,
+          entityTypes,
+          filesArr,
+          tipoviArr
+        );
+        console.log("Upload slides images result:", uploadRes);
+      }
+
+      console.log("Slides saved and files uploaded successfully!");
+    } catch (err) {
+      console.error("Failed to save slides and upload files:", err);
+    }
   };
 
   return {
@@ -69,7 +151,6 @@ export function useSlides() {
     handleSlideReorder,
     handleDeleteSlide,
     addSlide,
+    saveSlidesHandler, // dugme "Sačuvaj" poziva ovo
   };
 }
-
-

@@ -1,3 +1,4 @@
+// src/components/Pagination.tsx
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -20,11 +21,14 @@ export const Pagination: React.FC<PaginationProps> = ({
 }) => {
   if (totalPages <= 1) return null;
 
+  const showingFrom = totalItems === 0 ? 0 : startIndex + 1;
+  const showingTo = Math.min(startIndex + itemsPerPage, totalItems);
+ 
+  console.log("OD DO " + showingFrom , showingTo)
   return (
     <div className="flex items-center justify-between">
       <p className="text-sm text-gray-700">
-        Showing {startIndex + 1} to{" "}
-        {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems} offers
+        Prikazano {showingFrom} do {showingTo} od {totalItems} ponuda
       </p>
       <div className="flex items-center space-x-2">
         <button
@@ -33,7 +37,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           className="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
-          Previous
+          Prethodna
         </button>
 
         <div className="flex space-x-1">
@@ -57,7 +61,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === totalPages}
           className="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Next
+          Sledeća
           <ChevronRight className="w-4 h-4 ml-1" />
         </button>
       </div>

@@ -81,7 +81,8 @@ export default function PaymentsTable({
                   </td>
                   <td className="py-3 px-4">
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(offer.paymentStatus)}`}>
-                      {offer.paymentStatus}
+                      {offer.paymentStatus === "Not Paid" ? "Neplaćeno" :
+                      offer.paymentStatus === "Partially Paid" ? "Delimično Plaćeno" : "Plaćeno"}
                     </span>
                   </td>
                   <td className="py-3 px-4">

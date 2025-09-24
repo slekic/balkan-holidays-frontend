@@ -1,4 +1,4 @@
-import { User, UserRole, UserStatus } from './types';
+import { UserRole, UserStatus } from "../../types/user";
 
 export const getRoleColor = (role: UserRole) => {
   switch (role) {

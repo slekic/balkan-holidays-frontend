@@ -1,11 +1,12 @@
 import React from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, UserPlus } from "lucide-react";
 import { PageHeader } from "./components/PageHeader";
 import { TrashSearchAndFilters } from "./components/TrashSearchAndFilters";
 import { DeletedOfferCard } from "./components/DeletedOfferCard";
 import Pagination from "../shared/Pagination";
 import { EmptyState } from "./components/EmptyState";
 import { useTrash } from "./hooks/useTrash";
+import { UserProvider } from "../../UserManagement/UserContext";
 
 export default function Trash() {
   const {
@@ -46,6 +47,7 @@ export default function Trash() {
         </div>
       </div>
 
+    <UserProvider>
       <TrashSearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
@@ -54,6 +56,7 @@ export default function Trash() {
         filters={filters}
         onFilterChange={handleFilterChange}
       />
+      </UserProvider>
 
       {/* Offers Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

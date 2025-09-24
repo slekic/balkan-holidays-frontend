@@ -16,7 +16,6 @@ export interface RoomType {
   id: string;
   name: string;
 }
-
 export interface Restaurant {
   id: string;
   name: string;
@@ -85,8 +84,8 @@ export interface Client {
   id: string;
   name: string;
   pib: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface DayTemplate {

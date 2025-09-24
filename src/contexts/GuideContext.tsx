@@ -1,65 +1,68 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Guide } from '../types/cms';
-import { BaseEntityContext, BaseProviderProps, generateId, getCurrentTimestamp } from './base';
+import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
+import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi } from '../api/cms';
+import { mapGuideToRequest, mapUslugaToGuide } from '../utils/cms_response_mappers';
 
 interface GuideContextType extends BaseEntityContext<Guide> {
   guides: Guide[];
-  addGuide: (guide: Omit<Guide, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateGuide: (id: string, guide: Partial<Guide>) => void;
-  deleteGuide: (id: string) => void;
+  addGuide: (guide: Omit<Guide, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateGuide: (id: string, guide: Partial<Guide & { images?: string[] }>) => Promise<void>;
+  deleteGuide: (id: string) => Promise<void>;
 }
 
 const GuideContext = createContext<GuideContextType | undefined>(undefined);
 
-// Mock data
-const mockGuides: Guide[] = [
-  {
-    id: '1',
-    name: 'Belgrade City Guide - Stefan Nikolić',
-    defaultComment: 'Expert local guide for Belgrade tours',
-    vatGroup: 'Article 35',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    name: 'Dinner Assistance Guide',
-    defaultComment: 'Restaurant coordination and cultural explanation',
-    vatGroup: 'Article 35',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12'
-  },
-  {
-    id: '3',
-    name: 'Museum Guide - Art History',
-    defaultComment: 'Specialized guide for museums and galleries',
-    vatGroup: 'Article 35',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-10'
-  }
-];
-
 export function GuideProvider({ children }: BaseProviderProps) {
-  const [guides, setGuides] = useState<Guide[]>(mockGuides);
+  const [guides, setGuides] = useState<Guide[]>([]);
 
-  const addGuide = (guide: Omit<Guide, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newGuide: Guide = {
-      ...guide,
-      id: generateId(),
-      createdAt: getCurrentTimestamp(),
-      updatedAt: getCurrentTimestamp()
-    };
-    setGuides(prev => [...prev, newGuide]);
+  // Load all guides on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAllUsluge("vodic");
+        setGuides(data.items.map(mapUslugaToGuide));
+      } catch (err) {
+        console.error("Failed to load guides:", err);
+      }
+    })();
+  }, []);
+
+  const addGuide = async (guide: Omit<Guide, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const created = await createUsluga("vodic", mapGuideToRequest(guide));
+      const mapped = mapUslugaToGuide(created);
+      setGuides(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
+    } catch (err) {
+      console.error("Failed to add guide:", err);
+    }
   };
 
-  const updateGuide = (id: string, updates: Partial<Guide>) => {
-    setGuides(prev => prev.map(guide => 
-      guide.id === id ? { ...guide, ...updates, updatedAt: getCurrentTimestamp() } : guide
-    ));
+  const updateGuide = async (id: string, updates: Partial<Guide & { images?: string[] }>) => {
+    try {
+      const updated = await updateUslugaApi(Number(id), {
+        naziv: updates.name,
+        komentar: updates.defaultComment,
+        pdv_grupa: updates.vatGroup,
+      });
+
+      const mappedGuide = mapUslugaToGuide(updated);
+    
+      setGuides(prev =>
+        prev.map(g => g.id === id ? { ...mappedGuide, updatedAt: getCurrentTimestamp() } : g)
+      );
+    } catch (err) {
+      console.error("Failed to update guide:", err);
+    }
   };
 
-  const deleteGuide = (id: string) => {
-    setGuides(prev => prev.filter(guide => guide.id !== id));
+  const deleteGuide = async (id: string) => {
+    try {
+      await deleteUslugaApi(Number(id));
+      setGuides(prev => prev.filter(g => g.id !== id));
+    } catch (err) {
+      console.error("Failed to delete guide:", err);
+    }
   };
 
   return (
@@ -80,8 +83,6 @@ export function GuideProvider({ children }: BaseProviderProps) {
 
 export function useGuides() {
   const context = useContext(GuideContext);
-  if (context === undefined) {
-    throw new Error('useGuides must be used within a GuideProvider');
-  }
+  if (!context) throw new Error('useGuides must be used within a GuideProvider');
   return context;
 }

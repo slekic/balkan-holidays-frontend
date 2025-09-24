@@ -5,6 +5,7 @@ import { FollowUpOfferCard } from "./components/FollowUpOfferCard";
 import { Pagination } from "../AllOffers/components/Pagination";
 import { EmptyState } from "../AllOffers/components/EmptyState";
 import { useFollowUpOffers } from "./hooks/useFollowUpOffers";
+import { UserProvider } from "../../UserManagement/UserContext";
 
 export default function FollowUpOffers() {
   const {
@@ -26,7 +27,7 @@ export default function FollowUpOffers() {
   return (
     <div className="space-y-6">
       <PageHeader onExport={handleExport} />
-      
+      <UserProvider>
       <SearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
@@ -35,6 +36,7 @@ export default function FollowUpOffers() {
         filters={filters}
         onFilterChange={handleFilterChange}
       />
+      </UserProvider>
 
       {/* Follow-up Offers Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

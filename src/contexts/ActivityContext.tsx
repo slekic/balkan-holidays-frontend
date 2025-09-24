@@ -1,85 +1,179 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { act, createContext, useContext, useEffect, useState } from 'react';
 import { Activity } from '../types/cms';
-import { BaseEntityContext, BaseProviderProps, generateId, getCurrentTimestamp } from './base';
+import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
+import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
+import { mapUslugaToActivity, mapActivityToRequest } from '../utils/cms_response_mappers';
+import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
 
 interface ActivityContextType extends BaseEntityContext<Activity> {
   activities: Activity[];
-  addActivity: (activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateActivity: (id: string, activity: Partial<Activity>) => void;
-  deleteActivity: (id: string) => void;
+  addActivity: (activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateActivity: (id: string, updates: Partial<Activity & { backgroundImage?: string; images?: string[] }>) => Promise<void>;
+  deleteActivity: (id: string) => Promise<void>;
 }
 
 const ActivityContext = createContext<ActivityContextType | undefined>(undefined);
 
-// Mock data
-const mockActivities: Activity[] = [
-  {
-    id: '1',
-    name: 'Saint Sava Temple - Entrance Tickets',
-    defaultComment: 'Guided tour of the largest Orthodox church',
-    description: 'Visit the magnificent Saint Sava Temple, one of the largest Orthodox churches in the world',
-    backgroundImage: 'https://images.pexels.com/photos/3573382/pexels-photo-3573382.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    images: [
-      'https://images.pexels.com/photos/3573383/pexels-photo-3573383.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-      'https://images.pexels.com/photos/3573384/pexels-photo-3573384.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-      'https://images.pexels.com/photos/3573385/pexels-photo-3573385.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    ],
-    vatGroup: '10%',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    name: 'Belgrade Fortress Tour',
-    defaultComment: 'Historical fortress with panoramic views',
-    description: 'Explore the ancient Belgrade Fortress and enjoy stunning views of the Danube and Sava rivers',
-    backgroundImage: 'https://images.pexels.com/photos/1659438/pexels-photo-1659438.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    images: [
-      'https://images.pexels.com/photos/1659439/pexels-photo-1659439.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-      'https://images.pexels.com/photos/1659440/pexels-photo-1659440.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    ],
-    vatGroup: '10%',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12'
-  },
-  {
-    id: '3',
-    name: 'Danube River Cruise',
-    defaultComment: 'Scenic boat tour along the Danube',
-    description: 'Relaxing cruise along the Danube River with traditional Serbian music and refreshments',
-    backgroundImage: 'https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    images: [
-      'https://images.pexels.com/photos/1001683/pexels-photo-1001683.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-      'https://images.pexels.com/photos/1001684/pexels-photo-1001684.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-      'https://images.pexels.com/photos/1001685/pexels-photo-1001685.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    ],
-    vatGroup: '20%',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-10'
-  }
-];
-
 export function ActivityProvider({ children }: BaseProviderProps) {
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
-  const addActivity = (activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newActivity: Activity = {
-      ...activity,
-      id: generateId(),
-      createdAt: getCurrentTimestamp(),
-      updatedAt: getCurrentTimestamp()
-    };
-    setActivities(prev => [...prev, newActivity]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAllUsluge("aktivnost");
+        console.log(data)
+        setActivities(data.items.map(mapUslugaToActivity));
+      } catch (err) {
+        console.error("Failed to load activities:", err);
+      }
+    })();
+  }, []);
+
+  const addActivity = async (activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const created = await createUsluga("aktivnost", mapActivityToRequest(activity));
+      const mapped = mapUslugaToActivity(created);
+      const data: File[] = [];
+      const img_types: string[] = [];
+
+      if (activity.backgroundImage && activity.backgroundImage != '') {
+              data.push(dataURLtoFile(activity.backgroundImage, "activity-logo"+mapped.id));
+              img_types.push("logo"); 
+      }
+      if (activity.images && activity.images.length > 0) {
+          for (let i = 0; i < activity.images.length; i++) {
+            const img = activity.images[i];
+            data.push(dataURLtoFile(img, `activity-image-${mapped.id}-${i}`));
+            img_types.push("slika");  
+          }
+      }
+
+      if (data.length > 0){
+          const res = await uploadImages(
+            Number(mapped.id),
+            "usluga",
+            data,
+            img_types,
+            []
+          );
+          
+          mapped.backgroundImage = res.slike
+              .filter((s: { tip: string }) => s.tip === "logo")
+              .map((s: { putanja: string }) => s.putanja)[0] ?? mapped.backgroundImage;
+
+          if (Array.isArray(res.slike)) {
+            mapped.images = res.slike
+              .filter((s: { tip: string }) => s.tip === "slika")
+              .map((s: { putanja: string }) => s.putanja) || mapped.images;
+          }
+          
+      }
+      setActivities(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
+    } catch (err) {
+      console.error("Failed to add activity:", err);
+    }
   };
 
-  const updateActivity = (id: string, updates: Partial<Activity>) => {
-    setActivities(prev => prev.map(activity => 
-      activity.id === id ? { ...activity, ...updates, updatedAt: getCurrentTimestamp() } : activity
-    ));
+  const updateActivity = async (id: string, updates: Partial<Activity & { backgroundImage?: string; images?: string[] }>) => {
+    try {
+      const updated = await updateUslugaApi(Number(id), {
+        naziv: updates.name,
+        komentar: updates.defaultComment,
+        opis: updates.description,
+        pdv_grupa: updates.vatGroup,
+        slike: [],
+      });
+      const mapped = mapUslugaToActivity(updated);
+      const activity = activities.find(a => a.id === id);
+      
+      if (!activity) throw new Error("Activity not found");
+
+      const data: File[] = [];
+      const img_types: string[] = [];
+      const pathsToRemove: string[] = [];
+
+      let logoChanged = false;
+      mapped.backgroundImage = activity.backgroundImage;
+
+      if (updates.backgroundImage !== activity.backgroundImage) {
+          // logo is different → upload new image
+          pathsToRemove.push(
+            ...[activity.backgroundImage ? extractRelativePath(activity.backgroundImage) : undefined]
+              .filter((p): p is string => !!p)
+          );
+      
+          if (updates.backgroundImage !== undefined && updates.backgroundImage !== "") {
+              data.push(dataURLtoFile(updates.backgroundImage, `activity-logo${id}`));
+              img_types.push("logo");
+          }else{
+            mapped.backgroundImage = undefined
+          }
+
+          logoChanged = true;
+      }
+      if (updates.images || activity.images.length > 0) {    
+        const diff = (!updates.images || updates.images.length === 0)
+                      ? activity.images
+                      : activity.images.filter(existing => !updates.images?.includes(existing));
+        const keep = (!updates.images || updates.images.length === 0)
+                      ? []
+                      : activity.images.filter(existing => updates.images?.includes(existing));
+        pathsToRemove.push(...diff.map(img => extractRelativePath(img)));
+      
+        const toRemove = (logoChanged) ? pathsToRemove.length - 1 : pathsToRemove.length
+        if (toRemove == 0 && activity.images.length == updates.images?.length) {
+            mapped.images = activity.images
+        } else {
+            const newImages = updates.images?.filter(img => !activity.images.includes(img)) || [];
+            if (newImages.length > 0) {
+              for (let i = 0; i < newImages.length; i++) {
+                  const img = newImages[i];
+                        
+                  data.push(dataURLtoFile(img, `activity-image-${id}-${i}`));
+                  img_types.push("slika");
+              }
+            }
+            mapped.images = keep
+            console.log("Uploading images:", data, img_types, pathsToRemove);  
+        }
+      } 
+      if(data.length || pathsToRemove){
+          const res = await uploadImages(
+                    Number(id),
+                    "usluga",
+                    data,
+                    img_types,
+                    pathsToRemove
+          );
+
+          console.log("RES " + res.slike)
+          console.log("TR " + mapped.images)
+          console.log("BG " + mapped.backgroundImage)
+          mapped.backgroundImage = res.slike
+              .filter((s: { tip: string }) => s.tip === "logo")
+              .map((s: { putanja: string }) => s.putanja)[0] ?? mapped.backgroundImage;
+
+          if (Array.isArray(res.slike)) {
+            mapped.images = mapped.images.concat(res.slike
+              .filter((s: { tip: string }) => s.tip === "slika")
+              .map((s: { putanja: string }) => s.putanja)) || mapped.images;
+          }
+      }
+      setActivities(prev =>
+        prev.map(a => a.id === id ? { ...mapped, updatedAt: getCurrentTimestamp() } : a)
+      );
+    } catch (err) {
+      console.error("Failed to update activity:", err);
+    }
   };
 
-  const deleteActivity = (id: string) => {
-    setActivities(prev => prev.filter(activity => activity.id !== id));
+  const deleteActivity = async (id: string) => {
+    try {
+      await deleteUslugaApi(Number(id));
+      setActivities(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      console.error("Failed to delete activity:", err);
+    }
   };
 
   return (
@@ -100,8 +194,8 @@ export function ActivityProvider({ children }: BaseProviderProps) {
 
 export function useActivities() {
   const context = useContext(ActivityContext);
-  if (context === undefined) {
-    throw new Error('useActivities must be used within a ActivityProvider');
+  if (!context) {
+    throw new Error('useActivities must be used within an ActivityProvider');
   }
   return context;
 }

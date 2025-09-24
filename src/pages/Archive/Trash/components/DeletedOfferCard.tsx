@@ -93,7 +93,7 @@ export const DeletedOfferCard: React.FC<DeletedOfferCardProps> = ({
         <div className="flex items-center text-sm text-gray-600">
           <Euro className="w-4 h-4 mr-2" />
           <span className="font-semibold text-lg text-gray-900">
-            €{offer.totalPrice.toLocaleString()}
+            {offer.totalPrice.toLocaleString()}
           </span>
         </div>
 

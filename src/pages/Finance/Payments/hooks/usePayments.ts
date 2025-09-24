@@ -1,81 +1,67 @@
-import { useState, useEffect } from 'react';
-import { PaymentOffer } from '../utils/types';
-import { mockPaymentOffers } from '../data/mockData';
+import { useState, useEffect, useCallback } from "react";
+import { PaymentOffer } from "../utils/types";
+import { fetchFinanceOffersWithPayments } from "../data/mockData";
+import { mapPonudaFinanceWithPaymentsToOffer } from "../../../../utils/finance_response_mappers";
+import { createPayment } from "../../../../api/finances";
 
 export const usePayments = () => {
-  const [offers, setOffers] = useState<PaymentOffer[]>(mockPaymentOffers);
-  const [filteredOffers, setFilteredOffers] = useState<PaymentOffer[]>(mockPaymentOffers);
+  const [offers, setOffers] = useState<PaymentOffer[]>([]);
+  const [filteredOffers, setFilteredOffers] = useState<PaymentOffer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const updateFilteredOffers = (newOffers: PaymentOffer[]) => {
+  // Load offers from backend
+  useEffect(() => {
+    async function loadOffers() {
+      setLoading(true);
+      try {
+        const data = await fetchFinanceOffersWithPayments();
+        setOffers(data);
+        setFilteredOffers(data);
+      } catch (err) {
+        console.error("Failed to fetch finance offers with payments:", err);
+        setError("Failed to load offers");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadOffers();
+  }, []);
+
+  const updateFilteredOffers = useCallback((newOffers: PaymentOffer[]) => {
     setFilteredOffers(newOffers);
-  };
+  }, []);
 
-  const addPayment = (offerId: string, payment: { amount: number; comment: string; method: string }) => {
-    const newPayment = {
-      id: Date.now().toString(),
-      amount: payment.amount,
-      comment: payment.comment,
-      method: payment.method,
-      date: new Date().toISOString().split('T')[0]
-    };
+  const addPayment = useCallback(
+    async (
+      offerId: string,
+      payment: { amount: number; comment: string; method: string }
+    ) => {
+      try {
+        const response = await createPayment(offerId, payment);
 
-    setOffers(prevOffers => 
-      prevOffers.map(offer => {
-        if (offer.id === offerId) {
-          const newTotalPaid = offer.totalPaid + payment.amount;
-          let newPaymentStatus: 'Not Paid' | 'Partially Paid' | 'Fully Paid';
-          
-          if (newTotalPaid >= offer.totalPrice) {
-            newPaymentStatus = 'Fully Paid';
-          } else if (newTotalPaid > 0) {
-            newPaymentStatus = 'Partially Paid';
-          } else {
-            newPaymentStatus = 'Not Paid';
-          }
+        const mappedPayment = mapPonudaFinanceWithPaymentsToOffer(response);
 
-          return {
-            ...offer,
-            totalPaid: newTotalPaid,
-            paymentStatus: newPaymentStatus,
-            payments: [...offer.payments, newPayment]
-          };
-        }
-        return offer;
-      })
-    );
+        setOffers(prevOffers =>
+          prevOffers.map(offer => (offer.id === offerId ? mappedPayment : offer))
+        );
 
-    // Update filtered offers as well
-    setFilteredOffers(prevFiltered => 
-      prevFiltered.map(offer => {
-        if (offer.id === offerId) {
-          const newTotalPaid = offer.totalPaid + payment.amount;
-          let newPaymentStatus: 'Not Paid' | 'Partially Paid' | 'Fully Paid';
-          
-          if (newTotalPaid >= offer.totalPrice) {
-            newPaymentStatus = 'Fully Paid';
-          } else if (newTotalPaid > 0) {
-            newPaymentStatus = 'Partially Paid';
-          } else {
-            newPaymentStatus = 'Not Paid';
-          }
-
-          return {
-            ...offer,
-            totalPaid: newTotalPaid,
-            paymentStatus: newPaymentStatus,
-            payments: [...offer.payments, newPayment]
-          };
-        }
-        return offer;
-      })
-    );
-  };
+        setFilteredOffers(prevFiltered =>
+          prevFiltered.map(offer => (offer.id === offerId ? mappedPayment : offer))
+        );
+      } catch (err) {
+        console.error("Failed to add payment", err);
+      }
+    },
+    []
+  );
 
   return {
     offers,
     filteredOffers,
+    loading,
+    error,
     updateFilteredOffers,
-    addPayment
+    addPayment,
   };
 };
-

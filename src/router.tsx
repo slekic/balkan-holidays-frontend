@@ -23,6 +23,8 @@ import Payments from "./pages/Finance/Payments/Payments";
 import Debts from "./pages/Finance/Debts/Debts";
 import UserManagement from "./pages/UserManagement/UserManagement";
 import OfferCreation from "./pages/OfferCreation/OfferCreation";
+import EditOffer from "./pages/OfferCreation/OfferCreation";
+import { UserProvider } from "./pages/UserManagement/UserContext";
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -50,6 +52,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute requiredRoles={["Admin", "Operation"]}>
               <OfferCreation />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="offer-creation/:id/edit"
+          element={
+            <ProtectedRoute requiredRoles={["Admin", "Operation"]}>
+              <EditOffer />
             </ProtectedRoute>
           }
         />
@@ -111,7 +121,10 @@ const AppRoutes = () => {
           path="users"
           element={
             <ProtectedRoute requiredRoles={["Admin"]}>
-              <UserManagement />
+              <UserProvider>
+                <UserManagement />
+              </UserProvider>
+              
             </ProtectedRoute>
           }
         />

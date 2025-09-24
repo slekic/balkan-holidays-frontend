@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { PaymentFilters } from '../utils/types';
-import { PAYMENT_STATUS_OPTIONS, CLIENT_OPTIONS } from '../utils/constants';
+import { PAYMENT_STATUS_OPTIONS } from '../utils/constants';
+import { useCMS } from '../../../../contexts/CMSContext';
 
 interface SearchAndFiltersProps {
   searchTerm: string;
@@ -22,6 +23,14 @@ export default function SearchAndFilters({
   onFilterChange,
   onClearFilters
 }: SearchAndFiltersProps) {
+  const { clients } = useCMS();
+  const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
+
+  const handleClientSelect = (name: string) => {
+    onFilterChange('client', name);
+    setClientDropdownVisible(false);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="flex items-center space-x-4 mb-4">
@@ -46,10 +55,10 @@ export default function SearchAndFilters({
         </button>
       </div>
 
-      {/* Advanced Filters */}
       {showFilters && (
         <div className="border-t border-gray-200 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Status uplate */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status uplate</label>
               <select
@@ -65,21 +74,38 @@ export default function SearchAndFilters({
               </select>
             </div>
 
-            <div>
+            {/* Klijent autocomplete */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">Klijent</label>
-              <select
-                value={filters.client}
-                onChange={(e) => onFilterChange('client', e.target.value)}
+              <input
+                type="text"
+                placeholder="Pretraži klijenta..."
+                value={filters.client || ""}
+                onChange={(e) => {
+                  onFilterChange('client', e.target.value);
+                  setClientDropdownVisible(true);
+                }}
+                onFocus={() => setClientDropdownVisible(true)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {CLIENT_OPTIONS.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              />
+              {clientDropdownVisible && filters.client && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                  {clients
+                    .filter(c => c.name.toLowerCase().includes(filters.client!.toLowerCase()))
+                    .map(c => (
+                      <li
+                        key={c.id}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => handleClientSelect(c.name)}
+                      >
+                        {c.name}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
 
+            {/* Datum od */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Datum od</label>
               <input
@@ -90,6 +116,7 @@ export default function SearchAndFilters({
               />
             </div>
 
+            {/* Datum do */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Datum do</label>
               <input
@@ -100,7 +127,7 @@ export default function SearchAndFilters({
               />
             </div>
           </div>
-          
+
           <div className="mt-4 flex justify-end">
             <button
               onClick={onClearFilters}
@@ -114,4 +141,3 @@ export default function SearchAndFilters({
     </div>
   );
 }
-

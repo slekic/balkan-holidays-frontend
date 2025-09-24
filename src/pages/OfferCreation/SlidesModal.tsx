@@ -13,6 +13,7 @@ type Props = {
   onEdit: (slide: Slide) => void;
   onDelete: (id: string) => void;
   onOpenAdd: () => void;
+  onSave: () => Promise<void>;
 };
 
 export default function SlidesModal({
@@ -26,6 +27,7 @@ export default function SlidesModal({
   onEdit,
   onDelete,
   onOpenAdd,
+  onSave
 }: Props) {
   if (!open) return null;
 
@@ -231,6 +233,12 @@ export default function SlidesModal({
           >
             Otkaži
           </button>
+         <button
+          onClick={onSave} 
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        >
+          Sačuvaj slajdove
+        </button>
           <button
             onClick={() => {
               console.log("Exporting PDF with slides:", slides);

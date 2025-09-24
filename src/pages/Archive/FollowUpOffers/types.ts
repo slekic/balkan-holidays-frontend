@@ -11,6 +11,8 @@ export interface FollowUpOffer {
   status: "Sent" | "Accepted" | "Rejected" | "Finished";
   createdAt: string;
   createdBy: string;
+  deletedAt: string;
+  deletedBy: string;
   entities: string[];
   lastUpdated: string;
   daysSinceUpdate: number;

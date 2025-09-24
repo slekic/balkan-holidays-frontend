@@ -14,6 +14,7 @@ import {
   useExpenseActions,
 } from "./hooks";
 import { calculateExpenseSummary } from "./utils";
+import { UserProvider } from "../../UserManagement/UserContext";
 
 export default function Expenses() {
   const { expenses, filteredExpenses, updateFilteredExpenses } = useExpenses();
@@ -57,6 +58,7 @@ export default function Expenses() {
       <SummaryCard summary={summary} />
 
       {/* Search and Filter Bar */}
+      <UserProvider>
       <SearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -66,6 +68,7 @@ export default function Expenses() {
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
       />
+      </UserProvider>
 
       {/* Expenses Table */}
       <ExpensesTable

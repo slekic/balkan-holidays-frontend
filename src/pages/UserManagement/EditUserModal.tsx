@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { User, UserRole, UserStatus } from "./types";
+import { User, UserRole, UserStatus } from "../../types/user";
 import { getRolePermissions } from "./utils";
 
 type Props = {
@@ -11,17 +11,19 @@ type Props = {
 };
 
 export default function EditUserModal({ open, user, onClose, onSave }: Props) {
-  const [editing, setEditing] = React.useState<User | null>(user);
-  React.useEffect(() => setEditing(user), [user]);
-  if (!open || !editing) return null;
+  const [editingUser, setEditingUser] = useState<User | null>(user);
+
+  useEffect(() => {
+    setEditingUser(user);
+  }, [user]);
+
+  if (!open || !editingUser) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Izmeni korisnika
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900">Izmeni korisnika</h2>
           <button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -29,39 +31,43 @@ export default function EditUserModal({ open, user, onClose, onSave }: Props) {
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <div className="p-6 space-y-4">
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Puno ime <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              value={editing.name}
-              onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+              value={editingUser.name}
+              onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email adresa <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
-              value={editing.email}
-              onChange={(e) =>
-                setEditing({ ...editing, email: e.target.value })
-              }
+              value={editingUser.email}
+              onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+
+          {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Uloga <span className="text-red-500">*</span>
             </label>
             <select
-              value={editing.role}
+              value={editingUser.role}
               onChange={(e) =>
-                setEditing({ ...editing, role: e.target.value as UserRole })
+                setEditingUser({ ...editingUser, role: e.target.value as UserRole })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -69,26 +75,10 @@ export default function EditUserModal({ open, user, onClose, onSave }: Props) {
               <option value="Finance">Finansije</option>
               <option value="Admin">Administrator</option>
             </select>
-            <p className="text-xs text-gray-500 mt-1">
-              {getRolePermissions(editing.role)}
-            </p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={editing.status}
-              onChange={(e) =>
-                setEditing({ ...editing, status: e.target.value as UserStatus })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="Active">Aktivan</option>
-              <option value="Inactive">Neaktivan</option>
-            </select>
+            <p className="text-xs text-gray-500 mt-1">{getRolePermissions(editingUser.role)}</p>
           </div>
         </div>
+
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
           <button
             onClick={onClose}
@@ -97,7 +87,7 @@ export default function EditUserModal({ open, user, onClose, onSave }: Props) {
             Otkaži
           </button>
           <button
-            onClick={() => editing && onSave(editing)}
+            onClick={() => editingUser && onSave(editingUser)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Sačuvaj izmene

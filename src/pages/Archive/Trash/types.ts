@@ -13,6 +13,9 @@ export interface DeletedOffer {
   createdBy: string;
   deletedAt: string;
   deletedBy: string;
+  entities: string[];
+  lastUpdated: string;
+  daysSinceUpdate: number;
 }
 
 export interface TrashFilters {

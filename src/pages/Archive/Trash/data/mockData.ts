@@ -1,52 +1,13 @@
-import { DeletedOffer } from '../types';
+import { DeletedOffer } from "../types";
+import { getAllOffers } from "../../../../api/offer";
+import { mapPonudaToOffer } from "../../../../utils/offer_response_mappers";
 
-export const mockDeletedOffers: DeletedOffer[] = [
-  {
-    id: "7",
-    name: "Cancelled Corporate Retreat",
-    code: "CCR-2024-007",
-    client: "Tech Solutions Inc.",
-    numberOfPersons: 40,
-    startDate: "2024-09-15",
-    endDate: "2024-09-18",
-    days: 4,
-    totalPrice: 22000,
-    status: "Sent",
-    createdAt: "2024-01-28",
-    createdBy: "Operations Manager",
-    deletedAt: "2024-02-01",
-    deletedBy: "Admin User",
-  },
-  {
-    id: "8",
-    name: "Outdated Summer Package",
-    code: "OSP-2024-008",
-    client: "Family Vacations Ltd.",
-    numberOfPersons: 8,
-    startDate: "2024-06-20",
-    endDate: "2024-06-25",
-    days: 6,
-    totalPrice: 6400,
-    status: "Rejected",
-    createdAt: "2024-01-15",
-    createdBy: "Admin User",
-    deletedAt: "2024-01-30",
-    deletedBy: "Operations Manager",
-  },
-  {
-    id: "9",
-    name: "Duplicate Festival Tour",
-    code: "DFT-2024-009",
-    client: "Music Lovers Group",
-    numberOfPersons: 18,
-    startDate: "2024-08-10",
-    endDate: "2024-08-14",
-    days: 5,
-    totalPrice: 11700,
-    status: "Sent",
-    createdAt: "2024-01-22",
-    createdBy: "Operations Manager",
-    deletedAt: "2024-01-29",
-    deletedBy: "Admin User",
-  },
-];
+export async function fetchOffers(): Promise<DeletedOffer[]> {
+  try {
+    const data = await getAllOffers(1, 100, true);
+    return data.items.map(mapPonudaToOffer);
+  } catch (error) {
+    console.error("Failed to fetch offers:", error);
+    return [];
+  }
+}

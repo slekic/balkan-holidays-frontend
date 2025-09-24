@@ -207,7 +207,7 @@ export default function Gifts() {
           </div>
 
           <ImageUpload
-            label="Naziv poklona"
+            label="Slika poklona"
             value={formData.image}
             onChange={(value) => setFormData({ ...formData, image: value })}
           />

@@ -1,43 +1,81 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User } from '../types';
+import { loginRequest } from '../api/auth';
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users for demonstration
-const mockUsers: User[] = [
-  { id: '1', name: 'Stefan Lekić', email: 'admin@balkanhol.com', role: 'Admin', isActive: true },
-  { id: '2', name: 'Luka Milenković', email: 'ops@balkanhol.com', role: 'Operation', isActive: true },
-  { id: '3', name: 'Pavle Radić', email: 'finance@balkanhol.com', role: 'Finance', isActive: true },
-];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Učitavanje session-a iz localStorage/JWT pri mount-u
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload: any = JSON.parse(atob(token.split('.')[1]));
+        setUser({
+          id: payload.id,
+          name: payload.sub,
+          email: payload.email,
+          role: payload.role,
+          isActive: payload.isActive ?? true,
+        });
+      } catch (err) {
+        console.error("Invalid token", err);
+        localStorage.removeItem('token');
+      }
+    }
+    setLoading(false);
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Mock authentication - any credentials work
-    const foundUser = mockUsers.find(u => u.email === email) || mockUsers[0];
-    setUser(foundUser);
-    return true;
+    try {
+      const data = await loginRequest(email, password);
+      const u = data.data;
+      setUser({
+        id: u.id,
+        name: u.sub,
+        email: u.email,
+        role: u.role,
+        isActive: u.isActive ?? true,
+      });
+      localStorage.setItem('token', data.token);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('token');
   };
 
+  // dok se učitava, prikaz loader
+  if (loading) {
+    return <div>Checking session...</div>; 
+  }
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      login,
-      logout,
-      isAuthenticated: !!user
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        isAuthenticated: !!user,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

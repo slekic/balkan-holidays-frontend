@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Slide, slideTypeLabels } from "./utils/constants";
+import ImageUpload from "../../components/CMS/Common/ImageUpload";
 
 type Props = {
   slide: Slide | null;
@@ -9,11 +10,24 @@ type Props = {
 };
 
 export default function EditSlideModal({ slide, onClose, onSave }: Props) {
-  if (!slide) return null;
+  const [localSlide, setLocalSlide] = useState<Slide | null>(slide);
 
-  const setSlide = (updates: Partial<Slide>) => {
-    const next = { ...slide, ...updates } as Slide;
-    onSave(next);
+  useEffect(() => {
+    setLocalSlide(slide);
+  }, [slide]);
+
+  if (!localSlide) return null;
+
+  const handleChange = (updates: Partial<Slide>) => {
+    setLocalSlide({ ...localSlide, ...updates });
+  };
+
+  const handleContentChange = (updates: Partial<typeof localSlide.content>) => {
+    if (!localSlide) return;
+    setLocalSlide({
+      ...localSlide,
+      content: { ...localSlide.content, ...updates },
+    });
   };
 
   return (
@@ -21,7 +35,7 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            Izmeni {slideTypeLabels[slide.type]}
+            Izmeni {slideTypeLabels[localSlide.type]}
           </h3>
           <button
             onClick={onClose}
@@ -30,60 +44,51 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           <div className="space-y-6">
+            {/* Naslov */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Naslov
               </label>
               <input
                 type="text"
-                value={slide.title}
-                onChange={(e) => setSlide({ title: e.target.value })}
+                value={localSlide.title}
+                onChange={(e) => handleChange({ title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
-            {slide.type === "general" && (
+            {/* General slide */}
+            {localSlide.type === "general" && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Opis
                   </label>
                   <textarea
-                    value={slide.content.description || ""}
+                    value={localSlide.content.description || ""}
                     onChange={(e) =>
-                      setSlide({
-                        content: {
-                          ...slide.content,
-                          description: e.target.value,
-                        },
-                      })
+                      handleContentChange({ description: e.target.value })
                     }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Logo link
-                  </label>
-                  <input
-                    type="url"
-                    value={slide.content.logo || ""}
-                    onChange={(e) =>
-                      setSlide({
-                        content: { ...slide.content, logo: e.target.value },
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="https://example.com/logo.jpg"
+                  <ImageUpload
+                    label="Logo"
+                    value={localSlide.content.logo || ""}
+                    onChange={(value) => handleContentChange({ logo: value })}
                   />
                 </div>
               </>
             )}
 
-            {slide.type === "day" && (
+            {/* Day slide */}
+            {localSlide.type === "day" && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -91,13 +96,10 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   </label>
                   <input
                     type="number"
-                    value={slide.content.dayNumber || 1}
+                    value={localSlide.content.dayNumber || 1}
                     onChange={(e) =>
-                      setSlide({
-                        content: {
-                          ...slide.content,
-                          dayNumber: parseInt(e.target.value),
-                        },
+                      handleContentChange({
+                        dayNumber: parseInt(e.target.value),
                       })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -108,96 +110,59 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                     Opis
                   </label>
                   <textarea
-                    value={slide.content.description || ""}
+                    value={localSlide.content.description || ""}
                     onChange={(e) =>
-                      setSlide({
-                        content: {
-                          ...slide.content,
-                          description: e.target.value,
-                        },
-                      })
+                      handleContentChange({ description: e.target.value })
                     }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pozadinska slika link
-                  </label>
-                  <input
-                    type="url"
-                    value={slide.content.backgroundImage || ""}
-                    onChange={(e) =>
-                      setSlide({
-                        content: {
-                          ...slide.content,
-                          backgroundImage: e.target.value,
-                        },
-                      })
+                  <ImageUpload
+                    label="Pozadinska slika"
+                    value={localSlide.content.backgroundImage || ""}
+                    onChange={(value) =>
+                      handleContentChange({ backgroundImage: value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="https://example.com/background.jpg"
                   />
+                </div>
+                <div>
+                  <ImageUpload
+                    label="Dodatne slike dana"
+                    multiple
+                    values={localSlide.content.images || []}
+                    onMultipleChange={(images) => handleContentChange({ images })}
+                    maxImages={3} onChange={function (value: string): void {
+                      throw new Error("Function not implemented.");
+                    } }                  />
                 </div>
               </>
             )}
 
-            {slide.type === "hotel" && (
+            {/* Hotel, restaurant, gift slides */}
+            {["hotel", "restaurant", "gift"].includes(localSlide.type) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Naziv hotela
+                  Naziv {localSlide.type === "hotel"
+                    ? "hotela"
+                    : localSlide.type === "restaurant"
+                    ? "restorana"
+                    : "poklona"}
                 </label>
                 <input
                   type="text"
-                  value={slide.content.name || ""}
+                  value={localSlide.content.name || ""}
                   onChange={(e) =>
-                    setSlide({
-                      content: { ...slide.content, name: e.target.value },
-                    })
+                    handleContentChange({ name: e.target.value })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             )}
 
-            {slide.type === "restaurant" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Naziv restorana
-                </label>
-                <input
-                  type="text"
-                  value={slide.content.name || ""}
-                  onChange={(e) =>
-                    setSlide({
-                      content: { ...slide.content, name: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            )}
-
-            {slide.type === "gift" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Naziv poklona
-                </label>
-                <input
-                  type="text"
-                  value={slide.content.name || ""}
-                  onChange={(e) =>
-                    setSlide({
-                      content: { ...slide.content, name: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            )}
-
-            {slide.type === "what-to-expect" && (
+            {/* What-to-expect slide */}
+            {localSlide.type === "what-to-expect" && (
               <div className="p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
                   Ovo je fiksni šablon slajda sa unapred definisanim sadržajem o
@@ -209,6 +174,7 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
             )}
           </div>
         </div>
+
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
           <button
             onClick={onClose}
@@ -217,7 +183,7 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
             Otkaži
           </button>
           <button
-            onClick={() => onSave(slide)}
+            onClick={() => localSlide && onSave(localSlide)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Sačuvaj promene

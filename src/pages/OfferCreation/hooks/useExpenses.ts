@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExpenseEntry, DayService, HotelEntry } from "../../../types/offer";
+import { RashodResponse } from "../../../api/responses";
+import { entityTypeMapper } from "../../../utils/cms_response_mappers";
 
 type CMSEntities = {
   hotels: { id: string; name: string }[];
@@ -12,6 +14,7 @@ type CMSEntities = {
 };
 
 type OfferEssentials = {
+  offerId: number; // <--- Make sure offerId is passed
   accommodationEnabled: boolean;
   hotels: HotelEntry[];
   landServicesEnabled: boolean;
@@ -32,85 +35,127 @@ export function useExpenses(
     transports,
     gifts,
   } = cms;
+
   const [detectedEntities, setDetectedEntities] = useState<ExpenseEntry[]>([]);
   const [expenses, setExpenses] = useState<ExpenseEntry[]>([]);
 
-  const getDetectedEntities = (): ExpenseEntry[] => {
-    const results: ExpenseEntry[] = [];
+  const getDetectedEntities = async (): Promise<{ detected: ExpenseEntry[]; extras: ExpenseEntry[] }> => {
+    const detected: ExpenseEntry[] = [];
+    const extras: ExpenseEntry[] = [];
     const addedIds = new Set<string>();
+
+    let existingRashodi: RashodResponse[] = [];
+
+    if (offer && offer.offerId) {
+      try {
+        const res = await fetch(`http://localhost:8000/finansije/rashodi/ponuda/${offer.offerId}`);
+        if (res.ok) existingRashodi = await res.json();
+      } catch (err) {
+        console.error("Failed to fetch existing rashodi", err);
+      }
+    }
+
+    const findExisting = (entityType: string, entityId: number) =>
+      existingRashodi.find(
+        (r) => r.tipEntiteta === entityTypeMapper[entityType] && r.idEntiteta === entityId
+      );
+
+    // Hotels i land services (detektovani entiteti)
     if (offer.accommodationEnabled && offer.hotels) {
       offer.hotels.forEach((h) => {
         const hotel = hotels.find((hh) => hh.id === h.hotelId);
         if (hotel && !addedIds.has(hotel.id)) {
-          results.push({
+          const existing = findExisting("hotel", Number(hotel.id));
+          detected.push({
             id: `hotel-${hotel.id}`,
             entityType: "hotel",
             entityId: hotel.id,
             entityName: hotel.name,
-            costAmount: 0,
-            comment: "",
+            costAmount: existing?.iznos || 0,
+            comment: existing?.komentar || "",
             uploadedFile: undefined,
-          } as ExpenseEntry);
+          });
           addedIds.add(hotel.id);
         }
       });
     }
+
     if (offer.landServicesEnabled && offer.landServices) {
-      offer.landServices.forEach((day) => {
+      offer.landServices.forEach((day, dayIndex) => {
         day.services.forEach((service) => {
           let entityName = "";
           const entityId = service.serviceId;
           switch (service.serviceType) {
             case "activity":
-              entityName =
-                activities.find((a) => a.id === service.serviceId)?.name || "";
+              entityName = activities.find((a) => a.id === entityId)?.name || "";
               break;
             case "restaurant":
-              entityName =
-                restaurants.find((r) => r.id === service.serviceId)?.name || "";
+              entityName = restaurants.find((r) => r.id === entityId)?.name || "";
               break;
             case "guide":
-              entityName =
-                guides.find((g) => g.id === service.serviceId)?.name || "";
+              entityName = guides.find((g) => g.id === entityId)?.name || "";
               break;
             case "translator":
-              entityName =
-                translators.find((t) => t.id === service.serviceId)?.name || "";
+              entityName = translators.find((t) => t.id === entityId)?.name || "";
               break;
             case "transport":
-              entityName =
-                transports.find((t) => t.id === service.serviceId)?.name || "";
+              entityName = transports.find((t) => t.id === entityId)?.name || "";
               break;
             case "gift":
-              entityName =
-                gifts.find((g) => g.id === service.serviceId)?.name || "";
+              entityName = gifts.find((g) => g.id === entityId)?.name || "";
               break;
           }
-          if (
-            entityName &&
-            !addedIds.has(`${service.serviceType}-${entityId}`)
-          ) {
-            results.push({
-              id: `${service.serviceType}-${entityId}`,
+
+          const uniqueKey = `${service.serviceType}-${entityId}-day${dayIndex}`;
+
+          if (entityName && !addedIds.has(uniqueKey)) {
+            const existing = findExisting(service.serviceType, Number(entityId));
+            detected.push({
+              id: uniqueKey,
               entityType: service.serviceType,
-              entityId: entityId,
+              entityId,
               entityName,
-              costAmount: 0,
-              comment: "",
+              costAmount: existing?.iznos || 0,
+              comment: existing?.komentar || "",
               uploadedFile: undefined,
-            } as ExpenseEntry);
-            addedIds.add(`${service.serviceType}-${entityId}`);
+            });
+            addedIds.add(uniqueKey);
           }
         });
       });
     }
-    return results;
+
+    // Other troškovi -> u extras
+    existingRashodi
+      .filter((r) => r.tipEntiteta === entityTypeMapper["other"])
+      .forEach((r) => {
+        if (!addedIds.has(`other-${r.nazivEntiteta}`)) {
+          extras.push({
+            id: `other-${r.id}`,
+            entityType: "other",
+            entityId: "0",
+            entityName: r.nazivEntiteta || "",
+            costAmount: r.iznos || 0,
+            comment: r.komentar || "",
+            uploadedFile: undefined,
+          });
+          addedIds.add(`other-${r.nazivEntiteta}`);
+        }
+      });
+
+    return { detected, extras };
   };
 
   useEffect(() => {
-    if (expensesModalOpen) {
-      setDetectedEntities(getDetectedEntities());
-    }
+    if (!expensesModalOpen) return;
+
+    const fetchDetectedEntities = async () => {
+      const { detected, extras } = await getDetectedEntities();
+      setDetectedEntities(detected);
+      setExpenses(extras); 
+    };
+
+    fetchDetectedEntities();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     expensesModalOpen,
@@ -135,7 +180,7 @@ export function useExpenses(
       costAmount: 0,
       comment: "",
       uploadedFile: undefined,
-    } as ExpenseEntry;
+    };
     setExpenses((prev) => [...prev, newExpense]);
   };
 

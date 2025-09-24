@@ -17,9 +17,15 @@ export type SlideType =
 
 export interface Slide {
   id: string;
+  num: number;
   type: SlideType;
   title: string;
   content: any;
+}
+
+interface SlideFile {
+  file: File;
+  slideIndex: number;
 }
 
 export const slideTypeIcons = {

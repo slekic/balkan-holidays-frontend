@@ -170,8 +170,9 @@ export default function Activities() {
             multiple
             values={formData.images || []}
             onMultipleChange={(images) => setFormData({ ...formData, images })}
-            maxImages={3}
-          />
+            maxImages={3} onChange={function (value: string): void {
+              throw new Error('Function not implemented.');
+            } }          />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

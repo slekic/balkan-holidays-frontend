@@ -15,6 +15,7 @@ import {
   useDebtActions,
 } from "./hooks";
 import { calculateDebtSummary } from "./utils";
+import { UserProvider } from "../../UserManagement/UserContext";
 
 export default function Debts() {
   const { offers, filteredOffers, totalFilteredOffers, updateFilteredOffers } =
@@ -54,6 +55,7 @@ export default function Debts() {
       
       <CriticalDebtsAlert criticalDebtsCount={summary.criticalDebts} />
       
+      <UserProvider>
       <SearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -63,6 +65,7 @@ export default function Debts() {
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
       />
+      </UserProvider>
       
       {totalFilteredOffers > 0 ? (
         <>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Search, Filter } from "lucide-react";
 import { FilterState } from "./types";
+import { useClients } from "../../../contexts";
 
 interface SearchAndFiltersProps {
   searchTerm: string;
@@ -23,6 +24,9 @@ export default function SearchAndFilters({
   showAdvancedFilters = true,
   showDeletedByFilter = false
 }: SearchAndFiltersProps) {
+  // Destrukturiramo clients iz hook-a
+  const { clients } = useClients();
+
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     onFilterChange({ ...filters, [key]: value });
   };
@@ -57,6 +61,7 @@ export default function SearchAndFilters({
       {showFilters && showAdvancedFilters && (
         <div className="border-t border-gray-200 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Klijent */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Klijent
@@ -67,17 +72,15 @@ export default function SearchAndFilters({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi klijenti</option>
-                <option value="ABC Travel Agency">ABC Travel Agency</option>
-                <option value="European Tours Ltd.">European Tours Ltd.</option>
-                <option value="Global Adventures Inc.">Global Adventures Inc.</option>
-                <option value="Tech Solutions Inc.">Tech Solutions Inc.</option>
-                <option value="Family Vacations Ltd.">Family Vacations Ltd.</option>
-                <option value="Music Lovers Group">Music Lovers Group</option>
-                <option value="Adventure Seekers Ltd.">Adventure Seekers Ltd.</option>
-                <option value="Gourmet Travels Inc.">Gourmet Travels Inc.</option>
+                {clients?.map(client => (
+                  <option key={client.id} value={client.name}>
+                    {client.name}
+                  </option>
+                ))}
               </select>
             </div>
 
+            {/* Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -95,6 +98,7 @@ export default function SearchAndFilters({
               </select>
             </div>
 
+            {/* Kreirao */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Kreirao
@@ -110,6 +114,7 @@ export default function SearchAndFilters({
               </select>
             </div>
 
+            {/* Obrisao */}
             {showDeletedByFilter && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -127,6 +132,7 @@ export default function SearchAndFilters({
               </div>
             )}
 
+            {/* Entitet */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Entitet u ponudi
@@ -140,6 +146,7 @@ export default function SearchAndFilters({
               />
             </div>
 
+            {/* Opseg osoba */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Opseg osoba
@@ -162,6 +169,7 @@ export default function SearchAndFilters({
               </div>
             </div>
 
+            {/* Opseg cene */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Opseg cene (€)
@@ -184,6 +192,7 @@ export default function SearchAndFilters({
               </div>
             </div>
 
+            {/* Datum putovanja */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Datum putovanja
@@ -203,6 +212,7 @@ export default function SearchAndFilters({
                 />
               </div>
             </div>
+
           </div>
         </div>
       )}

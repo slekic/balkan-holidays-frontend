@@ -1,77 +1,101 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Gift } from '../types/cms';
-import { BaseEntityContext, BaseProviderProps, generateId, getCurrentTimestamp } from './base';
+import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
+import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
+import { mapUslugaToGift, mapGiftToRequest } from '../utils/cms_response_mappers';
+import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
 
 interface GiftContextType extends BaseEntityContext<Gift> {
   gifts: Gift[];
-  addGift: (gift: Omit<Gift, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateGift: (id: string, gift: Partial<Gift>) => void;
-  deleteGift: (id: string) => void;
+  addGift: (gift: Omit<Gift, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateGift: (id: string, gift: Partial<Gift & { image?: string }>) => Promise<void>;
+  deleteGift: (id: string) => Promise<void>;
 }
 
 const GiftContext = createContext<GiftContextType | undefined>(undefined);
 
-// Mock data
-const mockGifts: Gift[] = [
-  {
-    id: '1',
-    name: 'Welcome Gift Package',
-    defaultComment: 'Traditional Serbian welcome gifts',
-    description: 'Authentic Serbian souvenirs and local delicacies',
-    price: 25.00,
-    whatsIncluded: 'Serbian honey, rakija miniature, traditional handicraft, welcome card',
-    image: 'https://images.pexels.com/photos/1303081/pexels-photo-1303081.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-    vatGroup: '20%',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    name: 'Premium Souvenir Set',
-    defaultComment: 'High-quality Serbian crafts collection',
-    description: 'Carefully selected premium souvenirs representing Serbian culture',
-    price: 45.00,
-    whatsIncluded: 'Handmade pottery, traditional textile, premium rakija, Serbian cookbook',
-    image: 'https://images.pexels.com/photos/1303082/pexels-photo-1303082.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-    vatGroup: '20%',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12'
-  },
-  {
-    id: '3',
-    name: 'Corporate Gift Box',
-    defaultComment: 'Business-appropriate Serbian gifts',
-    description: 'Professional gift set suitable for corporate clients',
-    price: 35.00,
-    whatsIncluded: 'Serbian wine, branded notebook, traditional pen, company brochure',
-    image: 'https://images.pexels.com/photos/1303083/pexels-photo-1303083.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-    vatGroup: '20%',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-10'
-  }
-];
-
 export function GiftProvider({ children }: BaseProviderProps) {
-  const [gifts, setGifts] = useState<Gift[]>(mockGifts);
+  const [gifts, setGifts] = useState<Gift[]>([]);
 
-  const addGift = (gift: Omit<Gift, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newGift: Gift = {
-      ...gift,
-      id: generateId(),
-      createdAt: getCurrentTimestamp(),
-      updatedAt: getCurrentTimestamp()
-    };
-    setGifts(prev => [...prev, newGift]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAllUsluge("poklon");
+        console.log(data)
+        setGifts(data.items.map(mapUslugaToGift));
+      } catch (err) {
+        console.error("Failed to load gifts:", err);
+      }
+    })();
+  }, []);
+
+  const addGift = async (gift: Omit<Gift, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const created = await createUsluga("poklon", mapGiftToRequest(gift));
+      const mapped = mapUslugaToGift(created);
+
+      if (gift.image && gift.image != '') {
+          const res = await uploadImages(created.id, "usluga", [dataURLtoFile(gift.image, "gift-logo"+mapped.id)], ["logo"]);
+          console.log(res)
+          mapped.image=res ?? undefined
+      }
+
+      setGifts(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
+    } catch (err) {
+      console.error("Failed to add gift:", err);
+    }
   };
 
-  const updateGift = (id: string, updates: Partial<Gift>) => {
-    setGifts(prev => prev.map(gift => 
-      gift.id === id ? { ...gift, ...updates, updatedAt: getCurrentTimestamp() } : gift
-    ));
+  const updateGift = async (id: string, updates: Partial<Gift & { image?: string }>) => {
+    try {
+      const updated = await updateUslugaApi(Number(id), {
+        naziv: updates.name,
+        komentar: updates.defaultComment,
+        opis: updates.description,
+        cena: updates.price,
+        sadrzaj: updates.whatsIncluded,
+        pdv_grupa: updates.vatGroup,
+      });
+      const mapped = mapUslugaToGift(updated);
+
+      const gift = gifts.find(g => g.id === id);
+      if (!gift) throw new Error("Gift not found");
+      
+      // 2. Upload logo if provided
+      if (updates.image !== gift.image) {
+          // logo is different → upload new image
+          const pathToRemove = [gift.image ? extractRelativePath(gift.image) : undefined]
+                                .filter((p): p is string => !!p);
+          let data: File[] = [];
+          let img_type: string[] = [];
+          if (updates.image !== undefined && updates.image !== "") {
+              data = [dataURLtoFile(updates.image, `gift-logo${id}`)];
+              img_type = ["logo"];
+          }
+          console.log("data " + data)
+          const res = await uploadImages(
+            Number(id),
+            "usluga",
+            data,       
+            img_type,
+            pathToRemove
+          );
+      
+          mapped.image = res ?? mapped.image;
+      }
+      setGifts(prev => prev.map(g => g.id === id ? { ...mapped, updatedAt: getCurrentTimestamp() } : g));
+    } catch (err) {
+      console.error("Failed to update gift:", err);
+    }
   };
 
-  const deleteGift = (id: string) => {
-    setGifts(prev => prev.filter(gift => gift.id !== id));
+  const deleteGift = async (id: string) => {
+    try {
+      await deleteUslugaApi(Number(id));
+      setGifts(prev => prev.filter(g => g.id !== id));
+    } catch (err) {
+      console.error("Failed to delete gift:", err);
+    }
   };
 
   return (
@@ -92,8 +116,6 @@ export function GiftProvider({ children }: BaseProviderProps) {
 
 export function useGifts() {
   const context = useContext(GiftContext);
-  if (context === undefined) {
-    throw new Error('useGifts must be used within a GiftProvider');
-  }
+  if (!context) throw new Error('useGifts must be used within a GiftProvider');
   return context;
 }

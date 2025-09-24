@@ -1,6 +1,6 @@
 import React from "react";
 import { Search, Filter } from "lucide-react";
-import { TrashFilters } from "../types";
+import type { TrashFilters } from "../types"; // type-only import
 
 interface TrashFiltersProps {
   searchTerm: string;
@@ -11,7 +11,7 @@ interface TrashFiltersProps {
   onFilterChange: (filters: TrashFilters) => void;
 }
 
-export const TrashFilters: React.FC<TrashFiltersProps> = ({
+export const TrashFiltersComponent: React.FC<TrashFiltersProps> = ({
   searchTerm,
   onSearchChange,
   showFilters,
@@ -49,7 +49,6 @@ export const TrashFilters: React.FC<TrashFiltersProps> = ({
         </button>
       </div>
 
-      {/* Advanced Filters */}
       {showFilters && (
         <div className="border-t border-gray-200 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

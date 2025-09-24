@@ -46,9 +46,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            {offer.name}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900">{offer.name}</h3>
           <p className="text-sm text-gray-500">{offer.code}</p>
         </div>
         <span
@@ -64,33 +62,41 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       <div className="space-y-3 mb-4">
         <div className="flex items-center text-sm text-gray-600">
           <Users className="w-4 h-4 mr-2" />
-          <span className="font-medium">{offer.client}</span>
+          <span className="font-medium">{offer.client ?? "-"}</span>
           <span className="mx-2">•</span>
-          <span>{offer.numberOfPersons} osoba</span>
+          <span>{offer.numberOfPersons ?? 0} osoba</span>
         </div>
 
         <div className="flex items-center text-sm text-gray-600">
           <Calendar className="w-4 h-4 mr-2" />
           <span>
-            {new Date(offer.startDate).toLocaleDateString()} -{" "}
-            {new Date(offer.endDate).toLocaleDateString()}
+            {offer.startDate
+              ? new Date(offer.startDate).toLocaleDateString()
+              : "-"}{" "}
+            -{" "}
+            {offer.endDate
+              ? new Date(offer.endDate).toLocaleDateString()
+              : "-"}
           </span>
           <span className="mx-2">•</span>
-          <span>{offer.days} dana</span>
+          <span>{offer.days ?? 0} dana</span>
         </div>
 
         <div className="flex items-center text-sm text-gray-600">
           <Euro className="w-4 h-4 mr-2" />
           <span className="font-semibold text-lg text-gray-900">
-            €{offer.totalPrice.toLocaleString()}
+            {offer.totalPrice?.toLocaleString() ?? "0"}
           </span>
         </div>
 
         <div className="flex items-center text-sm text-gray-500">
           <MapPin className="w-4 h-4 mr-2" />
           <span>
-            Kreirao {new Date(offer.createdAt).toLocaleDateString()}{" "}
-            {offer.createdBy}
+            Kreirao{" "}
+            {offer.createdAt
+              ? new Date(offer.createdAt).toLocaleDateString()
+              : "-"}{" "}
+            {offer.createdBy ?? "-"}
           </span>
         </div>
       </div>
