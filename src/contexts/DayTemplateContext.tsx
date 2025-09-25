@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { DayTemplate } from '../types/cms';
 import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
 import { mapDayTemplateToSablonDanaRequest, mapSablonDanaToDayTemplate } from '../utils/cms_response_mappers';
-import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
+import { dataURLtoFile } from '../utils/image_converter';
 import { createSablon, deleteSablonApi, getAllSabloni, updateSablonApi, uploadImages } from '../api/cms';
 
 interface DayTemplateContextType extends BaseEntityContext<DayTemplate> {
@@ -88,7 +88,7 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
       let logoChanged = false;
       mapped.backgroundImage = template.backgroundImage;
       if (updates.backgroundImage !== template.backgroundImage) {
-        if (template.backgroundImage) pathsToRemove.push(extractRelativePath(template.backgroundImage));
+        if (template.backgroundImage) pathsToRemove.push(template.backgroundImage);
         if (updates.backgroundImage) {
           data.push(dataURLtoFile(updates.backgroundImage, `day-template-logo${id}`));
           img_types.push('logo');
@@ -107,7 +107,7 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
           ? []
           : template.galleryImages.filter(existing => updates.galleryImages?.includes(existing));
 
-        pathsToRemove.push(...diff.map(extractRelativePath));
+        pathsToRemove.push(...diff);
 
         const newImages = updates.galleryImages?.filter(img => !template.galleryImages.includes(img)) || [];
         newImages.forEach((img, i) => {

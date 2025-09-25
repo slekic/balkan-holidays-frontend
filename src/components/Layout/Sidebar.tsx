@@ -40,42 +40,49 @@ const navigationItems: NavigationItem[] = [
         label: "Hoteli",
         path: "/cms/hotels",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "restaurants",
         label: "Restorani",
         path: "/cms/restaurants",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "transport",
         label: "Prevoz",
         path: "/cms/transport",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "guides",
         label: "Vodiči",
         path: "/cms/guides",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "activities",
         label: "Aktivnosti",
         path: "/cms/activities",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "gifts",
         label: "Pokloni",
         path: "/cms/gifts",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "day-templates",
         label: "Šabloni dana",
         path: "/cms/day-templates",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
     ],
   },
@@ -90,18 +97,21 @@ const navigationItems: NavigationItem[] = [
         label: "Sve ponude",
         path: "/archive/all",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "follow-up",
         label: "Ponude za praćenje",
         path: "/archive/follow-up",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
       {
         id: "trash",
         label: "Kanta",
         path: "/archive/trash",
         roles: ["Admin", "Operation"],
+        icon: ""
       },
     ],
   },
@@ -116,24 +126,28 @@ const navigationItems: NavigationItem[] = [
         label: "Arhiva",
         path: "/finance/archive",
         roles: ["Admin", "Finance"],
+        icon: ""
       },
       {
         id: "expenses",
         label: "Rashodi",
         path: "/finance/expenses",
         roles: ["Admin", "Finance"],
+        icon: ""
       },
       {
         id: "payments",
         label: "Uplate",
         path: "/finance/payments",
         roles: ["Admin", "Finance"],
+        icon: ""
       },
       {
         id: "debts",
         label: "Dugovanja",
         path: "/finance/debts",
         roles: ["Admin", "Finance"],
+        icon: ""
       },
     ],
   },

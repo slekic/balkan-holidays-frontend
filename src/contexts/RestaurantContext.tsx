@@ -3,7 +3,7 @@ import { Restaurant } from '../types/cms';
 import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
 import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
 import { mapRestaurantToRequest, mapUslugaToRestaurant } from '../utils/cms_response_mappers';
-import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
+import { dataURLtoFile } from '../utils/image_converter';
 
 
 interface RestaurantContextType extends BaseEntityContext<Restaurant> {
@@ -88,7 +88,7 @@ export function RestaurantProvider({ children }: BaseProviderProps) {
         const keep = (!updates.images || updates.images.length === 0)
                     ? []
                     : restaurant.images.filter(existing => updates.images?.includes(existing));
-        const pathsToRemove = diff.map(img => extractRelativePath(img));
+        const pathsToRemove = diff;
 
         console.log("za brisanje ", pathsToRemove)
         if (pathsToRemove.length == 0 && restaurant.images.length == updates.images?.length) {

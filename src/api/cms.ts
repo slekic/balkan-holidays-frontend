@@ -9,6 +9,7 @@ export async function getAllHotels(page: number = 1, pageSize: number = 100): Pr
 }
 
 export async function createHotel(hotel: Omit<HotelResponse, 'id' | 'createdAt' | 'updatedAt'>): Promise<HotelResponse> {
+  console.log(JSON.stringify(hotel))
   const res = await fetch(`${BACKEND_URL}/cms/hotel`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -25,7 +26,7 @@ export async function updateHotelApi(
   id: string,
   hotel: Partial<Omit<HotelResponse, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<HotelResponse> {
- 
+    console.log(JSON.stringify(hotel))
   const res = await fetch(`${BACKEND_URL}/cms/hotel/${Number(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -66,7 +67,7 @@ export async function uploadImages(
   if (data.slike?.length > 0) {
     data.slike = data.slike.map((slika: { putanja: string }) => ({
       ...slika,
-      putanja: `${BACKEND_URL}/${slika.putanja}`
+      putanja: slika.putanja
     }));
   }
 
@@ -113,7 +114,7 @@ export async function uploadMultipleEntitiesImages(
 }
 
 export async function deleteHotelApi(id: string) {
-  const res = await fetch(`${BACKEND_URL}/hotel/${Number(id)}`, {
+  const res = await fetch(`${BACKEND_URL}/cms/hotel/${Number(id)}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete hotel");

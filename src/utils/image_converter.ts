@@ -10,11 +10,3 @@ export function dataURLtoFile(dataurl: string, filename: string) {
   return new File([u8arr], filename + "." + mime.split('/')[1], { type: mime });
 }
 
-export function extractRelativePath(fullUrl: string): string {
-  try {
-    const url = new URL(fullUrl);
-    return url.pathname.startsWith("/") ? url.pathname.slice(1) : url.pathname;
-  } catch {
-    return fullUrl;
-  }
-}

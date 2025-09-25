@@ -1,12 +1,10 @@
 import { AccommodationResponse, DailyServiceResponse, OfferResponse, PonudaAllResponse, SlajdResponse, SlikeResponse } from "../api/responses";
-import { BACKEND_URL } from "../config";
 import { Accommodation, DailyService, Offer, OfferDetailed } from "../pages/Archive/AllOffers/types";
 import { FollowUpOffer } from "../pages/Archive/FollowUpOffers/types";
 import { DeletedOffer } from "../pages/Archive/Trash/types";
 import { Slide, SlideType } from "../pages/OfferCreation/utils/constants";
 import { generateId } from "../pages/OfferCreation/utils/id";
 import { DayService, HotelEntry, OfferFormData, ServiceEntry } from "../types/offer";
-import { extractRelativePath } from "./image_converter";
 
 export const STATUS_MAP_RES_REQ: Record<string, string> = {
   "Poslato": "Sent",
@@ -257,12 +255,12 @@ export function mapSlajdResponseToSlide(apiSlide: SlajdResponse): Slide {
   const images: string[] = [];
 
   sadrzaj.slike?.forEach((s: string) => {
-      images.push(`${BACKEND_URL}/`+extractRelativePath(s));
+      images.push(s);
   });
 
   let logoObj = ""
   if (sadrzaj.logo) {
-    logoObj = `${BACKEND_URL}/`+extractRelativePath(sadrzaj.logo);
+    logoObj = sadrzaj.logo;
   }
 
   return {

@@ -3,7 +3,7 @@ import { Hotel } from '../types/cms';
 import { BaseEntityContext, BaseProviderProps, generateId, getCurrentTimestamp } from './base';
 import { createHotel, deleteHotelApi, getAllHotels, updateHotelApi, uploadImages } from '../api/cms';
 import { mapHotelResponse, mapHotelToRequest, mapPartialHotelToRequest } from '../utils/cms_response_mappers';
-import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
+import { dataURLtoFile } from '../utils/image_converter';
 
 
 interface HotelContextType extends BaseEntityContext<Hotel> {
@@ -73,7 +73,7 @@ export function HotelProvider({ children }: BaseProviderProps) {
       if (updates.logo !== hotel.logo) {
         // logo is different → upload new image
 
-        const pathToRemove = [hotel.logo ? extractRelativePath(hotel.logo) : undefined]
+        const pathToRemove = [hotel.logo ? hotel.logo : undefined]
                               .filter((p): p is string => !!p);
         let data: File[] = [];
         let img_type: string[] = [];

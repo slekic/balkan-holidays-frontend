@@ -3,7 +3,7 @@ import { Activity } from '../types/cms';
 import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
 import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
 import { mapUslugaToActivity, mapActivityToRequest } from '../utils/cms_response_mappers';
-import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
+import { dataURLtoFile } from '../utils/image_converter';
 
 interface ActivityContextType extends BaseEntityContext<Activity> {
   activities: Activity[];
@@ -98,7 +98,7 @@ export function ActivityProvider({ children }: BaseProviderProps) {
       if (updates.backgroundImage !== activity.backgroundImage) {
           // logo is different → upload new image
           pathsToRemove.push(
-            ...[activity.backgroundImage ? extractRelativePath(activity.backgroundImage) : undefined]
+            ...[activity.backgroundImage ? activity.backgroundImage : undefined]
               .filter((p): p is string => !!p)
           );
       
@@ -118,7 +118,7 @@ export function ActivityProvider({ children }: BaseProviderProps) {
         const keep = (!updates.images || updates.images.length === 0)
                       ? []
                       : activity.images.filter(existing => updates.images?.includes(existing));
-        pathsToRemove.push(...diff.map(img => extractRelativePath(img)));
+        pathsToRemove.push(...diff);
       
         const toRemove = (logoChanged) ? pathsToRemove.length - 1 : pathsToRemove.length
         if (toRemove == 0 && activity.images.length == updates.images?.length) {

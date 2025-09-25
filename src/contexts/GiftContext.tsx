@@ -3,7 +3,7 @@ import { Gift } from '../types/cms';
 import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
 import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
 import { mapUslugaToGift, mapGiftToRequest } from '../utils/cms_response_mappers';
-import { dataURLtoFile, extractRelativePath } from '../utils/image_converter';
+import { dataURLtoFile } from '../utils/image_converter';
 
 interface GiftContextType extends BaseEntityContext<Gift> {
   gifts: Gift[];
@@ -64,7 +64,7 @@ export function GiftProvider({ children }: BaseProviderProps) {
       // 2. Upload logo if provided
       if (updates.image !== gift.image) {
           // logo is different → upload new image
-          const pathToRemove = [gift.image ? extractRelativePath(gift.image) : undefined]
+          const pathToRemove = [gift.image ? gift.image : undefined]
                                 .filter((p): p is string => !!p);
           let data: File[] = [];
           let img_type: string[] = [];
