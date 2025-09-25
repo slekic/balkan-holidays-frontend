@@ -163,16 +163,20 @@ export default function OfferCreation() {
     console.log(JSON.stringify(payload));
   try {
     const method = isEdit ? "PUT" : "POST";
-    const url = isEdit && editOfferId
-    ? `${BACKEND_URL}/ponuda/${editOfferId}`
-    : `${BACKEND_URL}/ponuda`;
+    const rawUrl = isEdit && editOfferId
+  ? `${BACKEND_URL}/ponuda/${editOfferId}`
+  : `${BACKEND_URL}/ponuda`;
 
+  console.log("DA LI EDIT " + isEdit)
+  console.log("METODA " + method)
+  // forsiraj HTTPS
+  const url = rawUrl.replace(/^http:\/\//i, "https://");
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
     if (!res.ok) {
       throw new Error(`${isEdit ? "update" : "create"} failed: ${res.status}`);
