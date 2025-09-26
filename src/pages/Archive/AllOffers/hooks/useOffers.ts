@@ -156,17 +156,22 @@ export const useOffers = () => {
     if (action === "delete") {
       try {
         await deleteOfferApi(offerId);
+        toast.success("Ponuda prebačena u smeće")
         setCurrentBatch((prev) => prev.filter((offer) => offer.id !== offerId));
       } catch (error) {
         console.error(`Failed to delete offer ${offerId}:`, error);
+        toast.error("Neuspešno")
       }
     } else if (action === "duplicate") {
       try {
         const newOffer = await duplicateOfferApi(offerId);
+        console.log()
         const mapped = mapPonudaToOffer(newOffer);
+        toast.success("Kopija ponude uspešno kreirana")
         setCurrentBatch((prev) => [mapped, ...prev]);
       } catch (error) {
         console.error(`Failed to duplicate offer ${offerId}:`, error);
+        toast.error("Neuspešno pravljenje kopije")
       }
     } else if (action === "view" || action === "edit") {
       try {

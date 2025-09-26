@@ -114,6 +114,14 @@ export async function updateOfferStatusAPI({
 }
 
 export async function deleteOfferApi(id: string) {
+  const res = await fetch(`${BACKEND_URL}/ponuda/soft/${Number(id)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete offer");
+  return await res.json();
+}
+
+export async function deletePermOfferApi(id: string) {
   const res = await fetch(`${BACKEND_URL}/ponuda/${Number(id)}`, {
     method: "DELETE",
   });

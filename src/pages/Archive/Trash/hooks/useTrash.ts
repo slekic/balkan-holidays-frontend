@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { DeletedOffer, TrashFilters } from "../types";
 import { fetchOffers } from "../data/mockData";
-import { restoreOfferApi } from "../../../../api/offer";
+import { deletePermOfferApi, restoreOfferApi } from "../../../../api/offer";
+import { toast } from "react-toastify";
 
 export const useTrash = () => {
   const [offers, setOffers] = useState<DeletedOffer[]>([]);
@@ -80,32 +81,35 @@ export const useTrash = () => {
   };
 
   const handleRestore = async (offerId: string) => {
-    if (
-      confirm(
-        "Are you sure you want to restore this offer? It will be moved back to All Offers."
-      )
-    ) {
       try {
         await restoreOfferApi(offerId);
 
         setOffers((prev) => prev?.filter((offer) => offer.id !== offerId));
 
-        alert("Ponuda je uspešno vraćena.");
+        toast.success("Ponuda je uspešno vraćena.");
       } catch (error) {
         console.error("Failed to restore offer:", error);
-        alert("Vraćanje ponude nije uspelo.");
+        toast.error("Vraćanje ponude nije uspelo.");
       }
-    }
   };
 
 
-  const handlePermanentDelete = (offerId: string) => {
+  const handlePermanentDelete = async (offerId: string) => {
     if (
       confirm(
-        "Are you sure you want to permanently delete this offer? This action cannot be undone."
+        "Da li ste sigurni da trajno želite da obrišete ponudu?"
       )
     ) {
-      console.log(`Permanently deleting offer ${offerId}`);
+      try {
+        await deletePermOfferApi(offerId);
+
+        setOffers((prev) => prev?.filter((offer) => offer.id !== offerId));
+
+        toast.success("Ponuda je uspešno obrisana.");
+      } catch (error) {
+        console.error("Failed to restore offer:", error);
+        toast.error("Brisanje ponude nije uspelo.");
+      }
     }
   };
 
