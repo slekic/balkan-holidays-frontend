@@ -1,7 +1,9 @@
+import { toast } from "react-toastify";
+import { exportOfferProforma } from "../../../../api/export";
 import { ActionType } from "../utils/types";
 
 export function useFinanceActions() {
-  const handleAction = (action: ActionType, offerId: string) => {
+  const handleAction = async (action: ActionType, offerId: string) => {
     console.log(`${action} action for offer ${offerId}`);
     
     // Here you would implement the actual action logic
@@ -17,7 +19,11 @@ export function useFinanceActions() {
         // Create a copy of the offer
         break;
       case "proforma":
-        // Generate proforma invoice
+        try {
+              await exportOfferProforma(Number(offerId));
+        } catch (error) {
+              toast.error("Neuspešno eksportovanje predračuna");
+        }
         break;
       case "advance":
         // Generate advance invoice

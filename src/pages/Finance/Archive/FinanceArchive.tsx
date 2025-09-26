@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   useFinanceOffers,
@@ -59,6 +59,7 @@ export default function FinanceArchive() {
 
       {/* Offers Grid */}
       <OffersGrid offers={currentOffers} onAction={handleAction} />
+
 
       {/* Empty State */}
       {totalFilteredOffers === 0 && <EmptyState />}

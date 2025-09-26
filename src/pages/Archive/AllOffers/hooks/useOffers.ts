@@ -10,6 +10,7 @@ import {
 import { mapOffer, mapOfferToForm, mapPonudaToOffer } from "../../../../utils/offer_response_mappers";
 import { useNavigate } from "react-router-dom";
 import { exportOfferProforma } from "../../../../api/export";
+import { toast } from "react-toastify";
 
 const itemsPerPage = 6;        // koliko prikazujemo po strani
 const pagesPerBatch = 5;       // batch od 5 stranica
@@ -185,7 +186,7 @@ export const useOffers = () => {
       try {
         await exportOfferProforma(Number(offerId));
       } catch (error) {
-        console.error(`Failed to export proforma for offer ${offerId}:`, error);
+        toast.error("Neuspešno eksportovanje predračuna");
       }
     }
   };

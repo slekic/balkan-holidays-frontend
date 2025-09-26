@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "../config";
 import { Slide } from "../pages/OfferCreation/utils/constants";
-import { OfferResponse, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
+import { OfferResponse, OfferStats, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
 
 export async function getAllOffers(
   page: number = 1,
@@ -31,6 +31,14 @@ export async function getOffer(
   const res = await fetch(`${BACKEND_URL}/ponuda/${Number(id)}`);
 
   if (!res.ok) throw new Error("Failed to fetch offer");
+  return res.json();
+}
+
+export async function getStats(): Promise<OfferStats> {
+
+  const res = await fetch(`${BACKEND_URL}/ponuda/stats`);
+
+  if (!res.ok) throw new Error("Failed to fetch offer stats");
   return res.json();
 }
 

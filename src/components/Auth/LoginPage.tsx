@@ -83,16 +83,6 @@ export default function LoginPage() {
               {loading ? 'Prijava u toku...' : 'Prijavi se'}
             </button>
           </form>
-
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2 font-medium">Demo nalozi:</p>
-            <div className="space-y-1 text-xs text-gray-500">
-              <p>Admin: admin@balkanhol.com</p>
-              <p>Operativa: ops@balkanhol.com</p>
-              <p>Finansije: finance@balkanhol.com</p>
-              <p className="italic">Bilo koja lozinka funkcioniše za demo</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

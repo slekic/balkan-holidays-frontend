@@ -17,6 +17,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { mapOffer, mapOfferToForm } from "../../utils/offer_response_mappers";
 import { exportOffer } from "../../api/export";
 import { BACKEND_URL } from "../../config";
+import { toast } from "react-toastify";
+import { generateDayServices, useDatesAndDays } from "./hooks/useDatesAndDays";
+import { getOffer } from "../../api/offer";
 
 export default function OfferCreation() {
   const cms = useCMS();
@@ -105,10 +108,37 @@ export default function OfferCreation() {
       setIsEdit(true);
       setEditOfferId(incoming.id ?? incoming._id ?? null);
       // incoming is already OfferFormData
+      console.log("FORMA 1 " + JSON.stringify(incoming))
+
       setFormData(incoming);
     }
   }, [location.state, location.search]);
 
+   useEffect(() => {
+    const loadData = async () => {
+      if (editOfferId != null) {
+        try {
+          const res = await getOffer(editOfferId);
+          const mappedRes = mapOffer(res);
+           mappedRes.accommodation = mappedRes.accommodation.sort(
+            (a: any, b: any) =>
+              new Date(a.datum_od).getTime() - new Date(b.datum_od).getTime()
+          );
+
+          const forForm = mapOfferToForm(mappedRes)
+          forForm.landServices = generateDayServices(forForm.startDate, forForm.endDate, forForm.landServices)
+
+          setFormData(forForm);
+        } catch (err) {
+          console.error("Failed to load offer:", err);
+        }
+      } else if (isEdit){
+        toast.error("Ponuda nije pronađena")
+      }
+    } 
+
+    loadData();
+  }, [editOfferId]);
 
   const handleSaveOffer = async () => {
   if (!formData.clientId) {
@@ -182,46 +212,30 @@ export default function OfferCreation() {
     
     const mappedReturned = mapOffer(returned);
 
-    const start = new Date(mappedReturned.startDate);
-    const end = new Date(mappedReturned.endDate);
+    //mappedReturned.dailyServices.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    mappedReturned.accommodation = mappedReturned.accommodation.sort(
+      (a: any, b: any) =>
+        new Date(a.datum_od).getTime() - new Date(b.datum_od).getTime()
+    );
 
-    const allDates: string[] = [];
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      allDates.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD
-    }
+    const forForm = mapOfferToForm(mappedReturned)
+    forForm.landServices = generateDayServices(mappedReturned.startDate, mappedReturned.endDate, forForm.landServices)
 
-    mappedReturned.dailyServices = allDates.map(date => {
-      const existingDay = mappedReturned.dailyServices.find((d: any) => d.date === date);
-      if (existingDay) return existingDay;
+    console.log("FORMA 2 " + JSON.stringify(forForm))
+    //here 
+    setFormData(forForm);
+    toast.success(
+      isEdit ? "Promene uspešno sačuvane!" : "Ponuda uspešno sačuvana!"
+    );
 
-      return {
-        date,
-        dayName: new Date(date).toLocaleDateString('en-US', { weekday: 'long' }),
-        serviceId: 0,
-        serviceName: '',
-        serviceType: '',
-        numberOfPersons: 0,
-        numberOfDays: 0,
-        pricePerDayPerPerson: 0,
-        comment: '',
-      };
-    });
-
-    mappedReturned.dailyServices.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    mappedReturned.accommodation = mappedReturned.accommodation.map((h: any) => ({
-      ...h,
-      roomTypes: h.roomTypes.sort((a: any, b: any) => new Date(a.datum_od).getTime() - new Date(b.datum_od).getTime())
-    }));
-    
-    setFormData(mapOfferToForm(mappedReturned));
-
-    alert(isEdit ? "Offer updated successfully!" : "Offer saved successfully!");
     console.log(isEdit ? "Updated offer:" : "Created offer:", returned);
 
+    setIsEdit(true)
+    setEditOfferId(mappedReturned.id.toString())
     //navigate("/offers"); 
   } catch (err) {
     console.error(err);
-    alert(isEdit ? "Failed to update offer!" : "Failed to create offer!");
+    toast.error("Došlo je do greške prilikom čuvanja ponude!");
   }
   };
 
@@ -285,15 +299,28 @@ export default function OfferCreation() {
         totalOfferCost={totalOfferCost}
         pricePerPerson={pricePerPerson}
         numberOfPersons={formData.numberOfPersons}
-        onOpenExpenses={() => setExpensesModalOpen(true)}
+        onOpenExpenses={() => {
+          if (!editOfferId) {
+            toast.error("Ponuda još nije sačuvana, potom rashodi.");
+            return;
+          }
+          setExpensesModalOpen(true)
+        }
+        }
         onExportExcel={() => {
           if (!editOfferId) {
-            alert("Ponuda još nije sačuvana, prvo sačuvaj pa onda eksportuj.");
+            toast.error("Ponuda još nije sačuvana, potom ide eksport.");
             return;
           }
           exportOffer(Number(editOfferId));
         }}
-        onOpenPDF={() => setShowPDFModal(true)}
+        onOpenPDF={() => {
+          if (!editOfferId) {
+            toast.error("Ponuda još nije sačuvana, potom pdf.");
+            return;
+          }
+          setShowPDFModal(true)}
+        }
         onSave={handleSaveOffer}
       />
 

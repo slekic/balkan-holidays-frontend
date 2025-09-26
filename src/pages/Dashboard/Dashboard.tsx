@@ -1,5 +1,5 @@
 // components/Dashboard/Dashboard.tsx
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   FileText,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import StatCard from "./StatCard";
 import QuickActionCard from "./QuickActionCard";
+import { getStats } from "../../api/offer";
 
 type StatColor = "blue" | "yellow" | "green" | "red";
 type ActionColor = "blue" | "green" | "purple" | "orange";
@@ -31,18 +32,6 @@ type QuickAction = {
   path: string;
   roles: string[];
 };
-
-const stats: Stat[] = [
-  { title: "Ukupno ponuda", value: "247", icon: FileText, color: "blue" },
-  { title: "Potrebno praćenje", value: "18", icon: Archive, color: "yellow" },
-  { title: "Prihvaćene ponude", value: "89", icon: FileText, color: "green" },
-  {
-    title: "Neizmirena dugovanja",
-    value: "€12,450",
-    icon: DollarSign,
-    color: "red",
-  },
-];
 
 const quickActions: QuickAction[] = [
   {
@@ -81,6 +70,45 @@ const quickActions: QuickAction[] = [
 
 export default function Dashboard() {
   const { user } = useAuth();
+
+  const [stats, setStats] = useState<Stat[]>([]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await getStats();
+        setStats([
+          {
+            title: "Ukupno ponuda",
+            value: res.ukupno_ponuda.toString(),
+            icon: FileText,
+            color: "blue",
+          },
+          {
+            title: "Potrebno praćenje",
+            value: res.za_pracenje.toString(),
+            icon: Archive,
+            color: "yellow",
+          },
+          {
+            title: "Prihvaćene ponude",
+            value: res.prihvaceno.toString(),
+            icon: FileText,
+            color: "green",
+          },
+          {
+            title: "Neizmirena dugovanja",
+            value: `€${res.ukupno_dugovanja.toLocaleString()}`,
+            icon: DollarSign,
+            color: "red",
+          },
+        ]);
+      } catch (err) {
+        console.error("Failed to fetch stats", err);
+      }
+    }
+    fetchStats();
+  }, []);
 
   const accessibleActions = useMemo(
     () => quickActions.filter((a) => user && a.roles.includes(user.role)),

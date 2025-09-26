@@ -280,3 +280,10 @@ export interface SlajdResponse {
 export interface SlajdIdRedniMap {
   [id: number]: number; 
 }
+
+export interface OfferStats {
+  ukupno_ponuda: number;
+  za_pracenje: number;
+  prihvaceno: number;
+  ukupno_dugovanja: number;
+}
