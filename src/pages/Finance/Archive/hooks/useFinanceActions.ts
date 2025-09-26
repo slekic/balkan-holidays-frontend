@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { exportOfferProforma } from "../../../../api/export";
+import { exportOfferInvoice, exportOfferProforma } from "../../../../api/export";
 import { ActionType } from "../utils/types";
 
 export function useFinanceActions() {
@@ -26,10 +26,18 @@ export function useFinanceActions() {
         }
         break;
       case "advance":
-        // Generate advance invoice
+        try {
+              await exportOfferInvoice(Number(offerId), true);
+        } catch (error) {
+              toast.error("Neuspešno eksportovanje avansne fakture");
+        }
         break;
       case "final":
-        // Generate final invoice
+        try {
+              await exportOfferInvoice(Number(offerId), false);
+        } catch (error) {
+              toast.error("Neuspešno eksportovanje fakture");
+        }
         break;
       default:
         console.warn(`Unknown action: ${action}`);

@@ -9,7 +9,7 @@ import {
 } from "../../../../api/offer";
 import { mapOffer, mapOfferToForm, mapPonudaToOffer } from "../../../../utils/offer_response_mappers";
 import { useNavigate } from "react-router-dom";
-import { exportOfferProforma } from "../../../../api/export";
+import { exportOfferInvoice, exportOfferProforma } from "../../../../api/export";
 import { toast } from "react-toastify";
 
 const itemsPerPage = 6;        // koliko prikazujemo po strani
@@ -192,6 +192,19 @@ export const useOffers = () => {
         await exportOfferProforma(Number(offerId));
       } catch (error) {
         toast.error("Neuspešno eksportovanje predračuna");
+      }
+    } else if(action == "advance"){
+      try {
+          await exportOfferInvoice(Number(offerId), true);
+      } catch (error) {
+          toast.error("Neuspešno eksportovanje avansne fakture");
+      }
+
+    } else if(action == "final"){
+      try {
+          await exportOfferInvoice(Number(offerId), false);
+      } catch (error) {
+          toast.error("Neuspešno eksportovanje fakture");
       }
     }
   };
