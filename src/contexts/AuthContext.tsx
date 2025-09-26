@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: payload.role,
           isActive: payload.isActive ?? true,
         });
+        localStorage.setItem('user', payload.sub);
       } catch (err) {
         console.error("Invalid token", err);
         localStorage.removeItem('token');
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isActive: u.isActive ?? true,
       });
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', u.sub);
       return true;
     } catch (error) {
       console.error(error);

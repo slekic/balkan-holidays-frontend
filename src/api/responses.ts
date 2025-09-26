@@ -229,6 +229,7 @@ export interface RashodCreate {
   komentar?: string;
   fajl_index?: number; 
   naziv?: string;
+  kreirao: string;
 }
 
 export interface RashodResponse {
