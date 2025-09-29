@@ -366,8 +366,7 @@ export default function OfferCreation() {
         onSave={(updated) => {
           setSlides(slides.map((s) => (s.id === updated.id ? updated : s)));
           setEditingSlide(null);
-        }}
-      />
+        } } dayTemplates={[]}      />
 
       <NewClientModal
         open={showNewClientModal}
