@@ -42,6 +42,13 @@ export const OfferViewCard: React.FC<OfferViewCardProps> = ({ offer, onClose }) 
           Datum: {formatDateMDY(offer.startDate)} - {formatDateMDY(offer.endDate)}
         </p>
 
+        <p className="text-gray-700 mb-1">
+          Cena po osobi (bez PDV): €{offer.pricePerPerson?.toFixed(2) || "-"}
+        </p>
+        <p className="text-gray-700 mb-4">
+          Cena po osobi (sa PDV): €{offer.pricePerPersonVat?.toFixed(2) || "-"}
+        </p>
+
         {/* Smještaj */}
         {offer.accommodation?.length > 0 && (
           <div className="mb-6">

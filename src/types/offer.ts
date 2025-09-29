@@ -21,6 +21,7 @@ export interface OfferFormData {
   // Totals
   totalPrice: number;
   pricePerPerson: number;
+  last_known_updated_at: string;
 }
 
 export interface DayService {

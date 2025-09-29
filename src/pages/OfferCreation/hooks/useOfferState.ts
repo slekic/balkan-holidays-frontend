@@ -18,6 +18,7 @@ export function useOfferState() {
     landServices: [],
     totalPrice: 0,
     pricePerPerson: 0,
+    last_known_updated_at: ""
   });
 
   const handleInputChange = (field: keyof OfferFormData, value: any) => {

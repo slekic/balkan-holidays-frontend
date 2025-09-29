@@ -129,8 +129,8 @@ export function mapPonudaNaExpense(rashod: RashodResponse): Expense {
     amount: rashod.iznos || 0,
     comment: rashod.komentar || "",
     //attachedFile: rashod.dokument || undefined,
-    createdBy: rashod.kreirao || "",
     createdAt: rashod.kreirano || "",
     travelDate: rashod.datum || "",
+    attachedFile: rashod.fajl || "",
   };
 }

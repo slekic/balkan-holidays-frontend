@@ -178,12 +178,20 @@ export async function fetchClients(): Promise<PaginatedKlijent> {
 }
 
 export async function createClient(client: Omit<KlijentResponse, "id" | "createdAt" | "updatedAt">): Promise<KlijentResponse> {
+    console.log("IIIIII crrrrr" + JSON.stringify({
+      naziv: client.naziv,
+      pib: client.pib,
+      adresa: client.adresa,
+      broj_racuna: client.broj_racuna 
+    }))
   const res = await fetch(`${BACKEND_URL}/cms/klijent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       naziv: client.naziv,
       pib: client.pib,
+      adresa: client.adresa,
+      broj_racuna: client.broj_racuna
     }),
   });
   if (!res.ok) throw new Error("Failed to create client");
@@ -191,12 +199,21 @@ export async function createClient(client: Omit<KlijentResponse, "id" | "created
 }
 
 export async function updateClientApi(id: number, client: Partial<KlijentResponse>): Promise<KlijentResponse> {
+  
+  console.log("IIIIII " + JSON.stringify({
+      naziv: client.naziv,
+      pib: client.pib,
+      adresa: client.adresa,
+      broj_racuna: client.broj_racuna 
+    }))
   const res = await fetch(`${BACKEND_URL}/cms/klijent/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       naziv: client.naziv,
       pib: client.pib,
+      adresa: client.adresa,
+      broj_racuna: client.broj_racuna 
     }),
   });
   if (!res.ok) throw new Error("Failed to update client");

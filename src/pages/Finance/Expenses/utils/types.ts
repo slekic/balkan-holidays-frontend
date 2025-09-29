@@ -15,7 +15,6 @@ export interface Expense {
   amount: number;
   comment: string;
   attachedFile?: string;
-  createdBy: string;
   createdAt: string;
   travelDate: string;
 }

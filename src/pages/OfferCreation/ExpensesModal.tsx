@@ -54,7 +54,6 @@ export default function ExpensesModal({
           komentar: e.comment || "",
           fajl_index,
           naziv: e.entityName,
-          kreirao: localStorage.getItem("user") || "unknown",
         });
       };
 

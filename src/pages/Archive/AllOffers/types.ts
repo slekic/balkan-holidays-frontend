@@ -68,10 +68,13 @@ export interface OfferDetailed {
   endDate: string;  
   description?: string;
   status: string;
+  pricePerPerson: number;
+  pricePerPersonVat: number;
   includesAccommodation: boolean;
   includesDailyServices: boolean;
   accommodation: Accommodation[];
   dailyServices: DailyService[];
+  last_known_updated_at: string;
 }
 
 

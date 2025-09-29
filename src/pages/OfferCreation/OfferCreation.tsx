@@ -161,6 +161,7 @@ export default function OfferCreation() {
     opis: formData.option ?? null,
     ukljucuje_smestaj: formData.accommodationEnabled,
     ukljucuje_usluge: formData.landServicesEnabled,
+    last_known_updated_at: formData.last_known_updated_at === "" ? null : formData.last_known_updated_at,
     smestaj: formData.hotels.flatMap(h =>
       h.roomTypes.map(rt => ({
         hotel_id: Number(h.hotelId),

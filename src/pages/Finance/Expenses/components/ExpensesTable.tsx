@@ -105,7 +105,6 @@ export const ExpensesTable: React.FC<ExpensesTableProps> = ({
                       <p className="text-gray-900">
                         {new Date(expense.createdAt).toLocaleDateString()}
                       </p>
-                      <p className="text-gray-600">{expense.createdBy}</p>
                     </div>
                   </td>
                 </tr>

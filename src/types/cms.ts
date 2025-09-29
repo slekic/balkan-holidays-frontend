@@ -84,6 +84,8 @@ export interface Client {
   id: string;
   name: string;
   pib: string;
+  address: string;
+  bill: string;
   createdAt: Date;
   updatedAt: Date;
 }

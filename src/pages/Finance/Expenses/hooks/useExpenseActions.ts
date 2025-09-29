@@ -2,8 +2,11 @@ import { useCallback } from "react";
 
 export const useExpenseActions = () => {
   const handleViewFile = useCallback((fileName: string) => {
+    if (!fileName) return;
+
+    window.open(fileName, "_blank");
+
     console.log(`Viewing file: ${fileName}`);
-    // In a real app, this would open a file viewer or download the file
   }, []);
 
   const handleExportToExcel = useCallback(() => {

@@ -137,31 +137,41 @@ export function ActivityProvider({ children }: BaseProviderProps) {
             console.log("Uploading images:", data, img_types, pathsToRemove);  
         }
       } 
-      if(data.length || pathsToRemove){
-          const res = await uploadImages(
-                    Number(id),
-                    "usluga",
-                    data,
-                    img_types,
-                    pathsToRemove
-          );
+      if (data.length > 0 || pathsToRemove.length > 0) {
+        const res = await uploadImages(
+          Number(id),
+          "usluga",
+          data,
+          img_types,
+          pathsToRemove
+        );
 
-          console.log("RES " + res.slike)
-          console.log("TR " + mapped.images)
-          console.log("BG " + mapped.backgroundImage)
-          mapped.backgroundImage = res.slike
-              .filter((s: { tip: string }) => s.tip === "logo")
-              .map((s: { putanja: string }) => s.putanja)[0] ?? mapped.backgroundImage;
+        if (res && Array.isArray(res.slike)) {
+          mapped.backgroundImage =
+            res.slike.find((s: { tip: string }) => s.tip === "logo")?.putanja ??
+            mapped.backgroundImage;
 
-          if (Array.isArray(res.slike)) {
-            mapped.images = mapped.images.concat(res.slike
-              .filter((s: { tip: string }) => s.tip === "slika")
-              .map((s: { putanja: string }) => s.putanja)) || mapped.images;
-          }
+          const newImages = res.slike
+            .filter((s: { tip: string }) => s.tip === "slika")
+            .map((s: { putanja: string }) => s.putanja);
+
+          mapped.images = [...(mapped.images ?? []), ...newImages];
+        }
       }
+
+      console.log("MAPIRANO " + JSON.stringify(mapped))
       setActivities(prev =>
-        prev.map(a => a.id === id ? { ...mapped, updatedAt: getCurrentTimestamp() } : a)
-      );
+          prev.map(a =>
+            a.id === id
+              ? {
+                  ...a,
+                  ...mapped,
+                  updatedAt: getCurrentTimestamp(),
+                }
+              : a
+          )
+        );
+
     } catch (err) {
       console.error("Failed to update activity:", err);
     }

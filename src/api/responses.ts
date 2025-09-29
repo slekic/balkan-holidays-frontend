@@ -50,6 +50,8 @@ export interface KlijentResponse {
   id: string;
   naziv: string;
   pib: string;
+  adresa: string;
+  broj_racuna: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -199,10 +201,13 @@ export interface OfferResponse {
   datum_do: string; 
   opis?: string;
   status: string;
+  cena_po_osobi: number;
+  cena_po_osobi_pdv: number;
   ukljucuje_smestaj: boolean;
   ukljucuje_usluge: boolean;
   smestaj: AccommodationResponse[];
   usluge_po_danu: DailyServiceResponse[];
+  last_known_updated_at: string;
 }
 
 export interface KorisnikResponse {
@@ -229,7 +234,6 @@ export interface RashodCreate {
   komentar?: string;
   fajl_index?: number; 
   naziv?: string;
-  kreirao: string;
 }
 
 export interface RashodResponse {
@@ -242,7 +246,6 @@ export interface RashodResponse {
   nazivEntiteta: string;
   iznos: number;
   komentar?: string;
-  kreirao?: string | null;
   kreirano?: string | null;
   datum?: string | null;
   fajl?: string | null; 

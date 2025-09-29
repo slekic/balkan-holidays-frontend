@@ -42,15 +42,24 @@ export function ClientProvider({ children }: BaseProviderProps) {
   };
 
   const updateClient = async (id: string, updates: Partial<Client>) => {
-    const payload: { naziv?: string; pib?: string } = {};
+    const payload: { 
+      naziv?: string; 
+      pib?: string; 
+      adresa?: string; 
+      broj_racuna?: string 
+    } = {};
+
     if (updates.name !== undefined) payload.naziv = updates.name;
     if (updates.pib !== undefined) payload.pib = updates.pib;
+    if (updates.address !== undefined) payload.adresa = updates.address;
+    if (updates.bill !== undefined) payload.broj_racuna = updates.bill;
 
     const updated = await updateClientApi(Number(id), payload);
-    const mappedClient = mapKlijentResponseToClient(updated)
+    const mappedClient = mapKlijentResponseToClient(updated);
 
     setClients(prev => prev.map(c => (c.id === id ? mappedClient : c)));
   };
+
 
   const deleteClient = async (id: string) => {
     await deleteClientApi(Number(id));

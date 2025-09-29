@@ -45,10 +45,10 @@ export function mapHotelToRequest(
   return {
     naziv: hotel.name,
     tipovi_soba: hotel.roomTypes.map(rt => rt.name),
-    link_sajta: hotel.websiteLink || undefined,
-    opis: hotel.description || undefined,
-    broj_soba: hotel.numberOfRooms ?? null,
-    broj_restorana: hotel.numberOfRestaurants ?? null,
+    link_sajta: hotel.websiteLink || "",
+    opis: hotel.description || "",
+    broj_soba: hotel.numberOfRooms ?? 0,
+    broj_restorana: hotel.numberOfRestaurants ?? 0,
     pdv_grupa: hotel.vatGroup,
     slike: []
   };
@@ -222,6 +222,8 @@ export function mapClientToKlijentRequest(client: Omit<Client, "id" | "createdAt
   return {
     naziv: client.name,
     pib: client.pib,
+    adresa: client.address,
+    broj_racuna: client.bill
   };
 }
 
@@ -230,6 +232,8 @@ export function mapKlijentResponseToClient(klijent: KlijentResponse): Client {
     id: klijent.id.toString(),
     name: klijent.naziv,
     pib: klijent.pib,
+    address: klijent.adresa,
+    bill: klijent.broj_racuna,
     createdAt: klijent.createdAt ? parseDate(klijent.createdAt) : new Date(),
     updatedAt: klijent.updatedAt ? parseDate(klijent.updatedAt) : new Date(),
   };

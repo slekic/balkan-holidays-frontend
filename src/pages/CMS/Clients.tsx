@@ -11,12 +11,16 @@ export default function Clients() {
   const [formData, setFormData] = useState<Partial<Client>>({
     name: "",
     pib: "",
+    address: "",
+    bill: "",
   });
 
   const resetForm = () => {
     setFormData({
       name: "",
       pib: "",
+      address: "",
+      bill: "",
     });
     setEditingClient(null);
   };
@@ -62,15 +66,20 @@ export default function Clients() {
   };
 
   const columns = [
-    {
-      key: "name",
-      label: "Naziv klijenta",
-    },
+    { key: "name", label: "Naziv klijenta" },
     {
       key: "pib",
       label: "PIB (poreski broj)",
       render: (client: Client) => (
         <span className="font-mono text-sm">{client.pib}</span>
+      ),
+    },
+    { key: "address", label: "Adresa" },
+    {
+      key: "tekuciRacun",
+      label: "Tekući račun",
+      render: (client: Client) => (
+        <span className="font-mono text-sm">{client.bill}</span>
       ),
     },
     {
@@ -95,7 +104,9 @@ export default function Clients() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         searchPlaceholder="Pretraži klijente..."
-        getSearchValue={(client) => `${client.name} ${client.pib}`}
+        getSearchValue={(client) =>
+          `${client.name} ${client.pib} ${client.address} ${client.bill}`
+        }
       />
 
       <EntityModal
@@ -104,6 +115,7 @@ export default function Clients() {
         title={editingClient ? "Izmeni klijenta" : "Dodaj novog klijenta"}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Naziv */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Naziv klijenta <span className="text-red-500">*</span>
@@ -120,6 +132,7 @@ export default function Clients() {
             />
           </div>
 
+          {/* PIB */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               PIB (poreski broj) <span className="text-red-500">*</span>
@@ -133,6 +146,38 @@ export default function Clients() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
               placeholder="e.g., 123456789"
               required
+            />
+          </div>
+
+          {/* Adresa */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Adresa
+            </label>
+            <input
+              type="text"
+              value={formData.address || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., Bulevar kralja Aleksandra 123, Beograd"
+            />
+          </div>
+
+          {/* Tekući račun */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tekući račun
+            </label>
+            <input
+              type="text"
+              value={formData.bill || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, bill: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+              placeholder="e.g., 160-123456-78"
             />
           </div>
 

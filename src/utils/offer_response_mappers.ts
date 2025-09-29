@@ -84,10 +84,13 @@ export function mapOffer(apiData: OfferResponse): OfferDetailed {
     endDate: apiData.datum_do,
     description: apiData.opis,
     status: apiData.status,
+    pricePerPerson: apiData.cena_po_osobi,
+    pricePerPersonVat: apiData.cena_po_osobi_pdv,
     includesAccommodation: apiData.ukljucuje_smestaj,
     includesDailyServices: apiData.ukljucuje_usluge,
     accommodation: (apiData.smestaj || []).map(mapAccommodation),
     dailyServices: (apiData.usluge_po_danu || []).map(mapDailyService),
+    last_known_updated_at: apiData.last_known_updated_at
   };
 }
 
@@ -234,6 +237,7 @@ export function mapOfferToForm(offer: OfferDetailed): OfferFormData {
 
     totalPrice,
     pricePerPerson,
+    last_known_updated_at: offer.last_known_updated_at
   };
 }
 
