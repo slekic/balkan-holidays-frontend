@@ -40,7 +40,7 @@ export default function Expenses() {
     resetPagination,
   } = useExpensePagination(filteredExpenses);
 
-  const { handleViewFile, handleExportToExcel } = useExpenseActions();
+  const { handleViewFile, handleExportToExcel } = useExpenseActions(filteredExpenses);
 
   // Reset pagination when filters change
   useEffect(() => {
