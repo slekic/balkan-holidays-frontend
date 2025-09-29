@@ -170,3 +170,49 @@ export async function exportSelectedExpenses(expenseIds: number[]) {
     console.error("Error exporting expenses:", error);
   }
 }
+
+
+export async function exportSelectedOffers(offersIds: number[]) {
+  if (!offersIds || offersIds.length === 0) return;
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/export/offer/all`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ponude_ids: offersIds }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to export expenses: ${response.statusText}`);
+    }
+
+    console.log("RES OK")
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+
+    const disposition = response.headers.get("Content-Disposition");
+    let filename = "Ponude.xlsx";
+    if (disposition && disposition.includes("filename=")) {
+      filename = disposition
+        .split("filename=")[1]
+        .replace(/"/g, "")
+        .trim();
+    }
+
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    console.log("Offers exported successfully!");
+  } catch (error) {
+    console.error("Error exporting offers:", error);
+  }
+}

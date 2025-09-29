@@ -9,7 +9,7 @@ import {
 } from "../../../../api/offer";
 import { mapOffer, mapOfferToForm, mapPonudaToOffer } from "../../../../utils/offer_response_mappers";
 import { useNavigate } from "react-router-dom";
-import { exportOfferInvoice, exportOfferProforma } from "../../../../api/export";
+import { exportOfferInvoice, exportOfferProforma, exportSelectedOffers } from "../../../../api/export";
 import { toast } from "react-toastify";
 
 const itemsPerPage = 6;        // koliko prikazujemo po strani
@@ -209,8 +209,19 @@ export const useOffers = () => {
     }
   };
 
-  const handleExport = () => {
-    console.log("Exporting offers to Excel");
+  const handleExport = async () => {
+    if (!filteredOffers || filteredOffers.length === 0) {
+      console.warn("Nema ponuda za export");
+      return;
+    }
+
+    const offersIds = filteredOffers.map((offer) => Number(offer.id));
+
+    try {
+      await exportSelectedOffers(offersIds);
+    } catch (err) {
+      console.error("Greška prilikom exporta ponuda:", err);
+    }
   };
 
  const handleSearchChange = (value: string) => {
