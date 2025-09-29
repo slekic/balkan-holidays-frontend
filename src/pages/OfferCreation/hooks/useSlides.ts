@@ -98,7 +98,7 @@ export function useSlides(offerId: string | null) {
         const slideId = redniIdMap[slide.num];
         const content = slide.content || {};
 
-        if (content.backgroundImage) {
+         if (content.backgroundImage && content.backgroundImage.startsWith("data:")) {
           filesArr.push(content.backgroundImage);
           tipoviArr.push("logo");
           entityIds.push(slideId);
@@ -106,7 +106,7 @@ export function useSlides(offerId: string | null) {
         }
 
         content.images?.forEach((img: string) => {
-          if (img) {
+          if (img && img.startsWith("data:")) {
             filesArr.push(img);
             tipoviArr.push("slika");
             entityIds.push(slideId);
@@ -115,8 +115,6 @@ export function useSlides(offerId: string | null) {
         });
 
       });
-
-      console.log("JEBENO " + JSON.stringify(filesArr))
 
       // 4️⃣ Pozovi batch upload funkciju
       if (entityIds.length > 0) {

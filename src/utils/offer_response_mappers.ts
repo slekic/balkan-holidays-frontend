@@ -255,6 +255,7 @@ function mapServiceType(type: string | undefined): ServiceEntry['serviceType'] {
 }
 
 export function mapSlajdResponseToSlide(apiSlide: SlajdResponse): Slide {
+  console.log("SLIIII " + JSON.stringify(apiSlide))
   const sadrzaj = apiSlide.sadrzaj || {};
   const images: string[] = [];
 

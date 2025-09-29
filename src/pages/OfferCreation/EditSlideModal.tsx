@@ -2,18 +2,28 @@ import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Slide, slideTypeLabels } from "./utils/constants";
 import ImageUpload from "../../components/CMS/Common/ImageUpload";
+import { useCMS } from "../../contexts/CMSContext";
 
 type Props = {
   slide: Slide | null;
   onClose: () => void;
   onSave: (updated: Slide) => void;
+  dayTemplates: {
+    label: string;
+    content: Partial<Slide["content"]>;
+    title?: string;
+  }[];
 };
 
 export default function EditSlideModal({ slide, onClose, onSave }: Props) {
   const [localSlide, setLocalSlide] = useState<Slide | null>(slide);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+
+  const dayTemplates = useCMS().dayTemplates;
 
   useEffect(() => {
     setLocalSlide(slide);
+    setSelectedTemplate("");
   }, [slide]);
 
   if (!localSlide) return null;
@@ -28,6 +38,18 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
       ...localSlide,
       content: { ...localSlide.content, ...updates },
     });
+  };
+
+  const handleSelectTemplate = (label: string) => {
+    const template = dayTemplates.find((t) => t.title === label);
+    if (!template || !localSlide) return;
+
+    setSelectedTemplate(label);
+
+    handleContentChange({ description: template.description || "" });
+    if (template.title) {
+      handleChange({ title: template.title });
+    }
   };
 
   return (
@@ -45,134 +67,148 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-          <div className="space-y-6">
-            {/* Naslov */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Naslov
-              </label>
-              <input
-                type="text"
-                value={localSlide.title}
-                onChange={(e) => handleChange({ title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* General slide */}
-            {localSlide.type === "general" && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Opis
-                  </label>
-                  <textarea
-                    value={localSlide.content.description || ""}
-                    onChange={(e) =>
-                      handleContentChange({ description: e.target.value })
-                    }
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <ImageUpload
-                    label="Logo"
-                    value={localSlide.content.logo || ""}
-                    onChange={(value) => handleContentChange({ logo: value })}
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Day slide */}
-            {localSlide.type === "day" && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Broj dana
-                  </label>
-                  <input
-                    type="number"
-                    value={localSlide.content.dayNumber || 1}
-                    onChange={(e) =>
-                      handleContentChange({
-                        dayNumber: parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Opis
-                  </label>
-                  <textarea
-                    value={localSlide.content.description || ""}
-                    onChange={(e) =>
-                      handleContentChange({ description: e.target.value })
-                    }
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <ImageUpload
-                    label="Pozadinska slika"
-                    value={localSlide.content.backgroundImage || ""}
-                    onChange={(value) =>
-                      handleContentChange({ backgroundImage: value })
-                    }
-                  />
-                </div>
-                <div>
-                  <ImageUpload
-                    label="Dodatne slike dana"
-                    multiple
-                    values={localSlide.content.images || []}
-                    onMultipleChange={(images) => handleContentChange({ images })}
-                    maxImages={3} onChange={function (value: string): void {
-                      throw new Error("Function not implemented.");
-                    } }                  />
-                </div>
-              </>
-            )}
-
-            {/* Hotel, restaurant, gift slides */}
-            {["hotel", "restaurant", "gift"].includes(localSlide.type) && (
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-6">
+          {localSlide.type === "day" ? (
+            <div className="space-y-4">
+              {/* Polje za naslov */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Naziv {localSlide.type === "hotel"
-                    ? "hotela"
-                    : localSlide.type === "restaurant"
-                    ? "restorana"
-                    : "poklona"}
+                  Naslov dana
                 </label>
                 <input
                   type="text"
-                  value={localSlide.content.name || ""}
+                  value={localSlide.title}
+                  onChange={(e) => handleChange({ title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Select za template */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Izaberite template dana
+                </label>
+                <select
+                  value={selectedTemplate}
+                  onChange={(e) => handleSelectTemplate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">-- Izaberite --</option>
+                  {dayTemplates.map((t) => (
+                    <option key={t.title} value={t.title}>
+                      {t.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Broj dana */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Broj dana
+                </label>
+                <input
+                  type="number"
+                  value={localSlide.content.dayNumber || 1}
                   onChange={(e) =>
-                    handleContentChange({ name: e.target.value })
+                    handleContentChange({
+                      dayNumber: parseInt(e.target.value),
+                    })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-            )}
 
-            {/* What-to-expect slide */}
-            {localSlide.type === "what-to-expect" && (
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  Ovo je fiksni šablon slajda sa unapred definisanim sadržajem o
-                  uslugama i obećanjima vaše kompanije. Sadržaj se ne može
-                  menjati kako bi se očuvala konzistentnost u svim
-                  prezentacijama.
-                </p>
+              {/* Opis */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opis
+                </label>
+                <textarea
+                  value={localSlide.content.description || ""}
+                  onChange={(e) =>
+                    handleContentChange({ description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
-            )}
-          </div>
+
+              {/* Slike */}
+              <div>
+                <ImageUpload
+                  label="Pozadinska slika"
+                  value={localSlide.content.backgroundImage || ""}
+                  onChange={(value) =>
+                    handleContentChange({ backgroundImage: value })
+                  }
+                />
+              </div>
+              <div>
+                <ImageUpload
+                  label="Dodatne slike dana"
+                  multiple
+                  values={localSlide.content.images || []}
+                  onMultipleChange={(images) =>
+                    handleContentChange({ images })
+                  }
+                  maxImages={3}
+                  onChange={() => {}}
+                />
+              </div>
+            </div>
+          ) : (
+            // Ostali tipovi (hotel, restoran, aktivnost…)
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Naslov
+                </label>
+                <input
+                  type="text"
+                  value={localSlide.title || ""}
+                  onChange={(e) => handleChange({ title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opis
+                </label>
+                <textarea
+                  value={localSlide.content.description || ""}
+                  onChange={(e) =>
+                    handleContentChange({ description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <ImageUpload
+                  label="Pozadinska slika"
+                  value={localSlide.content.backgroundImage || ""}
+                  onChange={(value) =>
+                    handleContentChange({ backgroundImage: value })
+                  }
+                />
+              </div>
+              <div>
+                <ImageUpload
+                  label="Dodatne slike"
+                  multiple
+                  values={localSlide.content.images || []}
+                  onMultipleChange={(images) =>
+                    handleContentChange({ images })
+                  }
+                  maxImages={3}
+                  onChange={() => {}}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
