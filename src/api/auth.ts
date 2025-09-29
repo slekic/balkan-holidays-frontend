@@ -14,7 +14,6 @@ export async function loginRequest(email: string, password: string): Promise<Log
 
   if (!res.ok) {
     const errorData = await res.json(); 
-    console.log("ERRR " + JSON.stringify(errorData))
     throw { response: { data: errorData } }; 
   }
 
