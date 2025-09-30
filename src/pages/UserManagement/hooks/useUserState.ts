@@ -19,7 +19,7 @@ export function useUserState() {
           role: u.uloga as UserRole,
           status: u.aktivan ? "Active" : "Inactive",
           createdAt: u.kreirano || new Date().toISOString().split("T")[0],
-          lastLogin: "",
+          lastLogin: u.poslednji_login || "",
         }));
         setUsers(mappedUsers);
       } catch (err) {
@@ -66,7 +66,7 @@ export function useUserState() {
         role: createdUser.uloga as UserRole,
         status: createdUser.aktivan ? "Active" : "Inactive",
         createdAt: createdUser.kreirano || new Date().toISOString().split("T")[0],
-        lastLogin: "",
+        lastLogin: createdUser.poslednji_login || "",
       };
 
       setUsers((prev) => [...prev, newUser]);
@@ -91,7 +91,7 @@ export function useUserState() {
         role: updatedUserFromBackend.uloga as UserRole,
         status: updatedUserFromBackend.aktivan ? "Active" : "Inactive",
         createdAt: updatedUserFromBackend.kreirano || new Date().toISOString().split("T")[0],
-        lastLogin: "",
+        lastLogin: updatedUserFromBackend.poslednji_login || "",
       };
 
       setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));

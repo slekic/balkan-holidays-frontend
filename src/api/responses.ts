@@ -217,6 +217,7 @@ export interface KorisnikResponse {
   uloga: string;
   aktivan: boolean;
   kreirano: string;
+  poslednji_login: string;
 }
 
 export interface KreirajKorisnikaRequest {
