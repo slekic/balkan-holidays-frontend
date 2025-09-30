@@ -167,7 +167,7 @@ export default function Gifts() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cena <span className="text-red-500">*</span>
+              Cena na PDF prezentaciji <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
