@@ -35,7 +35,7 @@ export default function LoginPage() {
               <LogIn className="h-8 w-8 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900">Dobrodošli nazad</h2>
-            <p className="text-gray-600 mt-2">Prijavite se u interni sistem Balkan Holidays</p>
+            <p className="text-gray-600 mt-2">Prijavite se u interni sistem Balkan Holidays-a</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
