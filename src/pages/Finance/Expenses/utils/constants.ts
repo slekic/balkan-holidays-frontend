@@ -38,7 +38,7 @@ export const ENTITY_TYPE_LABELS = {
   other: "Ostalo",
 } as const;
 
-export const ITEMS_PER_PAGE = 10;
+export const ITEMS_PER_PAGE = 100;
 
 export const MOCK_CLIENTS = [
   "ABC Travel Agency",
