@@ -30,6 +30,15 @@ export default function AddUserModal({ open, onClose, onAdd }: Props) {
       return;
     }
 
+    const emailInput = document.createElement("input");
+        emailInput.type = "email";
+        emailInput.value = email;
+    
+    if (!emailInput.checkValidity()) {
+          toast.error("Unesite ispravnu email adresu.", { autoClose: 3000 });
+          return;
+    }
+
     onAdd(name, email, password, role);
     onClose();
   };
