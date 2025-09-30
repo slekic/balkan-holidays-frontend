@@ -1,4 +1,3 @@
-// components/Dashboard/Dashboard.tsx
 import React, { useMemo, useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import {
@@ -13,6 +12,7 @@ import {
 import StatCard from "./StatCard";
 import QuickActionCard from "./QuickActionCard";
 import { getStats } from "../../api/offer";
+import { User } from "../../types";
 
 type StatColor = "blue" | "yellow" | "green" | "red";
 type ActionColor = "blue" | "green" | "purple" | "orange";
@@ -69,9 +69,41 @@ const quickActions: QuickAction[] = [
 ];
 
 export default function Dashboard() {
-  const { user } = useAuth();
-
+  const { user, setUser } = useAuth(); // setUser mora da postoji u AuthContext
   const [stats, setStats] = useState<Stat[]>([]);
+
+  // fallback user iz localStorage ako auth context nema user
+  const currentUser: User | null = useMemo(() => {
+    if (user) return user;
+
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      try {
+        let u;
+        if (stored.startsWith("{")) {
+          u = JSON.parse(stored); // JSON iz storage
+        } else {
+          // fallback ako je ostao samo string (npr. "admin1")
+          u = { id: "", name: stored, email: "", role: "Operation", isActive: true };
+        }
+
+        const mappedUser: User = {
+          id: u.id ?? "",
+          name: u.name ?? u.sub ?? "Korisnik",
+          email: u.email ?? "",
+          role: u.role ?? "Operation",
+          isActive: u.isActive ?? true,
+        };
+
+        setUser?.(mappedUser); // update AuthContext
+        return mappedUser;
+      } catch (err) {
+        console.error("Invalid user in storage", err);
+        localStorage.removeItem("user");
+      }
+    }
+    return null;
+  }, [user, setUser]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -111,8 +143,11 @@ export default function Dashboard() {
   }, []);
 
   const accessibleActions = useMemo(
-    () => quickActions.filter((a) => user && a.roles.includes(user.role)),
-    [user]
+    () =>
+      quickActions.filter(
+        (a) => currentUser && a.roles.includes(currentUser.role)
+      ),
+    [currentUser]
   );
 
   return (
@@ -120,7 +155,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Dobrodošli nazad, {user?.name}
+            Dobrodošli nazad, {currentUser?.name}
           </h1>
           <p className="text-gray-600 mt-1">
             Evo šta se dešava u vašem turističkom poslovanju danas.

@@ -42,7 +42,6 @@ export default function EditUserModal({ open, user, onClose, onSave }: Props) {
       return;
     }
 
-
     onSave(editingUser);
     onClose();
   };
