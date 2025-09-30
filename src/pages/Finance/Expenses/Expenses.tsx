@@ -84,7 +84,7 @@ export default function Expenses() {
         currentPage={currentPage}
         totalPages={totalPages}
         startIndex={startIndex}
-        itemsPerPage={10}
+        itemsPerPage={100}
         totalItems={filteredExpenses.length}
         onPageChange={goToPage}
         onNextPage={goToNextPage}
