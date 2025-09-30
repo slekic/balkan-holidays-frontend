@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit, Trash2, UserCheck, UserX } from "lucide-react";
-import { User } from "./types";
 import { getRoleColor, getRolePermissions, getStatusColor } from "./utils";
+import { User } from "../../types/user";
 
 type Props = {
   users: User[];
@@ -81,7 +81,7 @@ export default function UsersTable({
                   <span className="text-sm text-gray-700">
                     {user.lastLogin
                       ? new Date(user.lastLogin).toLocaleDateString()
-                      : "Never"}
+                      : "Nikad"}
                   </span>
                 </td>
                 <td className="py-3 px-4">

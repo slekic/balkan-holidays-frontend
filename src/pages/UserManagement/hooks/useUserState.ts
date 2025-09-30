@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { User, UserRole, UserStatus } from "../../../types/user";
 import { createUser, getAllUsers, deactivateUser, updateUser as updateUserApi, deleteUserApi } from "../../../api/users";
+import { toast } from "react-toastify";
 
 export function useUserState() {
   const [users, setUsers] = useState<User[]>([]);
@@ -69,10 +70,18 @@ export function useUserState() {
         lastLogin: createdUser.poslednji_login || "",
       };
 
+      toast.success("Uspešno kreiranje korisnika")
       setUsers((prev) => [...prev, newUser]);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to create user:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Neuspelo kreiranje korisnika");
+      }
     }
+
   };
 
   const updateUser = async (updatedData: User) => {
@@ -94,9 +103,16 @@ export function useUserState() {
         lastLogin: updatedUserFromBackend.poslednji_login || "",
       };
 
+      toast.success("Uspešno ažuriranje korisnika")
       setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
-    } catch (err) {
-      console.error("Failed to update user:", err);
+    } catch (error: unknown) {
+      console.error("Failed to create user:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Neuspelo ažuriranje korisnika");
+      }
     }
   };
 

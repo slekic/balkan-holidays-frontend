@@ -18,7 +18,7 @@ export async function createUser(user: KreirajKorisnikaRequest): Promise<Korisni
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.detail || "Failed to create user");
+    throw new Error(errorData.detail || "Neuspešno kreiranje korisnika");
   }
 
   return res.json();
