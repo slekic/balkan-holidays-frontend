@@ -78,6 +78,13 @@ const navigationItems: NavigationItem[] = [
         icon: ""
       },
       {
+        id: "clients",
+        label: "Klijenti",
+        path: "/cms/clients",
+        roles: ["Admin", "Operation"],
+        icon: ""
+      },
+      {
         id: "day-templates",
         label: "Šabloni dana",
         path: "/cms/day-templates",
