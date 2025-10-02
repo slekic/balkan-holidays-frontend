@@ -122,7 +122,7 @@ export const useFollowUpOffers = () => {
   };
 
   const getFollowUpUrgency = (days: number) => {
-    if (days <= 3) return "bg-red-100 text-red-800";
+    if (days <= 2) return "bg-red-100 text-red-800";
     if (days <= 7) return "bg-yellow-100 text-yellow-800";
     return "bg-blue-100 text-blue-800";
   };
@@ -135,10 +135,13 @@ export const useFollowUpOffers = () => {
           o.id === offerId ? { ...o, status: newStatus as Offer["status"] } : o
         )
       );
+
       setFilteredOffers((prev) =>
-        prev.map((o) =>
-          o.id === offerId ? { ...o, status: newStatus as Offer["status"] } : o
-        )
+        prev
+          .map((o) =>
+            o.id === offerId ? { ...o, status: newStatus as Offer["status"] } : o
+          )
+          .filter((o) => o.status === "Sent")
       );
     } else {
       console.error("Failed to update status:", result.message);
