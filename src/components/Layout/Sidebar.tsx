@@ -57,6 +57,13 @@ const navigationItems: NavigationItem[] = [
         icon: ""
       },
       {
+        id: "translators",
+        label: "Prevodilac",
+        path: "/cms/translators",
+        roles: ["Admin", "Operation"],
+        icon: ""
+      },
+      {
         id: "guides",
         label: "Vodiči",
         path: "/cms/guides",
