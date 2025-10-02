@@ -43,10 +43,7 @@ export const OfferViewCard: React.FC<OfferViewCardProps> = ({ offer, onClose }) 
         </p>
 
         <p className="text-gray-700 mb-1">
-          Cena po osobi (bez PDV): €{offer.pricePerPerson?.toFixed(2) || "-"}
-        </p>
-        <p className="text-gray-700 mb-4">
-          Cena po osobi (sa PDV): €{offer.pricePerPersonVat?.toFixed(2) || "-"}
+          Cena po osobi: €{offer.pricePerPerson?.toFixed(2) || "-"}
         </p>
 
         {/* Smještaj */}
@@ -94,7 +91,7 @@ export const OfferViewCard: React.FC<OfferViewCardProps> = ({ offer, onClose }) 
                 </p>
                 {services.map((s, i) => (
                   <div key={i} className="ml-6 border p-2 rounded mb-1">
-                    <p>Naziv: {s.serviceId}</p>
+                    <p>Naziv: {s.serviceName}</p>
                     <p>Broj osoba: {s.numberOfPersons}</p>
                     <p>Broj noćenja: {s.numberOfDays}</p>
                     <p>Cena po osobi/danu: €{s.pricePerDayPerPerson}</p>
