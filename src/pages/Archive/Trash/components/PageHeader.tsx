@@ -17,13 +17,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ onExport }) => {
           Obrisane ponude - možete ih vratiti ili trajno obrisati
         </p>
       </div>
-      <button 
-        onClick={onExport}
-        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-      >
-        <Download className="w-4 h-4 mr-2" />
-        Izvezi u Excel
-      </button>
     </div>
   );
 };

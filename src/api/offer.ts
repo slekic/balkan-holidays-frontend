@@ -1,5 +1,4 @@
 import { BACKEND_URL } from "../config";
-import { Slide } from "../pages/OfferCreation/utils/constants";
 import { OfferResponse, OfferStats, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
 
 export async function getAllOffers(
