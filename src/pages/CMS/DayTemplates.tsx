@@ -4,6 +4,7 @@ import { DayTemplate } from "../../types/cms";
 import EntityList from "../../components/CMS/Common/EntityList";
 import EntityModal from "../../components/CMS/Common/EntityModal";
 import ImageUpload from "../../components/CMS/Common/ImageUpload";
+import { toast } from "react-toastify";
 
 export default function DayTemplates() {
   const { dayTemplates, addDayTemplate, updateDayTemplate, deleteDayTemplate } =
@@ -50,7 +51,22 @@ export default function DayTemplates() {
     e.preventDefault();
 
     if (!formData.title?.trim()) {
-      alert("Template title is required");
+      toast.error("Naslov šablona je obavezan");
+      return;
+    }
+
+    if (!formData.description?.trim()) {
+      toast.error("Opis je obavezan");
+      return;
+    }
+
+    if (!formData.backgroundImage?.trim()) {
+      toast.error("Pozadinska slika je obavezna");
+      return;
+    }
+
+    if (!formData.galleryImages || formData.galleryImages.length === 0) {
+      toast.error("Dodajte bar jednu sliku u galeriji");
       return;
     }
 

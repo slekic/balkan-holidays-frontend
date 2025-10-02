@@ -5,6 +5,7 @@ import EntityList from "../../components/CMS/Common/EntityList";
 import EntityModal from "../../components/CMS/Common/EntityModal";
 import ImageUpload from "../../components/CMS/Common/ImageUpload";
 import { Plus, X } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function Hotels() {
   const { hotels, addHotel, updateHotel, deleteHotel } = useCMS();
@@ -56,7 +57,18 @@ export default function Hotels() {
     e.preventDefault();
 
     if (!formData.name?.trim()) {
-      alert("Hotel name is required");
+      toast.error("Naziv hotela je obavezan");
+      return;
+    }
+
+    if (!formData.roomTypes || formData.roomTypes.length === 0) {
+      toast.error("Hotel mora imati bar jedan tip sobe");
+      return;
+    }
+
+    // dodatno: da bar jedan ima uneto ime
+    if (formData.roomTypes.some((rt) => !rt.name?.trim())) {
+      toast.error("Naziv tipa sobe ne može biti prazan");
       return;
     }
 
@@ -161,7 +173,7 @@ export default function Hotels() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tipovi soba
+              Tipovi soba <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
               {formData.roomTypes?.map((roomType, index) => (

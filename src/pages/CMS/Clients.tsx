@@ -3,6 +3,7 @@ import { useCMS } from "../../contexts/CMSContext";
 import { Client } from "../../types/cms";
 import EntityList from "../../components/CMS/Common/EntityList";
 import EntityModal from "../../components/CMS/Common/EntityModal";
+import { toast } from "react-toastify";
 
 export default function Clients() {
   const { clients, addClient, updateClient, deleteClient } = useCMS();
@@ -46,12 +47,12 @@ export default function Clients() {
     e.preventDefault();
 
     if (!formData.name?.trim()) {
-      alert("Client name is required");
+      toast.error("Naziv klijenta je obavezan");
       return;
     }
 
-    if (!formData.pib?.trim()) {
-      alert("PIB (Tax ID) is required");
+    if (!formData.address?.trim()) {
+      alert("Adresa klijenta je obavezna");
       return;
     }
 
@@ -132,27 +133,10 @@ export default function Clients() {
             />
           </div>
 
-          {/* PIB */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              PIB (poreski broj) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.pib || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, pib: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
-              placeholder="e.g., 123456789"
-              required
-            />
-          </div>
-
           {/* Adresa */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Adresa
+              Adresa <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -162,6 +146,23 @@ export default function Clients() {
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="e.g., Bulevar kralja Aleksandra 123, Beograd"
+              required
+            />
+          </div>
+
+          {/* PIB */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              PIB (poreski broj) 
+            </label>
+            <input
+              type="text"
+              value={formData.pib || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, pib: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+              placeholder="e.g., 123456789"
             />
           </div>
 
