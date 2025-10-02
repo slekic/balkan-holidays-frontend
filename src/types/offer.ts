@@ -69,7 +69,9 @@ export interface RoomTypeEntry {
 
 export interface NewClientFormData {
   name: string;
+  address: string;
   pib: string;
+  bill: string;
 }
 
 export interface ExpenseEntry {

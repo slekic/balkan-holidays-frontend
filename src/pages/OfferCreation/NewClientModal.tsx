@@ -12,20 +12,20 @@ type Props = {
 
 export default function NewClientModal({ open, onClose, onCreated }: Props) {
   const { addClient } = useCMS();
-  const [form, setForm] = useState<NewClientFormData>({ name: "", pib: "" });
+  const [form, setForm] = useState<NewClientFormData>({ name: "", address:"", pib: "", bill: ""});
 
   if (!open) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.pib.trim()) return;
-    const created = addClient({ name: form.name, pib: form.pib } as Omit<
+    if (!form.name.trim() || !form.address.trim()) return;
+    const created = addClient({ name: form.name, address: form.address, pib: form.pib, bill: form.bill } as Omit<
       Client,
       "id" | "createdAt" | "updatedAt"
     >) as unknown as Client;
     // Context's addClient returns Client per provider setup
     onCreated(created);
-    setForm({ name: "", pib: "" });
+    setForm({ name: "", address:"", pib: "", bill: ""});
     onClose();
   };
 
@@ -61,7 +61,22 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              PIB (poreski broj) <span className="text-red-500">*</span>
+              Adresa <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.address}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, address: e.target.value }))
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+              placeholder="e.g., Bulevar kralja Aleksandra 123, Beograd"
+              required
+            />
+          </div>
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              PIB (poreski broj) 
             </label>
             <input
               type="text"
@@ -71,7 +86,20 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
               placeholder="npr. 123456789"
-              required
+            />
+          </div>
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tekući račun 
+            </label>
+            <input
+              type="text"
+              value={form.bill}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, bill: e.target.value }))
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+              placeholder="npr. 160-123456-78"
             />
           </div>
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
