@@ -54,7 +54,7 @@ export default function Payments() {
   } = usePaymentActions();
 
   const handleAddPayment = (offerId: string) => {
-    if (newPayment.amount && newPayment.comment) {
+    if (newPayment.amount) {
       addPayment(offerId, {
         amount: parseFloat(newPayment.amount),
         comment: newPayment.comment,
