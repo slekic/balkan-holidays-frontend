@@ -133,7 +133,7 @@ export const useFollowUpOffers = () => {
       setOffers((prev) =>
         prev.map((o) =>
           o.id === offerId ? { ...o, status: newStatus as Offer["status"] } : o
-        )
+        ).filter((o) => o.status === "Sent")
       );
 
       setFilteredOffers((prev) =>
