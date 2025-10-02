@@ -228,7 +228,7 @@ export function GeneralInfoSection({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Broj dana
+              Broj noćenja
             </label>
             <div className="relative">
               <input

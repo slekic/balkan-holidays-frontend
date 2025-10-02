@@ -79,7 +79,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
               : "-"}
           </span>
           <span className="mx-2">•</span>
-          <span>{offer.days ?? 0} dana</span>
+          {offer.days ?? 0} dana / {(offer.days ? offer.days - 1 : 0)} noćenja
         </div>
 
         <div className="flex items-center text-sm text-gray-600">

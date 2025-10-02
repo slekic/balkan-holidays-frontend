@@ -96,7 +96,7 @@ export const OfferViewCard: React.FC<OfferViewCardProps> = ({ offer, onClose }) 
                   <div key={i} className="ml-6 border p-2 rounded mb-1">
                     <p>Naziv: {s.serviceId}</p>
                     <p>Broj osoba: {s.numberOfPersons}</p>
-                    <p>Broj dana: {s.numberOfDays}</p>
+                    <p>Broj noćenja: {s.numberOfDays}</p>
                     <p>Cena po osobi/danu: €{s.pricePerDayPerPerson}</p>
                     <p>Komentar: {s.comment || "-"}</p>
                   </div>
