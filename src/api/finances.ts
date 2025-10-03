@@ -1,5 +1,4 @@
 import { BACKEND_URL } from "../config";
-import { PaymentOffer } from "../pages/Finance/Payments/utils";
 import { FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
 
 export async function getAllFinanceOffers(
@@ -96,6 +95,41 @@ export async function createPayment(
   const data = await res.json();
 
   return data;
+}
+
+export async function updatePaymentApi(
+  paymentId: string,
+  payment: { amount: number; comment: string; method: string }
+): Promise<FinansijePonudaPlacanjaResponse> {
+  const body = {
+    kolicina_za_uplatu: payment.amount,
+    komentar: payment.comment,
+    nacin_placanja: payment.method,
+  };
+
+  console.log("Request body for updatePayment:", JSON.stringify(body));
+
+  const res = await fetch(`${BACKEND_URL}/finansije/uplata/${Number(paymentId)}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update payment");
+  }
+
+  return res.json();
+}
+
+export async function deletePaymentApi(id: string) {
+  const res = await fetch(`${BACKEND_URL}/finansije/uplata/${Number(id)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete payment");
+  return await res.json();
 }
 
 export async function createRashodiBatch(

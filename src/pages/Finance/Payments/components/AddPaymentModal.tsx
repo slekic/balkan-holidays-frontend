@@ -8,6 +8,7 @@ interface AddPaymentModalProps {
   newPayment: NewPayment;
   onUpdatePayment: (field: keyof NewPayment, value: string) => void;
   onSubmit: () => void;
+  isEdit?: boolean;
 }
 
 export default function AddPaymentModal({
@@ -15,16 +16,20 @@ export default function AddPaymentModal({
   onClose,
   newPayment,
   onUpdatePayment,
-  onSubmit
+  onSubmit,
+  isEdit = false
 }: AddPaymentModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Dodaj novu uplatu</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {isEdit ? 'Izmeni uplatu' : 'Dodaj novu uplatu'}
+          </h3>
           <div className="space-y-4">
+            {/* Iznos */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Iznos (€)</label>
               <input
@@ -36,6 +41,8 @@ export default function AddPaymentModal({
                 placeholder="0.00"
               />
             </div>
+
+            {/* Način plaćanja */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Način plaćanja</label>
               <select
@@ -50,6 +57,8 @@ export default function AddPaymentModal({
                 ))}
               </select>
             </div>
+
+            {/* Komentar */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Komentar</label>
               <textarea
@@ -61,6 +70,8 @@ export default function AddPaymentModal({
               />
             </div>
           </div>
+
+          {/* Dugmad */}
           <div className="flex justify-end space-x-3 mt-6">
             <button
               onClick={onClose}
@@ -72,7 +83,7 @@ export default function AddPaymentModal({
               onClick={onSubmit}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              Dodaj uplatu
+              {isEdit ? 'Izmeni uplatu' : 'Dodaj uplatu'}
             </button>
           </div>
         </div>
@@ -80,4 +91,3 @@ export default function AddPaymentModal({
     </div>
   );
 }
-

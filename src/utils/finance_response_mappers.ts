@@ -68,9 +68,10 @@ export function mapPonudaFinanceWithPaymentsToOffer(
 export function mapPonudaFinanceWithPaymentsToDebtOffer(
   p: FinansijePonudaPlacanjaResponse
 ): DebtOffer {
-  const totalPaid = p.placanja.reduce((sum, u) => sum + Number(u.iznos), 0);
+  const totalPaid = p.ukupno_placeno || 0;
   const remainingAmount = (p.ukupna_cena || 0) - totalPaid;
   const paymentPercentage = p.ukupna_cena ? Math.round((totalPaid / p.ukupna_cena) * 100) : 0;
+
   const lastPaymentDate =
     p.placanja.length > 0
       ? p.placanja.reduce((latest, u) =>

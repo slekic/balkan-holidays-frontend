@@ -16,9 +16,11 @@ import {
 } from './components';
 import { ITEMS_PER_PAGE } from './utils/constants';
 import { UserProvider } from '../../UserManagement/UserContext';
+import { NewPayment } from './utils';
+import { toast } from 'react-toastify';
 
 export default function Payments() {
-  const { offers, addPayment } = usePayments();
+  const { offers, addPayment, updatePayment, deletePayment } = usePayments();
 
   const {
     searchTerm,
@@ -45,56 +47,87 @@ export default function Payments() {
     showAddPayment,
     showPaymentHistory,
     newPayment,
+    editPaymentId,
     openAddPaymentModal,
     closeAddPaymentModal,
     openPaymentHistoryModal,
     closePaymentHistoryModal,
+    openEditPaymentModal,
     updateNewPayment,
     handleExportToExcel,
   } = usePaymentActions();
 
   const handleAddPayment = (offerId: string) => {
-    if (newPayment.amount) {
-      addPayment(offerId, {
-        amount: parseFloat(newPayment.amount),
-        comment: newPayment.comment,
-        method: newPayment.method,
-      });
-      closeAddPaymentModal();
+    try{
+      if (newPayment.amount) {
+        addPayment(offerId, {
+          amount: parseFloat(newPayment.amount),
+          comment: newPayment.comment,
+          method: newPayment.method,
+        });
+        toast.success("Uplata je uspešno dodata");
+        closeAddPaymentModal();
+      }
+    }catch (error) {
+      console.error("Error adding payment:", error);
+      toast.error("Greška pri dodavanju uplate");
     }
   };
+
+  const handleUpdatePayment = (id: string, updated: NewPayment) => {
+    try {
+      console.log("Updating payment:", id, updated);
+      updatePayment(id, {
+        amount: Number(updated.amount),
+        comment: updated.comment,
+        method: updated.method,
+      });
+
+      toast.success("Uplata je uspešno ažurirana");
+    } catch (error) {
+      console.error("Error updating payment:", error);
+      toast.error("Greška pri ažuriranju uplate");
+    }
+  };
+
+  const handleDeletePayment = (id: string) => {
+    try {
+      console.log("Deleting payment:", id);
+      deletePayment(id);
+
+      toast.success("Uplata je uspešno obrisana");
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      toast.error("Greška pri brisanju uplate");
+    }
+  };
+
 
   const currentOffer = offers.find(o => o.id === showPaymentHistory);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <Header onExportToExcel={handleExportToExcel} />
-
-      {/* Summary Cards */}
       <SummaryCards offers={filteredOffers} />
 
-      {/* Search and Filter Bar */}
       <UserProvider>
-      <SearchAndFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        showFilters={showFilters}
-        onToggleFilters={toggleFilters}
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-      />
+        <SearchAndFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showFilters={showFilters}
+          onToggleFilters={toggleFilters}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+        />
       </UserProvider>
 
-      {/* Payments Table */}
       <PaymentsTable
         offers={currentOffers}
         onAddPayment={openAddPaymentModal}
         onViewPaymentHistory={openPaymentHistoryModal}
       />
 
-      {/* Pagination */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -106,13 +139,21 @@ export default function Payments() {
         onPreviousPage={goToPreviousPage}
       />
 
-      {/* Add Payment Modal */}
+      {/* Add / Edit Payment Modal */}
       <AddPaymentModal
         isOpen={!!showAddPayment}
         onClose={closeAddPaymentModal}
         newPayment={newPayment}
         onUpdatePayment={updateNewPayment}
-        onSubmit={() => showAddPayment && handleAddPayment(showAddPayment)}
+        onSubmit={() => {
+          if (editPaymentId) {
+            handleUpdatePayment(editPaymentId, newPayment);
+          } else {
+            showAddPayment && handleAddPayment(showAddPayment);
+          }
+          closeAddPaymentModal();
+        }}
+        isEdit={!!editPaymentId}
       />
 
       {/* Payment History Modal */}
@@ -120,6 +161,8 @@ export default function Payments() {
         isOpen={!!showPaymentHistory}
         onClose={closePaymentHistoryModal}
         offer={currentOffer || null}
+        openEditPaymentModal={openEditPaymentModal}
+        onDelete={handleDeletePayment}
       />
     </div>
   );
