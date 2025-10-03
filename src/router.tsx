@@ -20,7 +20,6 @@ import Trash from "./pages/Archive/Trash/Trash";
 import FinanceArchive from "./pages/Finance/Archive/FinanceArchive";
 import Expenses from "./pages/Finance/Expenses/Expenses";
 import Payments from "./pages/Finance/Payments/Payments";
-import Debts from "./pages/Finance/Debts/Debts";
 import UserManagement from "./pages/UserManagement/UserManagement";
 import OfferCreation from "./pages/OfferCreation/OfferCreation";
 import EditOffer from "./pages/OfferCreation/OfferCreation";
@@ -110,7 +109,6 @@ const AppRoutes = () => {
                 <Route path="archive" element={<FinanceArchive />} />
                 <Route path="expenses" element={<Expenses />} />
                 <Route path="payments" element={<Payments />} />
-                <Route path="debts" element={<Debts />} />
               </Routes>
             </ProtectedRoute>
           }

@@ -1,6 +1,5 @@
 import { FinansijePonudaPlacanjaResponse, FinansijePonudaResponse, RashodResponse } from "../api/responses";
 import { FinanceOffer } from "../pages/Finance/Archive/utils";
-import { DebtOffer } from "../pages/Finance/Debts/utils";
 import { Expense } from "../pages/Finance/Expenses/utils";
 import { PaymentOffer } from "../pages/Finance/Payments/utils";
 
@@ -64,51 +63,6 @@ export function mapPonudaFinanceWithPaymentsToOffer(
     })),
   };
 }
-
-export function mapPonudaFinanceWithPaymentsToDebtOffer(
-  p: FinansijePonudaPlacanjaResponse
-): DebtOffer {
-  const totalPaid = p.ukupno_placeno || 0;
-  const remainingAmount = (p.ukupna_cena || 0) - totalPaid;
-  const paymentPercentage = p.ukupna_cena ? Math.round((totalPaid / p.ukupna_cena) * 100) : 0;
-
-  const lastPaymentDate =
-    p.placanja.length > 0
-      ? p.placanja.reduce((latest, u) =>
-          u.datum_uplate > latest ? u.datum_uplate : latest,
-        p.placanja[0].datum_uplate)
-      : undefined;
-
-  const daysSinceCreated = p.kreirano
-    ? Math.floor(
-        (new Date().getTime() - new Date(p.kreirano).getTime()) / (1000 * 60 * 60 * 24)
-      )
-    : 0;
-
-  let urgencyLevel: 'High' | 'Medium' | 'Low' = 'Low';
-  if (remainingAmount > 0 && daysSinceCreated > 30) urgencyLevel = 'High';
-  else if (remainingAmount > 0) urgencyLevel = 'Medium';
-
-  return {
-    id: p.id.toString(),
-    name: p.naziv,
-    code: p.sifra,
-    client: p.klijent,
-    numberOfPersons: p.broj_osoba,
-    startDate: p.datum_od,
-    endDate: p.datum_do,
-    totalPrice: p.ukupna_cena,
-    totalPaid,
-    remainingAmount,
-    paymentPercentage,
-    status: p.status === 'Accepted' ? 'Accepted' : 'Finished',
-    createdAt: p.kreirano,
-    daysSinceCreated,
-    urgencyLevel,
-    lastPaymentDate,
-  };
-}
-
 export function mapPonudaNaExpense(rashod: RashodResponse): Expense {
     const entityTypeMap: Record<string, Expense["entityType"]> = {
         restoran: "restaurant",

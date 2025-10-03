@@ -2,7 +2,6 @@ export const PAYMENT_METHODS = [
   { value: 'Bank Transfer', label: 'Bankovni transfer' },
   { value: 'Credit Card', label: 'Kreditna kartica' },
   { value: 'Cash', label: 'Gotovina' },
-  { value: 'Check', label: 'Ček' }
 ] as const;
 
 export const PAYMENT_STATUS_OPTIONS = [

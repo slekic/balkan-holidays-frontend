@@ -156,13 +156,6 @@ const navigationItems: NavigationItem[] = [
         roles: ["Admin", "Finance"],
         icon: ""
       },
-      {
-        id: "debts",
-        label: "Dugovanja",
-        path: "/finance/debts",
-        roles: ["Admin", "Finance"],
-        icon: ""
-      },
     ],
   },
   {
