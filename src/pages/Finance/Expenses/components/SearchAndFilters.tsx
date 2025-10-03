@@ -35,11 +35,6 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
     setClientDropdownVisible(false);
   };
 
-  const handleCreatorSelect = (name: string) => {
-    onFilterChange("createdBy", name);
-    setCreatorDropdownVisible(false);
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="flex items-center space-x-4 mb-4">
@@ -135,67 +130,6 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 onChange={(e) => onFilterChange("entityName", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            </div>
-
-            {/* Datum putovanja od */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Datum putovanja od
-              </label>
-              <input
-                type="date"
-                value={filters.dateFrom}
-                onChange={(e) => onFilterChange("dateFrom", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Datum putovanja do */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Datum putovanja do
-              </label>
-              <input
-                type="date"
-                value={filters.dateTo}
-                onChange={(e) => onFilterChange("dateTo", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Kreirao */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kreirao
-              </label>
-              <input
-                type="text"
-                placeholder="Pretraži korisnika..."
-                value={filters.createdBy || ""}
-                onChange={(e) => {
-                  onFilterChange("createdBy", e.target.value);
-                  setCreatorDropdownVisible(true);
-                }}
-                onFocus={() => setCreatorDropdownVisible(true)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              {creatorDropdownVisible && filters.createdBy && (
-                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
-                  {users
-                    .filter((u) =>
-                      u.name.toLowerCase().includes(filters.createdBy!.toLowerCase())
-                    )
-                    .map((u) => (
-                      <li
-                        key={u.id}
-                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleCreatorSelect(u.name)}
-                      >
-                        {u.name}
-                      </li>
-                    ))}
-                </ul>
-              )}
             </div>
           </div>
 
