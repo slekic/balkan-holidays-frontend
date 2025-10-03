@@ -8,22 +8,10 @@ interface SummaryCardsProps {
 }
 
 export default function SummaryCards({ offers }: SummaryCardsProps) {
-  const { totalReceivable, totalReceived, totalOutstanding, collectionRate } = calculatePaymentStats(offers);
+  const {totalReceived, totalOutstanding, collectionRate } = calculatePaymentStats(offers);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Ukupno za naplatu</p>
-            <p className="text-2xl font-bold text-gray-900">€{totalReceivable.toLocaleString()}</p>
-          </div>
-          <div className="p-3 rounded-full bg-blue-100">
-            <Euro className="w-6 h-6 text-blue-600" />
-          </div>
-        </div>
-      </div>
-
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between">
           <div>
