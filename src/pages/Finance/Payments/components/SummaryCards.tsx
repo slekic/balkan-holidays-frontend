@@ -15,7 +15,7 @@ export default function SummaryCards({ offers }: SummaryCardsProps) {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Ukupno primljeno</p>
+            <p className="text-sm font-medium text-gray-600">Ukupan prihod</p>
             <p className="text-2xl font-bold text-green-600">€{totalReceived.toLocaleString()}</p>
           </div>
           <div className="p-3 rounded-full bg-green-100">
