@@ -34,7 +34,7 @@ export const ExpensesTable: React.FC<ExpensesTableProps> = ({
                 Dokument
               </th>
               <th className="text-left py-3 px-4 font-medium text-gray-900">
-                Kreirano
+                Kreirano/Izmenjeno
               </th>
             </tr>
           </thead>
@@ -53,10 +53,6 @@ export const ExpensesTable: React.FC<ExpensesTableProps> = ({
                       </p>
                       <p className="text-sm text-gray-600">
                         {expense.client}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Travel:{" "}
-                        {new Date(expense.travelDate).toLocaleDateString()}
                       </p>
                     </div>
                   </td>
