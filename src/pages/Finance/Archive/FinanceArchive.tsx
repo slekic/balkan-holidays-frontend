@@ -37,7 +37,7 @@ export default function FinanceArchive() {
     goToPreviousPage,
   } = useFinancePagination(filteredOffers);
 
-  const { handleAction, handleExportToExcel } = useFinanceActions();
+  const { handleAction, handleExportToExcel } = useFinanceActions(filteredOffers);
 
   return (
     <div className="space-y-6">

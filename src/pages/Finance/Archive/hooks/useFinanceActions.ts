@@ -1,8 +1,8 @@
 import { toast } from "react-toastify";
-import { exportOfferInvoice, exportOfferProforma } from "../../../../api/export";
-import { ActionType } from "../utils/types";
+import { exportOfferInvoice, exportOfferProforma, exportSelectedFinOffers } from "../../../../api/export";
+import { ActionType, FinanceOffer } from "../utils/types";
 
-export function useFinanceActions() {
+export function useFinanceActions(filteredOffers: FinanceOffer[]) {
   const handleAction = async (action: ActionType, offerId: string) => {
     console.log(`${action} action for offer ${offerId}`);
     
@@ -14,9 +14,6 @@ export function useFinanceActions() {
         break;
       case "edit":
         // Navigate to edit form or open edit modal
-        break;
-      case "duplicate":
-        // Create a copy of the offer
         break;
       case "proforma":
         try {
@@ -44,10 +41,21 @@ export function useFinanceActions() {
     }
   };
 
-  const handleExportToExcel = () => {
-    console.log("Exporting to Excel...");
-    // Implement Excel export logic
-  };
+  const handleExportToExcel = async () => {
+      if (!filteredOffers || filteredOffers.length === 0) {
+        console.warn("Nema ponuda za export");
+        return;
+      }
+  
+      const offersIds = filteredOffers.map((offer) => Number(offer.id));
+      console.log("EXPORTIRAM " + offersIds)
+      try {
+        await exportSelectedFinOffers(offersIds);
+      } catch (err) {
+        console.log("Greška prilikom exporta ponuda:", err)
+        toast.error("Greška prilikom exporta ponuda");
+      }
+    };
 
   const handleDownloadInvoice = (invoiceType: string, offerId: string) => {
     console.log(`Downloading ${invoiceType} for offer ${offerId}`);
