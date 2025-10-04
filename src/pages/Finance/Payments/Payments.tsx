@@ -55,7 +55,7 @@ export default function Payments() {
     openEditPaymentModal,
     updateNewPayment,
     handleExportToExcel,
-  } = usePaymentActions();
+  } = usePaymentActions(filteredOffers);
 
   const handleAddPayment = (offerId: string) => {
     try{

@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { NewPayment, Payment } from '../utils/types';
+import { NewPayment, Payment, PaymentOffer } from '../utils/types';
+import { exportSelectedOffersPayments } from '../../../../api/export';
+import { toast } from 'react-toastify';
 
-export const usePaymentActions = () => {
+export const usePaymentActions = (filteredOffers: PaymentOffer[]) => {
   const [showAddPayment, setShowAddPayment] = useState<string | null>(null);
   const [showPaymentHistory, setShowPaymentHistory] = useState<string | null>(null);
   const [editPaymentId, setEditPaymentId] = useState<string | null>(null);
@@ -52,9 +54,20 @@ export const usePaymentActions = () => {
     // TODO: pozovi API ili update state
   };
 
-  const handleExportToExcel = () => {
-    console.log('Exporting payments to Excel...');
-  };
+  const handleExportToExcel = async () => {
+        if (!filteredOffers || filteredOffers.length === 0) {
+          console.warn("Nema ponuda za export");
+          return;
+        }
+    
+        const offersIds = filteredOffers.map((offer) => Number(offer.id));
+        try {
+          await exportSelectedOffersPayments(offersIds);
+        } catch (err) {
+          console.log("Greška prilikom exporta ponuda:", err)
+          toast.error("Greška prilikom exporta ponuda");
+        }
+    };
 
   return {
     showAddPayment,

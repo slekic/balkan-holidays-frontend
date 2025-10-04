@@ -48,7 +48,6 @@ export function useFinanceActions(filteredOffers: FinanceOffer[]) {
       }
   
       const offersIds = filteredOffers.map((offer) => Number(offer.id));
-      console.log("EXPORTIRAM " + offersIds)
       try {
         await exportSelectedFinOffers(offersIds);
       } catch (err) {
