@@ -59,8 +59,10 @@ export const usePaymentActions = (filteredOffers: PaymentOffer[]) => {
           console.warn("Nema ponuda za export");
           return;
         }
-    
+
         const offersIds = filteredOffers.map((offer) => Number(offer.id));
+        console.log("PONUDE za izvoz " + filteredOffers)
+
         try {
           await exportSelectedOffersPayments(offersIds);
         } catch (err) {
