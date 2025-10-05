@@ -11,22 +11,20 @@ export async function exportOffer(ponudaId: number) {
       throw new Error(`Failed to export offer: ${response.statusText}`);
     }
 
-    // Pretvaranje u blob
     const blob = await response.blob();
 
-    // Kreiranje URL-a za preuzimanje
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
 
-    // Izvuci ime fajla iz header-a ako postoji
     const disposition = response.headers.get("Content-Disposition");
-    let filename = `Ponuda_${ponudaId}.xlsx`;
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `Ponuda_${ponudaId}.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
@@ -62,12 +60,13 @@ export async function exportOfferProforma(ponudaId: number) {
 
     // Izvuci ime fajla iz header-a ako postoji
     const disposition = response.headers.get("Content-Disposition");
-    let filename = `Ponuda_${ponudaId}.xlsx`;
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `Ponuda_${ponudaId}.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
@@ -96,29 +95,26 @@ export async function exportOfferInvoice(ponudaId: number, adv: boolean) {
       throw new Error(`Failed to export offer: ${response.statusText}`);
     }
 
-    // Pretvaranje u blob
     const blob = await response.blob();
 
-    // Kreiranje URL-a za preuzimanje
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
 
-    // Izvuci ime fajla iz header-a ako postoji
     const disposition = response.headers.get("Content-Disposition");
-    let filename = `Ponuda_${ponudaId}.xlsx`;
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `Ponuda_${ponudaId}.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
 
-    // Čišćenje
     link.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
@@ -142,7 +138,6 @@ export async function exportSelectedExpenses(expenseIds: number[]) {
       throw new Error(`Failed to export expenses: ${response.statusText}`);
     }
 
-    console.log("RES OK")
     const blob = await response.blob();
 
     const url = window.URL.createObjectURL(blob);
@@ -150,12 +145,13 @@ export async function exportSelectedExpenses(expenseIds: number[]) {
     link.href = url;
 
     const disposition = response.headers.get("Content-Disposition");
-    let filename = "Rashodi.xlsx";
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `rashodi.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
@@ -188,7 +184,6 @@ export async function exportSelectedOffers(offersIds: number[]) {
       throw new Error(`Failed to export expenses: ${response.statusText}`);
     }
 
-    console.log("RES OK")
     const blob = await response.blob();
 
     const url = window.URL.createObjectURL(blob);
@@ -196,12 +191,13 @@ export async function exportSelectedOffers(offersIds: number[]) {
     link.href = url;
 
     const disposition = response.headers.get("Content-Disposition");
-    let filename = "Ponude.xlsx";
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `Ponude.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
@@ -241,12 +237,13 @@ export async function exportSelectedFinOffers(offersIds: number[]) {
     link.href = url;
 
     const disposition = response.headers.get("Content-Disposition");
-    let filename = "Ponude.xlsx";
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `Ponude_finansijski_pregled.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
@@ -286,12 +283,13 @@ export async function exportSelectedOffersPayments(offersIds: number[]) {
     link.href = url;
 
     const disposition = response.headers.get("Content-Disposition");
-    let filename = "Ponude.xlsx";
-    if (disposition && disposition.includes("filename=")) {
-      filename = disposition
-        .split("filename=")[1]
-        .replace(/"/g, "")
-        .trim();
+    let filename: string = `Ponude_placanja.xlsx`; 
+
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
     }
 
     link.setAttribute("download", filename);
