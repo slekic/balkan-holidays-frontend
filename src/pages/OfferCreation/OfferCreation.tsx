@@ -150,7 +150,6 @@ export default function OfferCreation() {
 
   console.log("FORM " + JSON.stringify(formData))
   const payload = {
-    sifra: formData.offerCode ?? null,
     naziv: formData.offerName,
     klijent_id: formData.clientId,
     korisnik_id: 1,

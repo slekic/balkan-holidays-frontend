@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { DayService, OfferFormData } from "../../../types/offer";
 import { generateId } from "../utils/id";
+import { useCMS } from "../../../contexts/CMSContext";
 
 export function useDatesAndDays(formData: OfferFormData, setFormData: (updater: any) => void) {
+  const {clients} = useCMS() 
   useEffect(() => {
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate);
@@ -17,6 +19,32 @@ export function useDatesAndDays(formData: OfferFormData, setFormData: (updater: 
       }));
     }
   }, [formData.startDate, formData.endDate]);
+
+  useEffect(() => {
+    if (formData.clientId) {
+      const client = clients.find((c) => c.id === formData.clientId);
+      const prefix = client?.name
+          ? client.name.length < 3
+            ? client.name.toUpperCase()
+            : client.name.substring(0, 3).toUpperCase()
+          : "XXX";
+
+      const date = new Date();
+      const datePart = `${String(date.getMonth() + 1).padStart(2, "0")}${String(
+        date.getDate()
+      ).padStart(2, "0")}${String(date.getFullYear()).slice(-2)}`;
+
+      const idPart = "X";
+
+      const offerCode = `${prefix}-${idPart}-${datePart}`;
+
+      setFormData((prev: OfferFormData) => ({
+        ...prev,
+        offerCode,
+      }));
+    }
+  }, [formData.clientId, setFormData]);
+
 }
 
 export function generateDayServices(

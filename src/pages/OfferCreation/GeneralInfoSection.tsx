@@ -64,23 +64,20 @@ export function GeneralInfoSection({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Šifra ponude <span className="text-red-500">*</span>
+              Šifra ponude 
             </label>
-            <input
-              type="text"
-              value={formData.offerCode}
-              onChange={(e) => onChange("offerCode", e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.offerCode ? "border-red-300" : "border-gray-300"
-              }`}
-              placeholder="npr. BEL-2024-001"
-            />
-            {errors.offerCode && (
-              <div className="flex items-center mt-1 text-sm text-red-600">
-                <AlertCircle className="w-4 h-4 mr-1" />
-                {errors.offerCode}
+            <div className="relative">
+              <input
+                type="text"
+                value={formData.offerCode}
+                readOnly
+                placeholder="KLIJENT-BROJ-DATUM"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                Auto
               </div>
-            )}
+            </div>
           </div>
 
           <div>
