@@ -57,10 +57,10 @@ export default function Payments() {
     handleExportToExcel,
   } = usePaymentActions(filteredOffers);
 
-  const handleAddPayment = (offerId: string) => {
+  const handleAddPayment = async (offerId: string) => {
     try{
       if (newPayment.amount) {
-        addPayment(offerId, {
+        await addPayment(offerId, {
           amount: parseFloat(newPayment.amount),
           comment: newPayment.comment,
           method: newPayment.method,
@@ -74,10 +74,9 @@ export default function Payments() {
     }
   };
 
-  const handleUpdatePayment = (id: string, updated: NewPayment) => {
+  const handleUpdatePayment = async (id: string, updated: NewPayment) => {
     try {
-      console.log("Updating payment:", id, updated);
-      updatePayment(id, {
+      await updatePayment(id, {
         amount: Number(updated.amount),
         comment: updated.comment,
         method: updated.method,
@@ -90,10 +89,9 @@ export default function Payments() {
     }
   };
 
-  const handleDeletePayment = (id: string) => {
+  const handleDeletePayment = async (id: string) => {
     try {
-      console.log("Deleting payment:", id);
-      deletePayment(id);
+      await deletePayment(id);
 
       toast.success("Uplata je uspešno obrisana");
     } catch (error) {

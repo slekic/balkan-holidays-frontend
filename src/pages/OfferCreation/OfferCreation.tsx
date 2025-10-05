@@ -175,7 +175,6 @@ export default function OfferCreation() {
       }))
     ),
     usluge_po_danu: formData.landServices.reduce((acc: any, day: any) => {
-      // Ako nema usluga za taj dan, postavi prazan niz (ne prazan objekat!)
       acc[day.date] = (day.services && day.services.length > 0)
         ? day.services.map((s: any) => ({
             datum: day.date,

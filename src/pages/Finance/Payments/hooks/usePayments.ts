@@ -50,7 +50,8 @@ export const usePayments = () => {
           prevFiltered.map(offer => (offer.id === offerId ? mappedPayment : offer))
         );
       } catch (err) {
-        console.error("Failed to add payment", err);
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(message);
       }
     },
     []
@@ -74,7 +75,8 @@ export const usePayments = () => {
           prevFiltered.map(offer => (offer.id === mappedOffer.id ? mappedOffer : offer))
         );
       } catch (err) {
-        console.error("Failed to update payment", err);
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(message);
       }
     },
     []
@@ -95,7 +97,8 @@ export const usePayments = () => {
           prevFiltered.map(offer => (offer.id === mappedOffer.id ? mappedOffer : offer))
         );
       } catch (err) {
-        console.error("Failed to delete payment", err);
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(message);
       }
     },
     []
