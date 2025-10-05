@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { LogOut, User, X } from 'lucide-react';
+import { LogOut, User, X, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { changePassword } from '../../api/users';
 
@@ -17,6 +17,11 @@ export default function Topbar({ title, breadcrumbs }: TopbarProps) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+
+  // za prikaz/sakrivanje lozinki
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -40,17 +45,20 @@ export default function Topbar({ title, breadcrumbs }: TopbarProps) {
       toast.error('Niste lepo ponovili novu lozinku');
       return;
     }
-    try{
-      if(user?.id){
-        await changePassword(Number(user.id), {stara_lozinka: currentPassword, nova_lozinka: newPassword})
-        toast.success("Uspešna promena lozinke")
+    try {
+      if (user?.id) {
+        await changePassword(Number(user.id), {
+          stara_lozinka: currentPassword,
+          nova_lozinka: newPassword,
+        });
+        toast.success('Uspešna promena lozinke');
       }
-    }catch (err: any) {
+    } catch (err: any) {
       if (err instanceof Error) {
         toast.error(err.message);
       }
     }
-    
+
     setShowChangePassword(false);
     setCurrentPassword('');
     setNewPassword('');
@@ -68,7 +76,13 @@ export default function Topbar({ title, breadcrumbs }: TopbarProps) {
                 {breadcrumbs.map((crumb, index) => (
                   <li key={index} className="flex items-center">
                     {index > 0 && <span className="mx-2">/</span>}
-                    <span className={index === breadcrumbs.length - 1 ? 'text-gray-900 font-medium' : ''}>
+                    <span
+                      className={
+                        index === breadcrumbs.length - 1
+                          ? 'text-gray-900 font-medium'
+                          : ''
+                      }
+                    >
                       {crumb.label}
                     </span>
                   </li>
@@ -86,12 +100,14 @@ export default function Topbar({ title, breadcrumbs }: TopbarProps) {
             >
               <User className="w-8 h-8 p-1.5 bg-gray-100 rounded-full hover:bg-gray-200 transition" />
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.name}
+                </p>
                 <div className="flex items-center space-x-2">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      getRoleBadgeColor(user?.role || '')
-                    }`}
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(
+                      user?.role || ''
+                    )}`}
                   >
                     {user?.role}
                   </span>
@@ -131,27 +147,59 @@ export default function Topbar({ title, breadcrumbs }: TopbarProps) {
             )}
 
             <div className="space-y-3">
-              <input
-                type="password"
-                placeholder="Trenutna lozinka"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              <input
-                type="password"
-                placeholder="Nova lozinka"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              <input
-                type="password"
-                placeholder="Ponovite novu lozinku"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
+              {/* Trenutna lozinka */}
+              <div className="relative">
+                <input
+                  type={showCurrent ? 'text' : 'password'}
+                  placeholder="Trenutna lozinka"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent((p) => !p)}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showCurrent ? <Eye size={20} /> : <EyeOff size={20} />}
+                </button>
+              </div>
+
+              {/* Nova lozinka */}
+              <div className="relative">
+                <input
+                  type={showNew ? 'text' : 'password'}
+                  placeholder="Nova lozinka"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew((p) => !p)}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showNew ? <Eye size={20} /> : <EyeOff size={20} />}
+                </button>
+              </div>
+
+              {/* Potvrda nove lozinke */}
+              <div className="relative">
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  placeholder="Ponovite novu lozinku"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((p) => !p)}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirm ? <Eye size={20} /> : <EyeOff size={20} />}
+                </button>
+              </div>
             </div>
 
             <div className="flex justify-end mt-5 space-x-3">
