@@ -12,6 +12,7 @@ import OffersGrid from "./components/OffersGrid";
 import EmptyState from "./components/EmptyState";
 import Pagination from "./components/Pagination";
 import { UserProvider } from "../../UserManagement/UserContext";
+import { OfferViewCard } from "../../Archive/AllOffers/components/OfferViewCard";
 
 export default function FinanceArchive() {
   const { offers, filteredOffers, totalFilteredOffers, updateFilteredOffers } =
@@ -37,7 +38,8 @@ export default function FinanceArchive() {
     goToPreviousPage,
   } = useFinancePagination(filteredOffers);
 
-  const { handleAction, handleExportToExcel } = useFinanceActions(filteredOffers);
+  const { handleAction, handleExportToExcel, viewPonuda, handleCloseView } =
+    useFinanceActions(filteredOffers);
 
   return (
     <div className="space-y-6">
@@ -60,6 +62,9 @@ export default function FinanceArchive() {
       {/* Offers Grid */}
       <OffersGrid offers={currentOffers} onAction={handleAction} />
 
+      {viewPonuda && (
+              <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />
+      )}
 
       {/* Empty State */}
       {totalFilteredOffers === 0 && <EmptyState />}
