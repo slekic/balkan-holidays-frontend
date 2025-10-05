@@ -139,7 +139,6 @@ export default function FinanceOfferCard({ offer, onAction }: FinanceOfferCardPr
       {/* Actions */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-200">
         <div className="flex space-x-2">
-          {
           <button
             onClick={() => onAction("view", offer.id)}
             className="flex items-center px-3 py-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
@@ -147,7 +146,13 @@ export default function FinanceOfferCard({ offer, onAction }: FinanceOfferCardPr
             <Eye className="w-4 h-4 mr-1" />
             Pregledaj
           </button>
-          }
+          <button
+            onClick={() => onAction("edit", offer.id)}
+            className="flex items-center px-3 py-1 text-gray-600 hover:bg-gray-50 rounded transition-colors"
+            >
+            <Edit className="w-4 h-4 mr-1" />
+              Izmeni rashode
+            </button>
         </div>
       </div>
 

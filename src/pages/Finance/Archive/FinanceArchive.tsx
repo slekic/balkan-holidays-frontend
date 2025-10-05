@@ -13,6 +13,8 @@ import EmptyState from "./components/EmptyState";
 import Pagination from "./components/Pagination";
 import { UserProvider } from "../../UserManagement/UserContext";
 import { OfferViewCard } from "../../Archive/AllOffers/components/OfferViewCard";
+import FinanceExpensesModal from "./ExpenseModal";
+import { useFinanceExpenses } from "./hooks/useExpenses";
 
 export default function FinanceArchive() {
   const { offers, filteredOffers, totalFilteredOffers, updateFilteredOffers } =
@@ -41,35 +43,65 @@ export default function FinanceArchive() {
   const { handleAction, handleExportToExcel, viewPonuda, handleCloseView } =
     useFinanceActions(filteredOffers);
 
+  // Modal state
+  const [showExpensesModal, setShowExpensesModal] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+
+  // Hook za rashode ponude
+  const {
+    expenses,
+    handleAddExpense,
+    handleUpdateExpense,
+    handleRemoveExpense,
+    totalExpenses,
+    saveExpenses,
+  } = useFinanceExpenses(selectedOfferId, showExpensesModal);
+
+  // Otvori modal sa rashodima
+  const openExpensesModal = (offerId: string) => {
+    setSelectedOfferId(offerId);
+    setShowExpensesModal(true);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <Header onExportToExcel={handleExportToExcel} />
 
-      {/* Search and Filter Bar */}
       <UserProvider>
-      <SearchAndFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        showFilters={showFilters}
-        onToggleFilters={toggleFilters}
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-      />
+        <SearchAndFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showFilters={showFilters}
+          onToggleFilters={toggleFilters}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+        />
       </UserProvider>
 
-      {/* Offers Grid */}
-      <OffersGrid offers={currentOffers} onAction={handleAction} />
+      <OffersGrid
+        offers={currentOffers}
+        onAction={(action, id) => {
+          if (action === "edit") openExpensesModal(id);
+          else handleAction(action, id);
+        }}
+      />
 
-      {viewPonuda && (
-              <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />
-      )}
+      {viewPonuda && <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />}
 
-      {/* Empty State */}
+      <FinanceExpensesModal
+        open={showExpensesModal}
+        offerId={selectedOfferId}
+        onClose={() => setShowExpensesModal(false)}
+        expenses={expenses}
+        handleAddExpense={handleAddExpense}
+        handleUpdateExpense={handleUpdateExpense}
+        handleRemoveExpense={handleRemoveExpense}
+        saveExpenses={saveExpenses}
+      />
+
       {totalFilteredOffers === 0 && <EmptyState />}
 
-      {/* Pagination */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

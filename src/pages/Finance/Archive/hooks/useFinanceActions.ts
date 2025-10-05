@@ -27,7 +27,6 @@ export function useFinanceActions(filteredOffers: FinanceOffer[]) {
             }
         break;
       case "edit":
-        // Navigate to edit form or open edit modal
         break;
       case "proforma":
         try {
