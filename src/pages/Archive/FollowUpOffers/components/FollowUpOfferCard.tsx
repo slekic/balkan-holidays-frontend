@@ -176,40 +176,6 @@ export const FollowUpOfferCard: React.FC<FollowUpOfferCardProps> = ({
           </div>
         </div>
       )}
-
-      {/* Actions */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-        <div className="flex space-x-2">
-          <button
-            onClick={() => onAction("view", offer.id)}
-            className="flex items-center px-3 py-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            Pregledaj
-          </button>
-          <button
-            onClick={() => onAction("edit", offer.id)}
-            className="flex items-center px-3 py-1 text-gray-600 hover:bg-gray-50 rounded transition-colors"
-          >
-            <Edit className="w-4 h-4 mr-1" />
-            Izmeni
-          </button>
-          <button
-            onClick={() => onAction("duplicate", offer.id)}
-            className="flex items-center px-3 py-1 text-green-600 hover:bg-green-50 rounded transition-colors"
-          >
-            <Copy className="w-4 h-4 mr-1" />
-            Dupliraj
-          </button>
-        </div>
-        <button
-          onClick={() => onAction("delete", offer.id)}
-          className="flex items-center px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-        >
-          <Trash2 className="w-4 h-4 mr-1" />
-          Obriši
-        </button>
-      </div>
     </div>
   );
 };
