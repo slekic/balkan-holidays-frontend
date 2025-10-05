@@ -274,6 +274,10 @@ export interface SlajdGenerateRequest {
   sadrzaj: Record<string, any>;     
 }
 
+export interface PromeniLozinkuRequest {
+  stara_lozinka: string;
+  nova_lozinka: string;
+}
 export interface SlajdResponse {
   redni_broj: number;
   id: number;
