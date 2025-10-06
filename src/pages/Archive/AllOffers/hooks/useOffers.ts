@@ -20,7 +20,7 @@ import {
 } from "../../../../api/export";
 import { toast } from "react-toastify";
 
-const itemsPerPage = 2;
+const itemsPerPage = 6;
 const pagesPerBatch = 5;
 const batchSize = itemsPerPage * pagesPerBatch;
 
