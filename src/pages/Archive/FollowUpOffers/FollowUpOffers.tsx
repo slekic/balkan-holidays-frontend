@@ -1,3 +1,4 @@
+// src/pages/FollowUpOffers.tsx
 import React from "react";
 import { PageHeader } from "./components/PageHeader";
 import { SearchAndFilters } from "../AllOffers/components/SearchAndFilters";
@@ -10,32 +11,43 @@ import { UserProvider } from "../../UserManagement/UserContext";
 export default function FollowUpOffers() {
   const {
     currentOffers,
+    currentPage,
+    currentBatchNumber,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    pagesPerBatch,
     showFilters,
     searchTerm,
     filters,
-    totalPages,
-    startIndex,
+    currentBatch,
+    filteredOffers,
+    handlePageChange,
     handleStatusChange,
     handleAction,
     handleExport,
-    handlePageChange,
     handleSearchChange,
     handleFilterChange,
     handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
   } = useFollowUpOffers();
 
   return (
     <div className="space-y-6">
       <PageHeader onExport={handleExport} />
+
       <UserProvider>
-      <SearchAndFilters
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-        showFilters={showFilters}
-        onToggleFilters={handleToggleFilters}
-        filters={filters}
-        onFilterChange={handleFilterChange}
-      />
+        <SearchAndFilters
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          showFilters={showFilters}
+          onToggleFilters={handleToggleFilters}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onSearch={handleApplyFilters}
+          onReset={handleResetFilters}
+        />
       </UserProvider>
 
       {/* Follow-up Offers Grid */}
@@ -55,11 +67,12 @@ export default function FollowUpOffers() {
 
       {/* Pagination */}
       <Pagination
-        currentPage={1}
+        currentPage={currentPage}
         totalPages={totalPages}
-        totalItems={currentOffers.length}
-        itemsPerPage={6}
-        startIndex={startIndex}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        pagesPerBatch={pagesPerBatch}
+        currentBatch={currentBatchNumber}
         onPageChange={handlePageChange}
       />
     </div>

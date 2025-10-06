@@ -129,7 +129,13 @@ export const useOffers = () => {
       try {
         await deleteOfferApi(offerId);
         toast.success("Ponuda prebačena u smeće");
-        setCurrentBatch((prev) => prev.filter((offer) => offer.id !== offerId));
+        const newBatch = currentBatch.filter((o) => o.id !== offerId);
+        updateBatchAndTotals(newBatch, totalItems - 1);
+
+        if (newBatch.length === 0 && currentPage > 1) {
+          handlePageChange(currentPage - 1);
+        }
+        
       } catch {
         toast.error("Neuspešno brisanje ponude");
       }
@@ -138,7 +144,8 @@ export const useOffers = () => {
         const newOffer = await duplicateOfferApi(offerId);
         const mapped = mapPonudaToOffer(newOffer);
         toast.success("Kopija ponude uspešno kreirana");
-        setCurrentBatch((prev) => [mapped, ...prev]);
+        const newBatch = [mapped, ...currentBatch];
+        updateBatchAndTotals(newBatch, totalItems + 1);
       } catch {
         toast.error("Neuspešno pravljenje kopije");
       }
@@ -181,6 +188,13 @@ export const useOffers = () => {
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
   };
+
+  const updateBatchAndTotals = (newBatch: Offer[] | Offer[], total?: number) => {
+    setCurrentBatch(newBatch);
+    setFilteredOffers(newBatch);
+    if (total !== undefined) setTotalItems(total);
+  };
+
 
   const handleFilterChange = (newFilters: OfferFilters) => {
     setFilters(newFilters);
