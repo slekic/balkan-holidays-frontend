@@ -17,9 +17,10 @@ export default function AllOffers() {
     searchTerm,
     filters,
     totalPages,
-    itemsPerPage,
-    startIndex,
     totalItems,
+    itemsPerPage,
+    pagesPerBatch,
+    currentBatchNumber,
     viewPonuda,
     handleStatusChange,
     handleAction,
@@ -29,6 +30,8 @@ export default function AllOffers() {
     handleFilterChange,
     handleToggleFilters,
     handleCloseView,
+    handleApplyFilters,
+    handleResetFilters,
   } = useOffers();
 
   return (
@@ -43,6 +46,8 @@ export default function AllOffers() {
         onToggleFilters={handleToggleFilters}
         filters={filters}
         onFilterChange={handleFilterChange}
+        onSearch={handleApplyFilters}
+        onReset={handleResetFilters}
       />
       </UserProvider>
 
@@ -72,7 +77,8 @@ export default function AllOffers() {
         totalPages={totalPages}
         totalItems={totalItems}
         itemsPerPage={itemsPerPage}
-        startIndex={startIndex}
+        pagesPerBatch={pagesPerBatch}
+        currentBatch={currentBatchNumber}
         onPageChange={handlePageChange}
       />
     </div>

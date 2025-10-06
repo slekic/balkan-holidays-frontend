@@ -7,14 +7,22 @@ import {
   updateOfferStatusAPI,
   getAllOffers,
 } from "../../../../api/offer";
-import { mapOffer, mapOfferToForm, mapPonudaToOffer } from "../../../../utils/offer_response_mappers";
+import {
+  mapOffer,
+  mapOfferToForm,
+  mapPonudaToOffer,
+} from "../../../../utils/offer_response_mappers";
 import { useNavigate } from "react-router-dom";
-import { exportOfferInvoice, exportOfferProforma, exportSelectedOffers } from "../../../../api/export";
+import {
+  exportOfferInvoice,
+  exportOfferProforma,
+  exportSelectedOffers,
+} from "../../../../api/export";
 import { toast } from "react-toastify";
 
-const itemsPerPage = 6;        // koliko prikazujemo po strani
-const pagesPerBatch = 5;       // batch od 5 stranica
-const batchSize = itemsPerPage * pagesPerBatch; // ukupno itema po batch-u
+const itemsPerPage = 2;
+const pagesPerBatch = 5;
+const batchSize = itemsPerPage * pagesPerBatch;
 
 export const useOffers = () => {
   const [currentBatch, setCurrentBatch] = useState<Offer[]>([]);
@@ -40,113 +48,77 @@ export const useOffers = () => {
 
   const navigate = useNavigate();
 
-  // ----- Fetch batch -----
-  const fetchBatch = async (batchNumber: number) => {
+  // ----------------- FETCH -----------------
+  const fetchBatch = async (
+    batchNumber: number,
+    filters: OfferFilters,
+    searchTerm: string
+  ) => {
+    const appliedFilters = {
+      search: searchTerm,
+      client: filters.client,
+      entity: filters.entity,
+      status: filters.status,
+      createdBy: filters.createdBy,
+      personsMin: Number(filters.personsMin),
+      personsMax: Number(filters.personsMax),
+      priceMin: Number(filters.priceMin),
+      priceMax: Number(filters.priceMax),
+      dateFrom: filters.dateFrom,
+      dateTo: filters.dateTo,
+    };
+
     try {
-      const page = (batchNumber - 1) * pagesPerBatch + 1;
-      const data = await getAllOffers(page, batchSize);
+      const page = batchNumber;
+      const data = await getAllOffers(page, batchSize, false, -1, appliedFilters);
       const mapped = data.items.map(mapPonudaToOffer);
       setCurrentBatch(mapped);
+      setFilteredOffers(mapped);
       setTotalItems(data.total);
     } catch (error) {
-      console.error("Failed to fetch batch:", error);
+      console.error("Failed to fetch offers:", error);
     }
   };
 
+  // Inicijalno učitavanje
   useEffect(() => {
-    fetchBatch(1);
+    fetchBatch(1, filters, searchTerm);
     setCurrentBatchNumber(1);
   }, []);
 
-  // ----- Filter + search na trenutni batch -----
-  useEffect(() => {
-    let filtered = [...currentBatch];
+  // ----------------- PAGINACIJA -----------------
+  const localPage =
+    currentPage % pagesPerBatch === 0
+      ? pagesPerBatch
+      : currentPage % pagesPerBatch;
 
-    if (searchTerm.trim() !== "") {
-      const lowerTerm = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (offer) =>
-          offer.name.toLowerCase().includes(lowerTerm) ||
-          offer.code.toLowerCase().includes(lowerTerm)
-      );
-    }
+  const startIndex = (localPage - 1) * itemsPerPage;
+  const currentOffers = filteredOffers.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    if (filters.client) {
-      filtered = filtered.filter((offer) => offer.client === filters.client);
-    }
-    if (filters.status) {
-      filtered = filtered.filter((offer) => offer.status === filters.status);
-    }
-    if (filters.createdBy) {
-      filtered = filtered.filter((offer) => offer.createdBy === filters.createdBy);
-    }
-    if (filters.entity) {
-      filtered = filtered.filter((offer) =>
-        offer.entities.some((entity) =>
-          entity.toLowerCase().includes(filters.entity.toLowerCase())
-        )
-      );
-    }
-    if (filters.personsMin) {
-      filtered = filtered.filter(
-        (offer) => offer.numberOfPersons >= Number(filters.personsMin)
-      );
-    }
-    if (filters.personsMax) {
-      filtered = filtered.filter(
-        (offer) => offer.numberOfPersons <= Number(filters.personsMax)
-      );
-    }
-    if (filters.priceMin) {
-      filtered = filtered.filter(
-        (offer) => offer.totalPrice >= Number(filters.priceMin)
-      );
-    }
-    if (filters.priceMax) {
-      filtered = filtered.filter(
-        (offer) => offer.totalPrice <= Number(filters.priceMax)
-      );
-    }
-    if (filters.dateFrom) {
-      filtered = filtered.filter(
-        (offer) => new Date(offer.startDate) >= new Date(filters.dateFrom)
-      );
-    }
-    if (filters.dateTo) {
-      filtered = filtered.filter(
-        (offer) => new Date(offer.endDate) <= new Date(filters.dateTo)
-      );
-    }
+  const handlePageChange = async (page: number) => {
+    const newBatch = page % pagesPerBatch;
 
-    setFilteredOffers(filtered);
-    setTotalItems(filtered.length);
-
-  }, [currentBatch, searchTerm, filters]);
-
-  // ----- Local pagination -----
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentOffers = filteredOffers.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil(filteredOffers.length / itemsPerPage);
-
-  const handlePageChange = (page: number) => {
-    console.log("STRRRR" + page)
-    const newBatchNumber = Math.ceil(page / pagesPerBatch);
-
-    if (newBatchNumber !== currentBatchNumber) {
-      fetchBatch(newBatchNumber);
+    if (newBatch === 1 || newBatch === 0) {
+      const newBatchNumber = Math.ceil(page / pagesPerBatch);
+      await fetchBatch(newBatchNumber, filters, searchTerm);
       setCurrentBatchNumber(newBatchNumber);
     }
-
     setCurrentPage(page);
   };
 
-  // ----- Ostale akcije -----
+  // ----------------- AKCIJE -----------------
   const handleStatusChange = async (offerId: string, newStatus: string) => {
     const result = await updateOfferStatusAPI({ offerId, newStatus });
     if (result.success) {
       setCurrentBatch((prev) =>
         prev.map((offer) =>
-          offer.id === offerId ? { ...offer, status: newStatus as Offer["status"] } : offer
+          offer.id === offerId
+            ? { ...offer, status: newStatus as Offer["status"] }
+            : offer
         )
       );
     } else console.error("Failed to update status:", result.message);
@@ -156,83 +128,83 @@ export const useOffers = () => {
     if (action === "delete") {
       try {
         await deleteOfferApi(offerId);
-        toast.success("Ponuda prebačena u smeće")
+        toast.success("Ponuda prebačena u smeće");
         setCurrentBatch((prev) => prev.filter((offer) => offer.id !== offerId));
-      } catch (error) {
-        console.error(`Failed to delete offer ${offerId}:`, error);
-        toast.error("Neuspešno")
+      } catch {
+        toast.error("Neuspešno brisanje ponude");
       }
     } else if (action === "duplicate") {
       try {
         const newOffer = await duplicateOfferApi(offerId);
-        console.log()
         const mapped = mapPonudaToOffer(newOffer);
-        toast.success("Kopija ponude uspešno kreirana")
+        toast.success("Kopija ponude uspešno kreirana");
         setCurrentBatch((prev) => [mapped, ...prev]);
-      } catch (error) {
-        console.error(`Failed to duplicate offer ${offerId}:`, error);
-        toast.error("Neuspešno pravljenje kopije")
+      } catch {
+        toast.error("Neuspešno pravljenje kopije");
       }
     } else if (action === "view" || action === "edit") {
       try {
         const offerDetailedApi = await getOffer(offerId);
         const offerDetailed = mapOffer(offerDetailedApi);
         if (action === "view") setViewPonuda(offerDetailed || null);
-        if (action === "edit") {
+        else {
           const offerFormData = mapOfferToForm(offerDetailed);
-          navigate(`/offer-creation/${offerDetailedApi.id}/edit`, { 
-            state: { offer: { ...offerFormData, id: offerDetailedApi.id } } 
+          navigate(`/offer-creation/${offerDetailedApi.id}/edit`, {
+            state: { offer: { ...offerFormData, id: offerDetailedApi.id } },
           });
         }
-      } catch (error) {
-        console.error(`Failed to fetch offer ${offerId}:`, error);
+      } catch {
+        toast.error("Greška prilikom otvaranja ponude");
       }
-    }else if(action == "proforma"){
+    } else if (action === "proforma") {
       try {
         await exportOfferProforma(Number(offerId));
-      } catch (error) {
+      } catch {
         toast.error("Neuspešno eksportovanje predračuna");
       }
-    } else if(action == "advance"){
+    } else if (action === "advance") {
       try {
-          await exportOfferInvoice(Number(offerId), true);
-      } catch (error) {
-          toast.error("Neuspešno eksportovanje avansne fakture");
+        await exportOfferInvoice(Number(offerId), true);
+      } catch {
+        toast.error("Neuspešno eksportovanje avansne fakture");
       }
-
-    } else if(action == "final"){
+    } else if (action === "final") {
       try {
-          await exportOfferInvoice(Number(offerId), false);
-      } catch (error) {
-          toast.error("Neuspešno eksportovanje fakture");
+        await exportOfferInvoice(Number(offerId), false);
+      } catch {
+        toast.error("Neuspešno eksportovanje fakture");
       }
     }
   };
 
-  const handleExport = async () => {
-    if (!filteredOffers || filteredOffers.length === 0) {
-      console.warn("Nema ponuda za export");
-      return;
-    }
-
-    const offersIds = filteredOffers.map((offer) => Number(offer.id));
-
-    try {
-      await exportSelectedOffers(offersIds);
-    } catch (err) {
-      console.error("Greška prilikom exporta ponuda:", err);
-    }
+  // ----------------- SEARCH & FILTERI -----------------
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
   };
-
- const handleSearchChange = (value: string) => {
-  setSearchTerm(value);
-  if (value !== searchTerm) {
-    setCurrentPage(1);
-  }
-};
 
   const handleFilterChange = (newFilters: OfferFilters) => {
     setFilters(newFilters);
+  };
+
+  const handleResetFilters = async () => {
+    console.log("Brisemooo")
+    const emptyFilters: OfferFilters = {
+      client: "",
+      entity: "",
+      createdBy: "",
+      status: "",
+      personsMin: "",
+      personsMax: "",
+      priceMin: "",
+      priceMax: "",
+      dateFrom: "",
+      dateTo: "",
+    };
+    setFilters(emptyFilters);
+    setSearchTerm("");
+    setShowFilters(false);
+    await fetchBatch(1, emptyFilters, "");
+    setCurrentBatchNumber(1);
     setCurrentPage(1);
   };
 
@@ -242,6 +214,25 @@ export const useOffers = () => {
 
   const handleCloseView = () => {
     setViewPonuda(null);
+  };
+
+  const handleApplyFilters = async (filters: OfferFilters, searchTerm: string) => {
+    await fetchBatch(1, filters, searchTerm);
+    setCurrentBatchNumber(1);
+    setCurrentPage(1);
+  };
+
+  const handleExport = async () => {
+    if (!filteredOffers || filteredOffers.length === 0) {
+      toast.warning("Nema ponuda za export");
+      return;
+    }
+    const offersIds = filteredOffers.map((offer) => Number(offer.id));
+    try {
+      await exportSelectedOffers(offersIds);
+    } catch {
+      toast.error("Greška prilikom exporta ponuda");
+    }
   };
 
   return {
@@ -256,7 +247,8 @@ export const useOffers = () => {
     totalPages,
     totalItems,
     itemsPerPage,
-    startIndex,
+    pagesPerBatch,
+    currentBatchNumber,
     handleStatusChange,
     handleAction,
     handleExport,
@@ -264,5 +256,7 @@ export const useOffers = () => {
     handleSearchChange,
     handleFilterChange,
     handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
   };
 };

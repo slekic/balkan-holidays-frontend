@@ -296,3 +296,16 @@ export interface OfferStats {
   prihvaceno: number;
   ukupno_dugovanja: number;
 }
+
+export interface OfferFilters {
+  search?: string;
+  client?: string;
+  status?: string;
+  createdBy?: string;
+  personsMin?: number;
+  personsMax?: number;
+  priceMin?: number;
+  priceMax?: number;
+  dateFrom?: string;
+  dateTo?: string;
+}

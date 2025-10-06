@@ -11,6 +11,8 @@ interface SearchAndFiltersProps {
   onToggleFilters: () => void;
   filters: OfferFilters;
   onFilterChange: (filters: OfferFilters) => void;
+  onSearch: (filters: OfferFilters, value: string) => void;
+  onReset: () => void;
 }
 
 export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
@@ -20,6 +22,8 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   onToggleFilters,
   filters,
   onFilterChange,
+  onSearch,
+  onReset
 }) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
@@ -35,27 +39,12 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
     return () => clearTimeout(timeout);
   }, [localSearch, onSearchChange]);
 
+  useEffect(() => {
+    setLocalSearch(searchTerm);
+  }, [searchTerm]);
+
   const handleFilterChange = (key: keyof OfferFilters, value: string) => {
     onFilterChange({ ...filters, [key]: value });
-  };
-
-  const handleResetFilters = () => {
-    onFilterChange({
-      client: "",
-      entity: "",
-      createdBy: "",
-      status: "",
-      personsMin: "",
-      personsMax: "",
-      priceMin: "",
-      priceMax: "",
-      dateFrom: "",
-      dateTo: "",
-    });
-    setLocalSearch("");
-    onSearchChange("");
-    setClientDropdownVisible(false);
-    setUserDropdownVisible(false);
   };
 
   return (
@@ -83,8 +72,15 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           Filteri
         </button>
         <button
-          onClick={handleResetFilters}
-          className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          onClick={() => onSearch(filters, localSearch)}
+          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Search className="w-4 h-4 mr-2" />
+          Pretraži
+        </button>
+        <button
+          onClick={onReset}
+          className="flex items-center px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-colors"
         >
           <X className="w-4 h-4 mr-2" />
           Resetuj

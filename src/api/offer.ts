@@ -1,11 +1,19 @@
 import { BACKEND_URL } from "../config";
-import { OfferResponse, OfferStats, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
+import { OfferFilters, OfferResponse, OfferStats, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
+
+export const STATUS_MAP_REQ_RES: Record<string, string> = {
+  "Sent": "poslato",
+  "Accepted": "prihvaceno",
+  "Rejected": "odbijeno",
+  "Finished": "zavrseno",
+};
 
 export async function getAllOffers(
   page: number = 1,
   pageSize: number = 100,
   onlyDeleted: boolean = false,
-  max_days_since_update: number = -1
+  max_days_since_update: number = -1,
+  filters: OfferFilters = {}
 ): Promise<PaginatedOffers> {
   const queryParams = new URLSearchParams({
     page: page.toString(),
@@ -16,6 +24,23 @@ export async function getAllOffers(
   if (max_days_since_update >= 0) {
     queryParams.append("max_days_since_update", max_days_since_update.toString());
   }
+
+  // 🔍 Dodaj filtere ako postoje
+  if (filters.search) queryParams.append("search", filters.search);
+  if (filters.client) queryParams.append("client", filters.client);
+
+  if (filters.status) {
+    const mappedStatus = STATUS_MAP_REQ_RES[filters.status] || filters.status.toLowerCase();
+    queryParams.append("status", mappedStatus);
+  }
+
+  if (filters.createdBy) queryParams.append("created_by", filters.createdBy);
+  if (filters.personsMin !== undefined) queryParams.append("persons_min", filters.personsMin.toString());
+  if (filters.personsMax !== undefined) queryParams.append("persons_max", filters.personsMax.toString());
+  if (filters.priceMin !== undefined) queryParams.append("price_min", filters.priceMin.toString());
+  if (filters.priceMax !== undefined) queryParams.append("price_max", filters.priceMax.toString());
+  if (filters.dateFrom) queryParams.append("date_from", filters.dateFrom);
+  if (filters.dateTo) queryParams.append("date_to", filters.dateTo);
 
   const res = await fetch(`${BACKEND_URL}/ponuda/all?${queryParams.toString()}`);
 
@@ -73,13 +98,6 @@ export async function saveSlides(
   const data: SlajdIdRedniMap = await res.json();
   return data;
 }
-
-export const STATUS_MAP_REQ_RES: Record<string, string> = {
-  "Sent": "poslato",
-  "Accepted": "prihvaceno",
-  "Rejected": "odbijeno",
-  "Finished": "zavrseno",
-};
 
 export async function updateOfferStatusAPI({
   offerId,
