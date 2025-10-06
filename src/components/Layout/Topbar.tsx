@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LogOut, User, X, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { changePassword } from '../../api/users';
+import Logo from '../../assets/logo.png';
 
 interface TopbarProps {
   title: string;
@@ -69,7 +70,11 @@ export default function Topbar({ title, breadcrumbs }: TopbarProps) {
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0 relative">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+          <img 
+            src={Logo} 
+            alt="Balkan Holidays" 
+            className="w-[120px]"
+          />
           {breadcrumbs && breadcrumbs.length > 0 && (
             <nav className="flex mt-1" aria-label="Breadcrumb">
               <ol className="flex items-center space-x-2 text-sm text-gray-500">

@@ -64,6 +64,7 @@ export default function FinanceArchive() {
   };
 
   return (
+    <>
     <div className="space-y-6">
       <Header onExportToExcel={handleExportToExcel} />
 
@@ -87,19 +88,6 @@ export default function FinanceArchive() {
         }}
       />
 
-      {viewPonuda && <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />}
-
-      <FinanceExpensesModal
-        open={showExpensesModal}
-        offerId={selectedOfferId}
-        onClose={() => setShowExpensesModal(false)}
-        expenses={expenses}
-        handleAddExpense={handleAddExpense}
-        handleUpdateExpense={handleUpdateExpense}
-        handleRemoveExpense={handleRemoveExpense}
-        saveExpenses={saveExpenses}
-      />
-
       {totalFilteredOffers === 0 && <EmptyState />}
 
       <Pagination
@@ -113,5 +101,18 @@ export default function FinanceArchive() {
         onPreviousPage={goToPreviousPage}
       />
     </div>
+    {viewPonuda && <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />}
+
+      <FinanceExpensesModal
+        open={showExpensesModal}
+        offerId={selectedOfferId}
+        onClose={() => setShowExpensesModal(false)}
+        expenses={expenses}
+        handleAddExpense={handleAddExpense}
+        handleUpdateExpense={handleUpdateExpense}
+        handleRemoveExpense={handleRemoveExpense}
+        saveExpenses={saveExpenses}
+      />
+    </>
   );
 }

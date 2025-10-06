@@ -104,6 +104,7 @@ export default function Payments() {
   const currentOffer = offers.find(o => o.id === showPaymentHistory);
 
   return (
+    <>
     <div className="space-y-6">
       <Header onExportToExcel={handleExportToExcel} />
       <SummaryCards offers={filteredOffers} />
@@ -136,8 +137,8 @@ export default function Payments() {
         onNextPage={goToNextPage}
         onPreviousPage={goToPreviousPage}
       />
-
-      {/* Add / Edit Payment Modal */}
+    </div>
+    {/* Add / Edit Payment Modal */}
       <AddPaymentModal
         isOpen={!!showAddPayment}
         onClose={closeAddPaymentModal}
@@ -162,6 +163,6 @@ export default function Payments() {
         openEditPaymentModal={openEditPaymentModal}
         onDelete={handleDeletePayment}
       />
-    </div>
+      </>
   );
 }

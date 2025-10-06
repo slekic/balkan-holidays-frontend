@@ -28,6 +28,7 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState<User | null>(null); // TIP-SIGURNO
 
   return (
+    <>
     <div className="space-y-6">
       <Header onAdd={() => setShowAddModal(true)} />
       <SummaryCards
@@ -52,7 +53,8 @@ export default function UserManagement() {
         onToggleStatus={toggleStatus}
         onDelete={deleteUser}
       />
-      <AddUserModal
+    </div>
+    <AddUserModal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={addUser}
@@ -66,6 +68,6 @@ export default function UserManagement() {
           setShowEditModal(false);
         }}
       />
-    </div>
+     </>
   );
 }

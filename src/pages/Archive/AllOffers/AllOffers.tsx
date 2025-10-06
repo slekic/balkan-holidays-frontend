@@ -32,6 +32,7 @@ export default function AllOffers() {
   } = useOffers();
 
   return (
+    <>
     <div className="space-y-6">
       <PageHeader onExport={handleExport} />
       
@@ -57,11 +58,6 @@ export default function AllOffers() {
           />
         ))}
       </div>
-
-      {/* View Offer Modal */}
-      {viewPonuda && (
-        <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />
-      )}
     
       {/* Empty State */}
       {currentOffers.length === 0 && <EmptyState />}
@@ -76,5 +72,10 @@ export default function AllOffers() {
         onPageChange={handlePageChange}
       />
     </div>
+    {/* View Offer Modal */}
+      {viewPonuda && (
+        <OfferViewCard offer={viewPonuda} onClose={handleCloseView} />
+    )}
+    </>
   );
 }

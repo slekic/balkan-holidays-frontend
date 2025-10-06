@@ -239,6 +239,7 @@ export default function OfferCreation() {
   };
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -322,8 +323,8 @@ export default function OfferCreation() {
         }
         onSave={handleSaveOffer}
       />
-
-      <ExpensesModal
+    </div>
+    <ExpensesModal
         open={expensesModalOpen}
         offerId={editOfferId}
         onClose={() => setExpensesModalOpen(false)}
@@ -373,6 +374,6 @@ export default function OfferCreation() {
           setFormData((prev: any) => ({ ...prev, clientId: client.id }))
         }
       />
-    </div>
+    </>
   );
 }

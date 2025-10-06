@@ -274,7 +274,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="hidden lg:flex h-full bg-white border-r border-gray-200 flex-col">
+    <div className="lg:flex h-[100svh] bg-white border-r border-gray-200 flex-col sticky top-0 overflow-y-auto">
       <nav className="flex-1 p-4 space-y-2">
         {navigationItems.map((item) => renderNavigationItem(item))}
       </nav>
