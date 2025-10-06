@@ -85,26 +85,29 @@ export const useFollowUpOffers = () => {
     setCurrentPage(page);
   };
 
-  // ----------------- STATUS -----------------
   const handleStatusChange = async (offerId: string, newStatus: string) => {
     const result = await updateOfferStatusAPI({ offerId, newStatus });
-    if (result.success) {
-      setCurrentBatch((prev) =>
-        prev.map((o) =>
-          o.id === offerId ? { ...o, status: newStatus as FollowUpOffer["status"] } : o
-        )
-      );
-      setFilteredOffers((prev) =>
-        prev.map((o) =>
-          o.id === offerId ? { ...o, status: newStatus as FollowUpOffer["status"] } : o
-        )
-      );
-    } else {
-      console.error("Failed to update status:", result.message);
+    if (!result.success) {
       toast.error("Neuspešna promena statusa");
+      return;
+    }
+
+    const filteredBatch = currentBatch.filter(
+      (o) => o.id !== offerId || (filters.status && filters.status === newStatus)
+    );
+
+    setCurrentBatch(filteredBatch);
+    setFilteredOffers(filteredBatch);
+
+    setTotalItems(filteredBatch.length);
+
+    const localPage =
+      currentPage % pagesPerBatch === 0 ? pagesPerBatch : currentPage % pagesPerBatch;
+    const startIndex = (localPage - 1) * itemsPerPage;
+    if (startIndex >= filteredBatch.length && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
-
   // ----------------- SEARCH & FILTERI -----------------
   const handleSearchChange = (value: string) => setSearchTerm(value);
   const handleFilterChange = (newFilters: FollowUpOfferFilters) => setFilters(newFilters);
