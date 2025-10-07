@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 import {
   usePayments,
   usePaymentFilters,
-  usePaymentPagination,
   usePaymentActions,
-} from './hooks';
+} from "./hooks";
 import {
   Header,
   SummaryCards,
@@ -13,35 +12,39 @@ import {
   AddPaymentModal,
   PaymentHistoryModal,
   Pagination,
-} from './components';
-import { ITEMS_PER_PAGE } from './utils/constants';
-import { UserProvider } from '../../UserManagement/UserContext';
-import { NewPayment } from './utils';
-import { toast } from 'react-toastify';
+} from "./components";
+import { UserProvider } from "../../UserManagement/UserContext";
+import { NewPayment } from "./utils";
+import { toast } from "react-toastify";
 
 export default function Payments() {
-  const { offers, addPayment, updatePayment, deletePayment } = usePayments();
+  const {
+    currentBatch,
+    filteredOffers,
+    updateFilteredOffers,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    pagesPerBatch,
+    currentBatchNumber,
+    handlePageChange,
+    addPayment,
+    updatePayment,
+    deletePayment,
+  } = usePayments();
 
   const {
     searchTerm,
     setSearchTerm,
     showFilters,
     filters,
-    filteredOffers,
     handleFilterChange,
     clearFilters,
     toggleFilters,
-  } = usePaymentFilters(offers);
-
-  const {
-    currentPage,
-    totalPages,
-    startIndex,
-    currentOffers,
-    goToPage,
-    goToNextPage,
-    goToPreviousPage,
-  } = usePaymentPagination(filteredOffers);
+  } = usePaymentFilters(filteredOffers);
 
   const {
     showAddPayment,
@@ -58,7 +61,7 @@ export default function Payments() {
   } = usePaymentActions(filteredOffers);
 
   const handleAddPayment = async (offerId: string) => {
-    try{
+    try {
       if (newPayment.amount) {
         await addPayment(offerId, {
           amount: parseFloat(newPayment.amount),
@@ -68,7 +71,7 @@ export default function Payments() {
         toast.success("Uplata je uspešno dodata");
         closeAddPaymentModal();
       }
-    }catch (error) {
+    } catch (error) {
       console.error("Error adding payment:", error);
       toast.error("Greška pri dodavanju uplate");
     }
@@ -81,7 +84,6 @@ export default function Payments() {
         comment: updated.comment,
         method: updated.method,
       });
-
       toast.success("Uplata je uspešno ažurirana");
     } catch (error) {
       console.error("Error updating payment:", error);
@@ -92,7 +94,6 @@ export default function Payments() {
   const handleDeletePayment = async (id: string) => {
     try {
       await deletePayment(id);
-
       toast.success("Uplata je uspešno obrisana");
     } catch (error) {
       console.error("Error deleting payment:", error);
@@ -100,8 +101,9 @@ export default function Payments() {
     }
   };
 
-
-  const currentOffer = offers.find(o => o.id === showPaymentHistory);
+  const currentOffer = filteredOffers.find(
+    (o) => o.id === showPaymentHistory
+  );
 
   return (
     <div className="space-y-6">
@@ -120,41 +122,41 @@ export default function Payments() {
         />
       </UserProvider>
 
-      <PaymentsTable
-        offers={currentOffers}
-        onAddPayment={openAddPaymentModal}
-        onViewPaymentHistory={openPaymentHistoryModal}
-      />
+      {loading ? (
+        <p className="text-center text-gray-500">Loading...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
+      ) : (
+        <PaymentsTable
+          offers={currentBatch}
+          onAddPayment={openAddPaymentModal}
+          onViewPaymentHistory={openPaymentHistoryModal}
+        />
+      )}
 
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        startIndex={startIndex}
-        itemsPerPage={ITEMS_PER_PAGE}
-        totalItems={filteredOffers.length}
-        onPageChange={goToPage}
-        onNextPage={goToNextPage}
-        onPreviousPage={goToPreviousPage}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        pagesPerBatch={pagesPerBatch}
+        currentBatch={currentBatchNumber}
+        onPageChange={handlePageChange}
       />
 
-      {/* Add / Edit Payment Modal */}
       <AddPaymentModal
         isOpen={!!showAddPayment}
         onClose={closeAddPaymentModal}
         newPayment={newPayment}
         onUpdatePayment={updateNewPayment}
         onSubmit={() => {
-          if (editPaymentId) {
-            handleUpdatePayment(editPaymentId, newPayment);
-          } else {
-            showAddPayment && handleAddPayment(showAddPayment);
-          }
+          if (editPaymentId) handleUpdatePayment(editPaymentId, newPayment);
+          else showAddPayment && handleAddPayment(showAddPayment);
           closeAddPaymentModal();
         }}
         isEdit={!!editPaymentId}
       />
 
-      {/* Payment History Modal */}
       <PaymentHistoryModal
         isOpen={!!showPaymentHistory}
         onClose={closePaymentHistoryModal}
