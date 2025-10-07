@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Expense } from "../utils/types";
-import { fetchExpenses } from "../data/mockData";
 import { getAllExpenses } from "../../../../api/finances";
 import { mapPonudaNaExpense } from "../../../../utils/finance_response_mappers";
+
+const ITEMS_PER_PAGE = 2;
+const PAGES_PER_BATCH = 3;
+const BATCH_SIZE = ITEMS_PER_PAGE * PAGES_PER_BATCH;
 
 export const useExpenses = () => {
   const [currentBatch, setCurrentBatch] = useState<Expense[]>([]);
@@ -11,57 +14,71 @@ export const useExpenses = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(2);
-  const [pagesPerBatch] = useState<number>(3);
-  const [totalItems, setTotalItems] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
   const [currentBatchNumber, setCurrentBatchNumber] = useState<number>(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
 
-  const loadExpenses = useCallback(
-    async (page: number = 1) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getAllExpenses(page, itemsPerPage);
-        const mapped = data.items.map(mapPonudaNaExpense);
-        setCurrentBatch(mapped); 
-        setFilteredExpenses(mapped);
-        setTotalItems(data.total);
-        setTotalPages(Math.ceil((data.total || 0) / itemsPerPage));
-        setCurrentPage(page);
-      } catch (err) {
-        console.error("Failed to fetch expenses:", err);
-        setError("Failed to fetch expenses");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [itemsPerPage]
-  );
+  // ---------------- FETCH BATCH ----------------
+  const fetchBatch = async (batchNumber: number) => {
+    setLoading(true);
+    try {
+      const data = await getAllExpenses(batchNumber, BATCH_SIZE);
+      const mapped = data.items.map(mapPonudaNaExpense);
+      setCurrentBatch(mapped);
+      setFilteredExpenses(mapped);
+      setTotalItems(data.total);
+    } catch (err) {
+      console.error("Failed to fetch expenses:", err);
+      setError("Greška pri učitavanju troškova");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    loadExpenses(1);
-  }, [loadExpenses]);
+    fetchBatch(1);
+  }, []);
+
+  // ---------------- PAGINATION ----------------
+  const localPage =
+    currentPage % PAGES_PER_BATCH === 0
+      ? PAGES_PER_BATCH
+      : currentPage % PAGES_PER_BATCH;
+
+  const startIndex = (localPage - 1) * ITEMS_PER_PAGE;
+  const currentExpenses = currentBatch.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
 
   const handlePageChange = async (page: number) => {
-    await loadExpenses(page);
+    const newBatchModulo = page % PAGES_PER_BATCH;
+    if (newBatchModulo === 1 || newBatchModulo === 0) {
+      const newBatchNumber = Math.ceil(page / PAGES_PER_BATCH);
+      await fetchBatch(newBatchNumber);
+      setCurrentBatchNumber(newBatchNumber);
+    }
+    setCurrentPage(page);
   };
 
-  const updateFilteredExpenses = (newFiltered: Expense[]) => {
+  // ---------------- FILTERING ----------------
+  const updateFilteredExpenses = useCallback((newFiltered: Expense[]) => {
     setFilteredExpenses(newFiltered);
-  };
+  }, []);
 
   return {
     currentBatch,
-    filteredExpenses,
+    currentExpenses,
     updateFilteredExpenses,
     loading,
     error,
     currentPage,
     totalPages,
     totalItems,
-    itemsPerPage,
-    pagesPerBatch,
+    itemsPerPage: ITEMS_PER_PAGE,
+    pagesPerBatch: PAGES_PER_BATCH,
     currentBatchNumber,
     handlePageChange,
   };

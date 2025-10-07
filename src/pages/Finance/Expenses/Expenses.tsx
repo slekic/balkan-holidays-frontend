@@ -14,7 +14,7 @@ import Pagination from "./components/Pagination";
 export default function Expenses() {
   const {
     currentBatch,
-    filteredExpenses,
+    currentExpenses,
     updateFilteredExpenses,
     loading,
     error,
@@ -35,11 +35,11 @@ export default function Expenses() {
     handleFilterChange,
     clearFilters,
     toggleFilters,
-  } = useExpenseFilters(filteredExpenses, updateFilteredExpenses);
+  } = useExpenseFilters(currentExpenses, updateFilteredExpenses);
 
-  const { handleViewFile, handleExportToExcel } = useExpenseActions(filteredExpenses);
+  const { handleViewFile, handleExportToExcel } = useExpenseActions(currentExpenses);
 
-  const summary = calculateExpenseSummary(filteredExpenses);
+  const summary = calculateExpenseSummary(currentExpenses);
 
   return (
     <div className="space-y-6">
@@ -62,10 +62,10 @@ export default function Expenses() {
         <p className="text-center text-gray-500">Loading...</p>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
-      ) : filteredExpenses.length === 0 ? (
+      ) : currentExpenses.length === 0 ? (
         <EmptyState />
       ) : (
-        <ExpensesTable expenses={currentBatch} onViewFile={handleViewFile} />
+        <ExpensesTable expenses={currentExpenses} onViewFile={handleViewFile} />
       )}
 
       <Pagination
@@ -75,7 +75,7 @@ export default function Expenses() {
         itemsPerPage={itemsPerPage}
         pagesPerBatch={pagesPerBatch}
         currentBatch={currentBatchNumber}
-        onPageChange={handlePageChange}
+        onPageChange={(page) => handlePageChange(page)}
       />
     </div>
   );
