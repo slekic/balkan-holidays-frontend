@@ -78,40 +78,39 @@ export const useExpenses = () => {
 
   // ---------------- FILTERING ----------------
   const handleSearchChange = (value: string) => {
-        setSearchTerm(value);
-      };
+    setSearchTerm(value);
+  };
   
-      const handleFilterChange = (newFilters: ExpenseFilters) => {
-        setFilters(newFilters);
-      };
+  const handleFilterChange = (newFilters: ExpenseFilters) => {
+    setFilters(newFilters);
+  };
     
-      const handleResetFilters = async () => {
-        const emptyFilters: ExpenseFilters = {
-          entityName: "",
-          entityType: "",
-          createdBy: "",
-          client: "",
-          dateFrom: "",
-          dateTo: ""
-        };
-        setFilters(emptyFilters);
-        setSearchTerm("");
-        setShowFilters(false);
-        await fetchBatch(1, emptyFilters, "");
-        setCurrentBatchNumber(1);
-        setCurrentPage(1);
-      };
+  const handleResetFilters = async () => {
+    const emptyFilters: ExpenseFilters = {
+        entityName: "",
+        entityType: "",
+        createdBy: "",
+        client: "",
+        dateFrom: "",
+        dateTo: ""
+    };
+    setFilters(emptyFilters);
+    setSearchTerm("");
+    setShowFilters(false);
+    await fetchBatch(1, emptyFilters, "");
+    setCurrentBatchNumber(1);
+    setCurrentPage(1);
+  };
     
-      const handleToggleFilters = () => {
-        setShowFilters(!showFilters);
-      };
+  const handleToggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
   
-      const handleApplyFilters = async (filters: ExpenseFilters, searchTerm: string) => {
-        console.log("TRAZIMOOO ", searchTerm)
-          await fetchBatch(1, filters, searchTerm);
-          setCurrentBatchNumber(1);
-          setCurrentPage(1);
-      };
+  const handleApplyFilters = async (filters: ExpenseFilters, searchTerm: string) => {
+    await fetchBatch(1, filters, searchTerm);
+    setCurrentBatchNumber(1);
+    setCurrentPage(1);
+  };
     
   return {
     currentBatch,

@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "../config";
-import { ExpenseFilters, FinanceFilters, FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
+import { ExpenseFilters, FinanceFilters, FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, PaymentFilters, RashodCreate, RashodResponse } from "./responses";
 
 export const STATUS_MAP_REQ_RES: Record<string, string> = {
   "Sent": "poslato",
@@ -69,6 +69,7 @@ export async function getAllFinanceOffers(
 export async function getAllFinanceOffersWithPayments(
   page: number = 1,
   pageSize: number = 100,
+  filters: PaymentFilters = {},
   onlyDeleted: boolean = false,
   excludeCompleted: boolean = false 
 ): Promise<PaginatedFinansijePonudaPlacanja> {
@@ -78,6 +79,17 @@ export async function getAllFinanceOffersWithPayments(
     only_deleted: onlyDeleted.toString(),
     exclude_completed: excludeCompleted.toString(), 
   });
+
+  if (filters.search) queryParams.append("search", filters.search);
+  if (filters.client) queryParams.append("client", filters.client);
+  
+  if (filters.paymentStatus) {
+      const mappedStatus = PAY_STATUS_MAP_REQ_RES[filters.paymentStatus] || filters.paymentStatus.toLowerCase();
+      queryParams.append("payment_status", mappedStatus);
+  }
+  if (filters.dateFrom) queryParams.append("date_from", filters.dateFrom);
+  if (filters.dateTo) queryParams.append("date_to", filters.dateTo);
+
 
   const res = await fetch(
     `${BACKEND_URL}/finansije/all/payments?${queryParams.toString()}`

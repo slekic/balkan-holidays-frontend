@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { PaymentOffer } from "../utils/types";
+import { PaymentFilters, PaymentOffer } from "../utils/types";
 import {
   mapPonudaFinanceWithPaymentsToOffer,
 } from "../../../../utils/finance_response_mappers";
@@ -24,13 +24,30 @@ export const usePayments = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentBatchNumber, setCurrentBatchNumber] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
-
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<PaymentFilters>({
+        client: "",
+        dateFrom: "",
+        dateTo: "",
+        paymentStatus: ""
+    });
   // --- Fetch batch of offers ---
-  const fetchBatch = useCallback(async (batchNumber: number) => {
+  const fetchBatch = useCallback(async (batchNumber: number,
+            filters: PaymentFilters,
+            searchTerm: string
+  ) => {
     setLoading(true);
     setError(null);
+    const appliedFilters = {
+      search: searchTerm,
+      client: filters.client,
+      dateFrom: filters.dateFrom,
+      dateTo: filters.dateTo,
+      paymentStatus: filters.paymentStatus   
+    };
     try {
-      const data = await getAllFinanceOffersWithPayments(batchNumber, BATCH_SIZE);
+      const data = await getAllFinanceOffersWithPayments(batchNumber, BATCH_SIZE, appliedFilters);
       const mapped = data.items.map(mapPonudaFinanceWithPaymentsToOffer);
       setCurrentBatch(mapped);
       setFilteredOffers(mapped);
@@ -44,7 +61,7 @@ export const usePayments = () => {
   }, []);
 
   useEffect(() => {
-    fetchBatch(1);
+    fetchBatch(1, filters, searchTerm);
   }, [fetchBatch]);
 
   // --- Pagination logic ---
@@ -61,16 +78,45 @@ export const usePayments = () => {
   const handlePageChange = async (page: number) => {
     const newBatchNumber = Math.ceil(page / PAGES_PER_BATCH);
     if (newBatchNumber !== currentBatchNumber) {
-      await fetchBatch(newBatchNumber);
+      await fetchBatch(newBatchNumber, filters, searchTerm);
       setCurrentBatchNumber(newBatchNumber);
     }
     setCurrentPage(page);
   };
 
   // --- Filter updates ---
-  const updateFilteredOffers = useCallback((newOffers: PaymentOffer[]) => {
-    setFilteredOffers(newOffers);
-  }, []);
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+    
+  const handleFilterChange = (newFilters: PaymentFilters) => {
+    setFilters(newFilters);
+  };
+      
+  const handleResetFilters = async () => {
+    const emptyFilters: PaymentFilters = {
+      paymentStatus: "",
+      client: "",
+      dateFrom: "",
+      dateTo: ""
+    };
+    setFilters(emptyFilters);
+    setSearchTerm("");
+    setShowFilters(false);
+    await fetchBatch(1, emptyFilters, "");
+    setCurrentBatchNumber(1);
+    setCurrentPage(1);
+  };
+      
+  const handleToggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+    
+  const handleApplyFilters = async (filters: PaymentFilters, searchTerm: string) => {
+    await fetchBatch(1, filters, searchTerm);
+    setCurrentBatchNumber(1);
+    setCurrentPage(1);
+  };
 
   // --- Payment CRUD ---
   const addPayment = useCallback(
@@ -140,9 +186,16 @@ export const usePayments = () => {
     pagesPerBatch: PAGES_PER_BATCH,
     currentBatchNumber,
     handlePageChange,
-    updateFilteredOffers,
     addPayment,
     updatePayment,
     deletePayment,
+    handleSearchChange,
+    handleFilterChange,
+    handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
+    showFilters,
+    searchTerm,
+    filters,
   };
 };

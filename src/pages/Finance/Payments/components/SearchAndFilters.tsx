@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Filter } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Filter, X } from 'lucide-react';
 import { PaymentFilters } from '../utils/types';
 import { PAYMENT_STATUS_OPTIONS } from '../utils/constants';
 import { useCMS } from '../../../../contexts/CMSContext';
@@ -10,8 +10,9 @@ interface SearchAndFiltersProps {
   showFilters: boolean;
   onToggleFilters: () => void;
   filters: PaymentFilters;
-  onFilterChange: (key: keyof PaymentFilters, value: string) => void;
-  onClearFilters: () => void;
+  onFilterChange: (filters: PaymentFilters) => void;
+  onSearch: (filters: PaymentFilters, value: string) => void;
+  onReset: () => void;
 }
 
 export default function SearchAndFilters({
@@ -21,14 +22,26 @@ export default function SearchAndFilters({
   onToggleFilters,
   filters,
   onFilterChange,
-  onClearFilters
+  onSearch,
+  onReset,
 }: SearchAndFiltersProps) {
   const { clients } = useCMS();
   const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
-
-  const handleClientSelect = (name: string) => {
-    onFilterChange('client', name);
-    setClientDropdownVisible(false);
+  const [localSearch, setLocalSearch] = useState(searchTerm);
+  
+  useEffect(() => {
+        const timeout = setTimeout(() => {
+          onSearchChange(localSearch);
+        }, 300);
+        return () => clearTimeout(timeout);
+      }, [localSearch, onSearchChange]);
+    
+  useEffect(() => {
+      setLocalSearch(searchTerm);
+  }, [searchTerm]);
+      
+  const handleFilterChange = (key: keyof PaymentFilters, value: string) => {
+      onFilterChange({ ...filters, [key]: value });
   };
 
   return (
@@ -53,6 +66,20 @@ export default function SearchAndFilters({
           <Filter className="w-4 h-4 mr-2" />
           Filteri
         </button>
+        <button
+            onClick={() => onSearch(filters, localSearch)}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Pretraži
+          </button>
+          <button
+            onClick={onReset}
+            className="flex items-center px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-colors"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Resetuj
+          </button>
       </div>
 
       {showFilters && (
@@ -63,7 +90,7 @@ export default function SearchAndFilters({
               <label className="block text-sm font-medium text-gray-700 mb-1">Status uplate</label>
               <select
                 value={filters.paymentStatus}
-                onChange={(e) => onFilterChange('paymentStatus', e.target.value)}
+                onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {PAYMENT_STATUS_OPTIONS.map(option => (
@@ -82,7 +109,7 @@ export default function SearchAndFilters({
                 placeholder="Pretraži klijenta..."
                 value={filters.client || ""}
                 onChange={(e) => {
-                  onFilterChange('client', e.target.value);
+                  handleFilterChange('client', e.target.value);
                   setClientDropdownVisible(true);
                 }}
                 onFocus={() => setClientDropdownVisible(true)}
@@ -96,7 +123,7 @@ export default function SearchAndFilters({
                       <li
                         key={c.id}
                         className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleClientSelect(c.name)}
+                        onClick={() => handleFilterChange("client", c.name)}
                       >
                         {c.name}
                       </li>
@@ -111,7 +138,7 @@ export default function SearchAndFilters({
               <input
                 type="date"
                 value={filters.dateFrom}
-                onChange={(e) => onFilterChange('dateFrom', e.target.value)}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -122,19 +149,10 @@ export default function SearchAndFilters({
               <input
                 type="date"
                 value={filters.dateTo}
-                onChange={(e) => onFilterChange('dateTo', e.target.value)}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-          </div>
-
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={onClearFilters}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Obriši filtere
-            </button>
           </div>
         </div>
       )}

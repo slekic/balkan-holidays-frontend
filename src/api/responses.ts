@@ -330,3 +330,11 @@ export interface ExpenseFilters {
   entityType?: string;
   entityName?: string;
 }
+
+export interface PaymentFilters {
+  search?: string;
+  client?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  paymentStatus?: string;
+}

@@ -1,7 +1,6 @@
 import React from "react";
 import {
   usePayments,
-  usePaymentFilters,
   usePaymentActions,
 } from "./hooks";
 import {
@@ -21,7 +20,6 @@ export default function Payments() {
   const {
     currentOffers,
     filteredOffers,
-    updateFilteredOffers,
     loading,
     error,
     currentPage,
@@ -34,17 +32,15 @@ export default function Payments() {
     addPayment,
     updatePayment,
     deletePayment,
-  } = usePayments();
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    showFilters,
-    filters,
+    handleSearchChange,
     handleFilterChange,
-    clearFilters,
-    toggleFilters,
-  } = usePaymentFilters(filteredOffers);
+    handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
+    showFilters,
+    searchTerm,
+    filters,
+  } = usePayments();
 
   const {
     showAddPayment,
@@ -113,12 +109,13 @@ export default function Payments() {
       <UserProvider>
         <SearchAndFilters
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchChange={handleSearchChange}
           showFilters={showFilters}
-          onToggleFilters={toggleFilters}
+          onToggleFilters={handleToggleFilters}
           filters={filters}
           onFilterChange={handleFilterChange}
-          onClearFilters={clearFilters}
+          onSearch={handleApplyFilters}
+          onReset={handleResetFilters}
         />
       </UserProvider>
 
