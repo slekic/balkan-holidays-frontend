@@ -10,21 +10,28 @@ import { UserProvider } from "../../UserManagement/UserContext";
 
 export default function Trash() {
   const {
+    startIndex,
     currentOffers,
+    currentPage,
+    currentBatchNumber,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    pagesPerBatch,
     showFilters,
     searchTerm,
     filters,
-    totalPages,
-    currentPage,
-    startIndex,
-    itemsPerPage,
+    currentBatch,
+    filteredOffers,
+    handlePageChange,
     handleRestore,
     handlePermanentDelete,
     handleExport,
-    handlePageChange,
     handleSearchChange,
     handleFilterChange,
     handleToggleFilters,
+    handleResetFilters,
+    handleApplyFilters
   } = useTrash();
 
   return (
@@ -55,6 +62,8 @@ export default function Trash() {
         onToggleFilters={handleToggleFilters}
         filters={filters}
         onFilterChange={handleFilterChange}
+        onSearch={handleApplyFilters}
+        onReset={handleResetFilters}
       />
       </UserProvider>
 

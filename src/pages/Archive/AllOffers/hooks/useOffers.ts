@@ -201,7 +201,6 @@ export const useOffers = () => {
   };
 
   const handleResetFilters = async () => {
-    console.log("Brisemooo")
     const emptyFilters: OfferFilters = {
       client: "",
       entity: "",

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import type { TrashFilters } from "../types";
 import { useClients } from "../../../../contexts";
 import { useUsers } from "../../../UserManagement/UserContext";
@@ -11,6 +11,8 @@ interface TrashSearchAndFiltersProps {
   onToggleFilters: () => void;
   filters: TrashFilters;
   onFilterChange: (filters: Partial<TrashFilters>) => void;
+  onSearch: (filters: Partial<TrashFilters>, value: string) => void;
+  onReset: () => void;  
 }
 
 export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
@@ -20,6 +22,8 @@ export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
   onToggleFilters,
   filters,
   onFilterChange,
+  onSearch,
+  onReset, 
 }) => {
   const { clients } = useClients();
   const { users } = useUsers();
@@ -56,17 +60,32 @@ export const TrashSearchAndFilters: React.FC<TrashSearchAndFiltersProps> = ({
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-        <button
-          onClick={onToggleFilters}
-          className={`flex items-center px-4 py-2 border rounded-lg transition-colors ${
-            showFilters
-              ? "bg-blue-50 border-blue-300 text-blue-700"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          <Filter className="w-4 h-4 mr-2" />
-          Filteri
-        </button>
+        {/* Filteri dugme */}
+    <button
+      onClick={onToggleFilters}
+      className={`flex items-center px-4 py-2 border rounded-lg transition-colors ${
+        showFilters
+          ? "bg-blue-50 border-blue-300 text-blue-700"
+          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+      }`}
+    >
+      <Filter className="w-4 h-4 mr-2" />
+      Filteri
+      </button>
+      <button
+        onClick={() => onSearch(filters, searchTerm)}
+        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+      >
+        <Search className="w-4 h-4 mr-2" />
+        Pretraži
+      </button>
+      <button
+        onClick={onReset}
+        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        <X className="w-4 h-4 mr-2" />
+        Resetuj
+      </button>
       </div>
 
       {showFilters && (
