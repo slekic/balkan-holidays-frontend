@@ -39,24 +39,18 @@ export const useExpenses = () => {
   }, []);
 
   // ---------------- PAGINATION ----------------
-  const localPage =
-    currentPage % PAGES_PER_BATCH === 0
-      ? PAGES_PER_BATCH
-      : currentPage % PAGES_PER_BATCH;
-
-  const startIndex = (localPage - 1) * ITEMS_PER_PAGE;
-  const currentExpenses = currentBatch.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
+  const currentBatchStartIndex = (currentPage - 1) % PAGES_PER_BATCH * ITEMS_PER_PAGE;
+  const currentExpenses = filteredExpenses.slice(
+    currentBatchStartIndex,
+    currentBatchStartIndex + ITEMS_PER_PAGE
   );
 
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-
   const handlePageChange = async (page: number) => {
-    const newBatchModulo = page % PAGES_PER_BATCH;
-    if (newBatchModulo === 1 || newBatchModulo === 0) {
-      const newBatchNumber = Math.ceil(page / PAGES_PER_BATCH);
+    // Check if we need to fetch a new batch
+    const newBatchNumber = Math.ceil(page / PAGES_PER_BATCH);
+    if (newBatchNumber !== currentBatchNumber) {
       await fetchBatch(newBatchNumber);
       setCurrentBatchNumber(newBatchNumber);
     }
