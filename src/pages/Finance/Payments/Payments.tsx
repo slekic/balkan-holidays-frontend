@@ -102,6 +102,7 @@ export default function Payments() {
   );
 
   return (
+    <>
     <div className="space-y-6">
       <Header onExportToExcel={handleExportToExcel} />
       <SummaryCards offers={filteredOffers} />
@@ -140,7 +141,7 @@ export default function Payments() {
         currentBatch={currentBatchNumber}
         onPageChange={handlePageChange}
       />
-
+      </div>
       <AddPaymentModal
         isOpen={!!showAddPayment}
         onClose={closeAddPaymentModal}
@@ -161,6 +162,6 @@ export default function Payments() {
         openEditPaymentModal={openEditPaymentModal}
         onDelete={handleDeletePayment}
       />
-    </div>
+     </>
   );
 }
