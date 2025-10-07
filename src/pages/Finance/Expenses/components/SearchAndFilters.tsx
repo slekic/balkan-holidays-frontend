@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { ExpenseFilters } from "../utils/types";
 import { ENTITY_TYPE_LABELS } from "../utils/constants";
@@ -11,8 +11,9 @@ interface SearchAndFiltersProps {
   showFilters: boolean;
   onToggleFilters: () => void;
   filters: ExpenseFilters;
-  onFilterChange: (key: keyof ExpenseFilters, value: string) => void;
-  onClearFilters: () => void;
+  onFilterChange: (filters: ExpenseFilters) => void;
+  onSearch: (filters: ExpenseFilters, value: string) => void;
+  onReset: () => void;
 }
 
 export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
@@ -22,17 +23,30 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   onToggleFilters,
   filters,
   onFilterChange,
-  onClearFilters,
+  onSearch,
+  onReset,
 }) => {
   const { clients } = useCMS();
   const { users } = useUsers();
 
+  const [localSearch, setLocalSearch] = useState(searchTerm);
+  
   const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
   const [creatorDropdownVisible, setCreatorDropdownVisible] = useState(false);
 
-  const handleClientSelect = (name: string) => {
-    onFilterChange("client", name);
-    setClientDropdownVisible(false);
+  useEffect(() => {
+        const timeout = setTimeout(() => {
+          onSearchChange(localSearch);
+        }, 300);
+        return () => clearTimeout(timeout);
+      }, [localSearch, onSearchChange]);
+    
+      useEffect(() => {
+        setLocalSearch(searchTerm);
+      }, [searchTerm]);
+      
+  const handleFilterChange = (key: keyof ExpenseFilters, value: string) => {
+      onFilterChange({ ...filters, [key]: value });
   };
 
   return (
@@ -59,6 +73,20 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           <Filter className="w-4 h-4 mr-2" />
           Filteri
         </button>
+        <button
+            onClick={() => onSearch(filters, localSearch)}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Pretraži
+          </button>
+          <button
+            onClick={onReset}
+            className="flex items-center px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-colors"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Resetuj
+          </button>
       </div>
 
       {showFilters && (
@@ -71,7 +99,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
               </label>
               <select
                 value={filters.entityType}
-                onChange={(e) => onFilterChange("entityType", e.target.value)}
+                onChange={(e) => handleFilterChange("entityType", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi tipovi</option>
@@ -93,7 +121,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 placeholder="Pretraži klijenta..."
                 value={filters.client || ""}
                 onChange={(e) => {
-                  onFilterChange("client", e.target.value);
+                  handleFilterChange("client", e.target.value);
                   setClientDropdownVisible(true);
                 }}
                 onFocus={() => setClientDropdownVisible(true)}
@@ -109,7 +137,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                       <li
                         key={c.id}
                         className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleClientSelect(c.name)}
+                        onClick={() => handleFilterChange("client", c.name)}
                       >
                         {c.name}
                       </li>
@@ -127,19 +155,10 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 type="text"
                 placeholder="Pretraži naziv entiteta..."
                 value={filters.entityName}
-                onChange={(e) => onFilterChange("entityName", e.target.value)}
+                onChange={(e) => handleFilterChange("entityName", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-          </div>
-
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={onClearFilters}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Očisti filtere
-            </button>
           </div>
         </div>
       )}

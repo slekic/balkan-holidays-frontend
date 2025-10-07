@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "../config";
-import { FinanceFilters, FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
+import { ExpenseFilters, FinanceFilters, FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
 
 export const STATUS_MAP_REQ_RES: Record<string, string> = {
   "Sent": "poslato",
@@ -14,6 +14,17 @@ export const PAY_STATUS_MAP_REQ_RES: Record<string, string> = {
   "Partially Paid": "polovicno",
 };
 
+export const ENTITY_MAP_REQ_RES: Record<string, string> = {
+  "restaurant": "restoran",
+  "translator": "prevodilac",
+  "gift": "poklon",
+  "hotel": "hotel",
+  "transport":"prevoz",
+  "guide":"vodic",
+  "activity":"aktivnost",
+  "other":"ostalo"
+};
+
 export async function getAllFinanceOffers(
   page: number = 1,
   pageSize: number = 100,
@@ -25,7 +36,6 @@ export async function getAllFinanceOffers(
     page_size: pageSize.toString(),
     only_deleted: onlyDeleted.toString(),
   });
-    console.log(filters.paymentStatus)
 
     if (filters.search) queryParams.append("search", filters.search);
     if (filters.client) queryParams.append("client", filters.client);
@@ -80,6 +90,7 @@ export async function getAllFinanceOffersWithPayments(
 export async function getAllExpenses(
   page: number = 1,
   pageSize: number = 100,
+  filters: ExpenseFilters = {},
   onlyDeleted: boolean = false,
   excludeCompleted: boolean = false
 ): Promise<PaginatedRashodResponse> {
@@ -89,6 +100,15 @@ export async function getAllExpenses(
     only_deleted: onlyDeleted.toString(),
     exclude_completed: excludeCompleted.toString(),
   });
+   if (filters.search) queryParams.append("search", filters.search);
+   if (filters.client) queryParams.append("client", filters.client);
+  
+   if (filters.entityName) queryParams.append("entity_name", filters.entityName);
+
+   if (filters.entityType) {
+      const mapped = ENTITY_MAP_REQ_RES[filters.entityType] || filters.entityType.toLowerCase();
+      queryParams.append("entity_type", mapped);
+    }
 
   const res = await fetch(
     `${BACKEND_URL}/finansije/all/rashodi?${queryParams.toString()}`

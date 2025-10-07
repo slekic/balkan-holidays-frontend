@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Expense } from "../utils/types";
+import { Expense, ExpenseFilters } from "../utils/types";
 import { getAllExpenses } from "../../../../api/finances";
 import { mapPonudaNaExpense } from "../../../../utils/finance_response_mappers";
 
@@ -16,12 +16,31 @@ export const useExpenses = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentBatchNumber, setCurrentBatchNumber] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<ExpenseFilters>({
+      entityType: "",
+      entityName: "",
+      client: "",
+      createdBy: "",
+      dateFrom: "",
+      dateTo: "",
+    });
 
   // ---------------- FETCH BATCH ----------------
-  const fetchBatch = async (batchNumber: number) => {
+  const fetchBatch = async (batchNumber: number,
+          filters: ExpenseFilters,
+          searchTerm: string
+  ) => {
     setLoading(true);
+    const appliedFilters = {
+      search: searchTerm,
+      client: filters.client,
+      entityType: filters.entityType,
+      entityName: filters.entityName,   
+    };
     try {
-      const data = await getAllExpenses(batchNumber, BATCH_SIZE);
+      const data = await getAllExpenses(batchNumber, BATCH_SIZE, appliedFilters);
       const mapped = data.items.map(mapPonudaNaExpense);
       setCurrentBatch(mapped);
       setFilteredExpenses(mapped);
@@ -35,7 +54,7 @@ export const useExpenses = () => {
   };
 
   useEffect(() => {
-    fetchBatch(1);
+    fetchBatch(1, filters, searchTerm);
   }, []);
 
   // ---------------- PAGINATION ----------------
@@ -51,21 +70,52 @@ export const useExpenses = () => {
     // Check if we need to fetch a new batch
     const newBatchNumber = Math.ceil(page / PAGES_PER_BATCH);
     if (newBatchNumber !== currentBatchNumber) {
-      await fetchBatch(newBatchNumber);
+      await fetchBatch(newBatchNumber, filters, searchTerm);
       setCurrentBatchNumber(newBatchNumber);
     }
     setCurrentPage(page);
   };
 
   // ---------------- FILTERING ----------------
-  const updateFilteredExpenses = useCallback((newFiltered: Expense[]) => {
-    setFilteredExpenses(newFiltered);
-  }, []);
-
+  const handleSearchChange = (value: string) => {
+        setSearchTerm(value);
+      };
+  
+      const handleFilterChange = (newFilters: ExpenseFilters) => {
+        setFilters(newFilters);
+      };
+    
+      const handleResetFilters = async () => {
+        const emptyFilters: ExpenseFilters = {
+          entityName: "",
+          entityType: "",
+          createdBy: "",
+          client: "",
+          dateFrom: "",
+          dateTo: ""
+        };
+        setFilters(emptyFilters);
+        setSearchTerm("");
+        setShowFilters(false);
+        await fetchBatch(1, emptyFilters, "");
+        setCurrentBatchNumber(1);
+        setCurrentPage(1);
+      };
+    
+      const handleToggleFilters = () => {
+        setShowFilters(!showFilters);
+      };
+  
+      const handleApplyFilters = async (filters: ExpenseFilters, searchTerm: string) => {
+        console.log("TRAZIMOOO ", searchTerm)
+          await fetchBatch(1, filters, searchTerm);
+          setCurrentBatchNumber(1);
+          setCurrentPage(1);
+      };
+    
   return {
     currentBatch,
     currentExpenses,
-    updateFilteredExpenses,
     loading,
     error,
     currentPage,
@@ -75,5 +125,13 @@ export const useExpenses = () => {
     pagesPerBatch: PAGES_PER_BATCH,
     currentBatchNumber,
     handlePageChange,
+    handleSearchChange,
+    handleFilterChange,
+    handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
+    showFilters,
+    searchTerm,
+    filters,
   };
 };

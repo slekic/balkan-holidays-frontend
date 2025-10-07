@@ -6,7 +6,7 @@ import {
   ExpensesTable,
   EmptyState,
 } from "./components";
-import { useExpenses, useExpenseFilters, useExpenseActions } from "./hooks";
+import { useExpenses, useExpenseActions } from "./hooks";
 import { calculateExpenseSummary } from "./utils";
 import { UserProvider } from "../../UserManagement/UserContext";
 import Pagination from "./components/Pagination";
@@ -15,7 +15,6 @@ export default function Expenses() {
   const {
     currentBatch,
     currentExpenses,
-    updateFilteredExpenses,
     loading,
     error,
     currentPage,
@@ -25,17 +24,15 @@ export default function Expenses() {
     pagesPerBatch,
     currentBatchNumber,
     handlePageChange,
-  } = useExpenses();
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    showFilters,
-    filters,
+    handleSearchChange,
     handleFilterChange,
-    clearFilters,
-    toggleFilters,
-  } = useExpenseFilters(currentExpenses, updateFilteredExpenses);
+    handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
+    showFilters,
+    searchTerm,
+    filters,
+  } = useExpenses();
 
   const { handleViewFile, handleExportToExcel } = useExpenseActions(currentExpenses);
 
@@ -49,12 +46,13 @@ export default function Expenses() {
       <UserProvider>
         <SearchAndFilters
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchChange={handleSearchChange}
           showFilters={showFilters}
-          onToggleFilters={toggleFilters}
+          onToggleFilters={handleToggleFilters}
           filters={filters}
           onFilterChange={handleFilterChange}
-          onClearFilters={clearFilters}
+          onSearch={handleApplyFilters}
+          onReset={handleResetFilters}
         />
       </UserProvider>
 

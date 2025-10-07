@@ -323,3 +323,10 @@ export interface FinanceFilters {
   dateFrom?: string;
   dateTo?: string;
 }
+
+export interface ExpenseFilters {
+  search?: string;
+  client?: string;
+  entityType?: string;
+  entityName?: string;
+}
