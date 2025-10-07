@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { FinanceFilters } from "../utils/types";
 import { filterOptions } from "../utils/constants";
@@ -11,8 +11,9 @@ interface SearchAndFiltersProps {
   showFilters: boolean;
   onToggleFilters: () => void;
   filters: FinanceFilters;
-  onFilterChange: (key: keyof FinanceFilters, value: string) => void;
-  onClearFilters: () => void;
+  onFilterChange: (filters: FinanceFilters) => void;
+  onSearch: (filters: FinanceFilters, value: string) => void;
+  onReset: () => void;
 }
 
 export default function SearchAndFilters({
@@ -22,23 +23,31 @@ export default function SearchAndFilters({
   onToggleFilters,
   filters,
   onFilterChange,
-  onClearFilters,
+  onSearch,
+  onReset
 }: SearchAndFiltersProps) {
   const { clients } = useCMS(); 
   const { users } = useUsers();
 
+  const [localSearch, setLocalSearch] = useState(searchTerm);
+
   const [clientDropdownVisible, setClientDropdownVisible] = useState(false);
   const [creatorDropdownVisible, setCreatorDropdownVisible] = useState(false);
 
-  const handleClientSelect = (name: string) => {
-    onFilterChange("client", name);
-    setClientDropdownVisible(false);
-  };
+  const handleFilterChange = (key: keyof FinanceFilters, value: string) => {
+      onFilterChange({ ...filters, [key]: value });
+    };
 
-  const handleCreatorSelect = (name: string) => {
-    onFilterChange("createdBy", name);
-    setCreatorDropdownVisible(false);
-  };
+  useEffect(() => {
+      const timeout = setTimeout(() => {
+        onSearchChange(localSearch);
+      }, 300);
+      return () => clearTimeout(timeout);
+    }, [localSearch, onSearchChange]);
+  
+    useEffect(() => {
+      setLocalSearch(searchTerm);
+    }, [searchTerm]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -49,8 +58,8 @@ export default function SearchAndFilters({
           <input
             type="text"
             placeholder="Pretraga po nazivu ili šifri ponude..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -65,6 +74,20 @@ export default function SearchAndFilters({
           <Filter className="w-4 h-4 mr-2" />
           Filteri
         </button>
+        <button
+            onClick={() => onSearch(filters, localSearch)}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Pretraži
+          </button>
+          <button
+            onClick={onReset}
+            className="flex items-center px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-colors"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Resetuj
+          </button>
       </div>
 
       {/* Advanced Filters */}
@@ -72,13 +95,6 @@ export default function SearchAndFilters({
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-gray-700">Napredni filteri</h3>
-            <button
-              onClick={onClearFilters}
-              className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-4 h-4 mr-1" />
-              Očisti filtere
-            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -93,7 +109,7 @@ export default function SearchAndFilters({
                 placeholder="Pretraži klijenta..."
                 value={filters.client || ""}
                 onChange={(e) => {
-                  onFilterChange("client", e.target.value);
+                  handleFilterChange("client", e.target.value);
                   setClientDropdownVisible(true);
                 }}
                 onFocus={() => setClientDropdownVisible(true)}
@@ -109,7 +125,7 @@ export default function SearchAndFilters({
                       <li
                         key={c.id}
                         className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleClientSelect(c.name)}
+                        onClick={() => handleFilterChange("client", c.name)}
                       >
                         {c.name}
                       </li>
@@ -125,7 +141,7 @@ export default function SearchAndFilters({
               </label>
               <select
                 value={filters.status}
-                onChange={(e) => onFilterChange("status", e.target.value)}
+                onChange={(e) => handleFilterChange("status", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi statusi</option>
@@ -144,7 +160,7 @@ export default function SearchAndFilters({
               </label>
               <select
                 value={filters.paymentStatus}
-                onChange={(e) => onFilterChange("paymentStatus", e.target.value)}
+                onChange={(e) => handleFilterChange("paymentStatus", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Svi statusi uplate</option>
@@ -170,7 +186,7 @@ export default function SearchAndFilters({
                 placeholder="Pretraži korisnika..."
                 value={filters.createdBy || ""}
                 onChange={(e) => {
-                  onFilterChange("createdBy", e.target.value);
+                  handleFilterChange("createdBy", e.target.value);
                   setCreatorDropdownVisible(true);
                 }}
                 onFocus={() => setCreatorDropdownVisible(true)}
@@ -186,7 +202,7 @@ export default function SearchAndFilters({
                       <li
                         key={u.id}
                         className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleCreatorSelect(u.name)}
+                        onClick={() => handleFilterChange("createdBy", u.name)}
                       >
                         {u.name}
                       </li>

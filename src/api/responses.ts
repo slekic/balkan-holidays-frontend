@@ -309,3 +309,17 @@ export interface OfferFilters {
   dateFrom?: string;
   dateTo?: string;
 }
+
+export interface FinanceFilters {
+  search?: string;
+  client?: string;
+  status?: string;
+  paymentStatus?: string;
+  createdBy?: string;
+  personsMin?: number;
+  personsMax?: number;
+  priceMin?: number;
+  priceMax?: number;
+  dateFrom?: string;
+  dateTo?: string;
+}

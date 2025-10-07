@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import {
   useFinanceOffers,
-  useFinanceFilters,
   useFinanceActions,
 } from "./hooks";
 import Header from "./components/Header";
@@ -26,20 +25,16 @@ export default function FinanceArchive() {
     pagesPerBatch,
     currentBatchNumber,
     handlePageChange,
-    updateFilteredOffers,
     filteredOffers,
-  } = useFinanceOffers();
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    showFilters,
-    filters,
+    handleSearchChange,
     handleFilterChange,
-    clearFilters,
-    toggleFilters,
-  } = useFinanceFilters(filteredOffers, updateFilteredOffers);
-
+    handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
+    showFilters,
+    searchTerm,
+    filters,
+  } = useFinanceOffers();
 
   const { handleAction, handleExportToExcel, viewPonuda, handleCloseView } =
     useFinanceActions(currentOffers);
@@ -69,12 +64,13 @@ export default function FinanceArchive() {
       <UserProvider>
         <SearchAndFilters
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchChange={handleSearchChange}
           showFilters={showFilters}
-          onToggleFilters={toggleFilters}
+          onToggleFilters={handleToggleFilters}
           filters={filters}
           onFilterChange={handleFilterChange}
-          onClearFilters={clearFilters}
+          onSearch={handleApplyFilters}
+          onReset={handleResetFilters}
         />
       </UserProvider>
 

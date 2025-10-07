@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
-import { FinanceOffer } from "../utils/types";
+import { FinanceFilters, FinanceOffer } from "../utils/types";
 import { getAllFinanceOffers } from "../../../../api/finances";
 import { mapPonudaFinanceToOffer } from "../../../../utils/finance_response_mappers";
 
@@ -16,14 +16,44 @@ export function useFinanceOffers() {
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<FinanceFilters>({
+    client: "",
+    createdBy: "",
+    paymentStatus: "",
+    status: "",
+    personsMin: "",
+    personsMax: "",
+    priceMin: "",
+    priceMax: "",
+    dateFrom: "",
+    dateTo: "",
+  });
   // ---------------- FETCH BATCH ----------------
-  const fetchBatch = async (batchNumber: number) => {
+  const fetchBatch = async (batchNumber: number, 
+      filters: FinanceFilters,
+      searchTerm: string) => {
     setLoading(true);
+
+    const appliedFilters = {
+      search: searchTerm,
+      client: filters.client,
+      status: filters.status,
+      paymentStatus: filters.paymentStatus,
+      createdBy: filters.createdBy,
+      personsMin: Number(filters.personsMin),
+      personsMax: Number(filters.personsMax),
+      priceMin: Number(filters.priceMin),
+      priceMax: Number(filters.priceMax),
+      dateFrom: filters.dateFrom,
+      dateTo: filters.dateTo,
+    };
+
     try {
       console.log("GET SA ", batchNumber)
       console.log("GET sa ", BATCH_SIZE)
-      const data = await getAllFinanceOffers(batchNumber, BATCH_SIZE);
+      const data = await getAllFinanceOffers(batchNumber, BATCH_SIZE, appliedFilters);
       const mapped = data.items.map(mapPonudaFinanceToOffer);
       setCurrentBatch(mapped);
       setFilteredOffers(mapped);
@@ -38,7 +68,7 @@ export function useFinanceOffers() {
   };
 
   useEffect(() => {
-    fetchBatch(1);
+    fetchBatch(1, filters, searchTerm);
   }, []);
 
   // ---------------- PAGINATION ----------------
@@ -59,7 +89,7 @@ export function useFinanceOffers() {
     const newBatchModulo = page % PAGES_PER_BATCH;
     if (newBatchModulo === 1 || newBatchModulo === 0) {
       const newBatchNumber = Math.ceil(page / PAGES_PER_BATCH);
-      await fetchBatch(newBatchNumber);
+      await fetchBatch(newBatchNumber, filters, searchTerm);
       setCurrentBatchNumber(newBatchNumber);
     }
     setCurrentPage(page);
@@ -80,9 +110,46 @@ export function useFinanceOffers() {
   );
 
   // ---------------- FILTERING ----------------
-  const updateFilteredOffers = useCallback((newFilteredOffers: FinanceOffer[]) => {
-    setFilteredOffers(newFilteredOffers);
-  }, []);
+    const handleSearchChange = (value: string) => {
+      setSearchTerm(value);
+    };
+
+    const handleFilterChange = (newFilters: FinanceFilters) => {
+      setFilters(newFilters);
+    };
+  
+    const handleResetFilters = async () => {
+      const emptyFilters: FinanceFilters = {
+        client: "",
+        paymentStatus: "",
+        createdBy: "",
+        status: "",
+        personsMin: "",
+        personsMax: "",
+        priceMin: "",
+        priceMax: "",
+        dateFrom: "",
+        dateTo: "",
+      };
+      setFilters(emptyFilters);
+      setSearchTerm("");
+      setShowFilters(false);
+      await fetchBatch(1, emptyFilters, "");
+      setCurrentBatchNumber(1);
+      setCurrentPage(1);
+    };
+  
+    const handleToggleFilters = () => {
+      setShowFilters(!showFilters);
+    };
+
+    const handleApplyFilters = async (filters: FinanceFilters, searchTerm: string) => {
+      console.log("TRAZIMOOO ", searchTerm)
+        await fetchBatch(1, filters, searchTerm);
+        setCurrentBatchNumber(1);
+        setCurrentPage(1);
+    };
+  
 
   // ---------------- BATCH & TOTALS UPDATE ----------------
   const updateBatchAndTotals = (newBatch: FinanceOffer[], total?: number) => {
@@ -105,8 +172,15 @@ export function useFinanceOffers() {
     loading,
     error,
     handlePageChange,
-    updateFilteredOffers,
     updateBatchAndTotals,
-    filteredOffers
+    filteredOffers,
+    handleSearchChange,
+    handleFilterChange,
+    handleToggleFilters,
+    handleApplyFilters,
+    handleResetFilters,
+    showFilters,
+    searchTerm,
+    filters,
   };
 }

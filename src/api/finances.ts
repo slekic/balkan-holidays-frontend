@@ -1,9 +1,23 @@
 import { BACKEND_URL } from "../config";
-import { FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
+import { FinanceFilters, FinansijePonudaPlacanjaResponse, PaginatedFinansijePonuda, PaginatedFinansijePonudaPlacanja, PaginatedRashodResponse, RashodCreate, RashodResponse } from "./responses";
+
+export const STATUS_MAP_REQ_RES: Record<string, string> = {
+  "Sent": "poslato",
+  "Accepted": "prihvaceno",
+  "Rejected": "odbijeno",
+  "Finished": "zavrseno",
+};
+
+export const PAY_STATUS_MAP_REQ_RES: Record<string, string> = {
+  "Fully Paid": "placeno",
+  "Not Paid": "neplaceno",
+  "Partially Paid": "polovicno",
+};
 
 export async function getAllFinanceOffers(
   page: number = 1,
   pageSize: number = 100,
+  filters: FinanceFilters = {},
   onlyDeleted: boolean = false,
 ): Promise<PaginatedFinansijePonuda> {
   const queryParams = new URLSearchParams({
@@ -11,6 +25,28 @@ export async function getAllFinanceOffers(
     page_size: pageSize.toString(),
     only_deleted: onlyDeleted.toString(),
   });
+    console.log(filters.paymentStatus)
+
+    if (filters.search) queryParams.append("search", filters.search);
+    if (filters.client) queryParams.append("client", filters.client);
+  
+    if (filters.paymentStatus) {
+      const mappedStatus = PAY_STATUS_MAP_REQ_RES[filters.paymentStatus] || filters.paymentStatus.toLowerCase();
+      queryParams.append("payment_status", mappedStatus);
+    }
+
+    if (filters.status) {
+      const mappedStatus = STATUS_MAP_REQ_RES[filters.status] || filters.status.toLowerCase();
+      queryParams.append("status", mappedStatus);
+    }
+  
+    if (filters.createdBy) queryParams.append("created_by", filters.createdBy);
+    if (filters.personsMin !== undefined) queryParams.append("persons_min", filters.personsMin.toString());
+    if (filters.personsMax !== undefined) queryParams.append("persons_max", filters.personsMax.toString());
+    if (filters.priceMin !== undefined) queryParams.append("price_min", filters.priceMin.toString());
+    if (filters.priceMax !== undefined) queryParams.append("price_max", filters.priceMax.toString());
+    if (filters.dateFrom) queryParams.append("date_from", filters.dateFrom);
+    if (filters.dateTo) queryParams.append("date_to", filters.dateTo);
 
   const res = await fetch(
     `${BACKEND_URL}/finansije/all?${queryParams.toString()}`
