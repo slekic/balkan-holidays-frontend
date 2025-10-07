@@ -116,9 +116,13 @@ export const useOffers = () => {
     if (result.success) {
       setCurrentBatch((prev) =>
         prev.map((offer) =>
-          offer.id === offerId
-            ? { ...offer, status: newStatus as Offer["status"] }
-            : offer
+          offer.id === offerId ? { ...offer, status: newStatus as Offer["status"] } : offer
+        )
+      );
+
+      setFilteredOffers((prevFiltered) =>
+        prevFiltered.map((offer) =>
+          offer.id === offerId ? { ...offer, status: newStatus as Offer["status"] } : offer
         )
       );
     } else console.error("Failed to update status:", result.message);

@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   useFinanceOffers,
   useFinanceFilters,
-  useFinancePagination,
   useFinanceActions,
 } from "./hooks";
 import Header from "./components/Header";
@@ -17,8 +16,19 @@ import FinanceExpensesModal from "./ExpenseModal";
 import { useFinanceExpenses } from "./hooks/useExpenses";
 
 export default function FinanceArchive() {
-  const { offers, filteredOffers, totalFilteredOffers, updateFilteredOffers } =
-    useFinanceOffers();
+  // ---------------- HOOKOVI ----------------
+  const {
+    currentOffers,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    pagesPerBatch,
+    currentBatchNumber,
+    handlePageChange,
+    updateFilteredOffers,
+    filteredOffers,
+  } = useFinanceOffers();
 
   const {
     searchTerm,
@@ -28,41 +38,30 @@ export default function FinanceArchive() {
     handleFilterChange,
     clearFilters,
     toggleFilters,
-  } = useFinanceFilters(offers, updateFilteredOffers);
+  } = useFinanceFilters(filteredOffers, updateFilteredOffers);
 
-  const {
-    currentPage,
-    totalPages,
-    startIndex,
-    currentOffers,
-    goToPage,
-    goToNextPage,
-    goToPreviousPage,
-  } = useFinancePagination(filteredOffers);
 
   const { handleAction, handleExportToExcel, viewPonuda, handleCloseView } =
-    useFinanceActions(filteredOffers);
+    useFinanceActions(currentOffers);
 
-  // Modal state
+  // ---------------- MODAL ----------------
   const [showExpensesModal, setShowExpensesModal] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
 
-  // Hook za rashode ponude
   const {
     expenses,
     handleAddExpense,
     handleUpdateExpense,
     handleRemoveExpense,
-    totalExpenses,
     saveExpenses,
   } = useFinanceExpenses(selectedOfferId, showExpensesModal);
 
-  // Otvori modal sa rashodima
   const openExpensesModal = (offerId: string) => {
     setSelectedOfferId(offerId);
     setShowExpensesModal(true);
   };
 
+  // ---------------- RENDER ----------------
   return (
     <div className="space-y-6">
       <Header onExportToExcel={handleExportToExcel} />
@@ -100,17 +99,16 @@ export default function FinanceArchive() {
         saveExpenses={saveExpenses}
       />
 
-      {totalFilteredOffers === 0 && <EmptyState />}
+      {totalItems === 0 && <EmptyState />}
 
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        startIndex={startIndex}
-        itemsPerPage={6}
-        totalItems={totalFilteredOffers}
-        onPageChange={goToPage}
-        onNextPage={goToNextPage}
-        onPreviousPage={goToPreviousPage}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        pagesPerBatch={pagesPerBatch}
+        currentBatch={currentBatchNumber}
+        onPageChange={(page) => handlePageChange(page)}
       />
     </div>
   );

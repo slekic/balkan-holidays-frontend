@@ -2,9 +2,9 @@ import { getAllFinanceOffers } from "../../../../api/finances";
 import { mapPonudaFinanceToOffer } from "../../../../utils/finance_response_mappers";
 import { FinanceOffer } from "./types";
 
-export async function fetchFinanceOffers(): Promise<FinanceOffer[]> {
+export async function fetchFinanceOffers(batchNumber: number, batchSize: number): Promise<FinanceOffer[]> {
   try {
-    const data = await getAllFinanceOffers(1, 100, false);
+    const data = await getAllFinanceOffers(batchNumber, batchSize, false);
     return data.items.map(mapPonudaFinanceToOffer);
   } catch (error) {
     console.error("Failed to fetch finance offers:", error);
