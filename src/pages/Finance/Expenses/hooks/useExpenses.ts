@@ -3,8 +3,8 @@ import { Expense } from "../utils/types";
 import { getAllExpenses } from "../../../../api/finances";
 import { mapPonudaNaExpense } from "../../../../utils/finance_response_mappers";
 
-const ITEMS_PER_PAGE = 2;
-const PAGES_PER_BATCH = 3;
+const ITEMS_PER_PAGE = 8;
+const PAGES_PER_BATCH = 5;
 const BATCH_SIZE = ITEMS_PER_PAGE * PAGES_PER_BATCH;
 
 export const useExpenses = () => {

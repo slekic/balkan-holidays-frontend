@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 
 export default function Payments() {
   const {
-    currentBatch,
+    currentOffers,
     filteredOffers,
     updateFilteredOffers,
     loading,
@@ -101,7 +101,7 @@ export default function Payments() {
     }
   };
 
-  const currentOffer = filteredOffers.find(
+  const currentOffer = currentOffers.find(
     (o) => o.id === showPaymentHistory
   );
 
@@ -128,7 +128,7 @@ export default function Payments() {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <PaymentsTable
-          offers={currentBatch}
+          offers={currentOffers}
           onAddPayment={openAddPaymentModal}
           onViewPaymentHistory={openPaymentHistoryModal}
         />
