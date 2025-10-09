@@ -32,11 +32,10 @@ export default function Expenses() {
     showFilters,
     searchTerm,
     filters,
+    summary
   } = useExpenses();
 
   const { handleViewFile, handleExportToExcel } = useExpenseActions(currentExpenses);
-
-  const summary = calculateExpenseSummary(currentExpenses);
 
   return (
     <div className="space-y-6">

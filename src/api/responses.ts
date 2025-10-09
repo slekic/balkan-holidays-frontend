@@ -162,6 +162,13 @@ export interface PaginatedRashodResponse {
   page: number;
   page_size: number;
   items: RashodResponse[];
+  summary: SummaryResponse;
+}
+
+export interface SummaryResponse {
+  totalAmount: number;
+  totalCount: number;
+  averageAmount: number;
 }
 
 export interface AccommodationResponse {

@@ -45,11 +45,6 @@ export const filterExpenses = (
       return false;
     }
 
-    // Created by filter
-    if (filters.createdBy && expense.createdBy !== filters.createdBy) {
-      return false;
-    }
-
     // Date range filters
     if (filters.dateFrom && new Date(expense.travelDate) < new Date(filters.dateFrom)) {
       return false;

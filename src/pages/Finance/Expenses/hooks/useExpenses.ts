@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Expense, ExpenseFilters } from "../utils/types";
+import { Expense, ExpenseFilters, ExpenseSummary } from "../utils/types";
 import { getAllExpenses } from "../../../../api/finances";
 import { mapPonudaNaExpense } from "../../../../utils/finance_response_mappers";
 
@@ -18,6 +18,11 @@ export const useExpenses = () => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [summary, setSummary] = useState<ExpenseSummary>({
+    averageAmount: 0,
+    totalAmount: 0,
+    totalCount: 0
+  })
   const [filters, setFilters] = useState<ExpenseFilters>({
       entityType: "",
       entityName: "",
@@ -45,6 +50,7 @@ export const useExpenses = () => {
       setCurrentBatch(mapped);
       setFilteredExpenses(mapped);
       setTotalItems(data.total);
+      setSummary(data.summary)
     } catch (err) {
       console.error("Failed to fetch expenses:", err);
       setError("Greška pri učitavanju troškova");
@@ -132,5 +138,6 @@ export const useExpenses = () => {
     showFilters,
     searchTerm,
     filters,
+    summary
   };
 };
