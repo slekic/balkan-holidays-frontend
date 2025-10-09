@@ -93,16 +93,24 @@ export function useSlides(offerId: string | null) {
       const entityTypes: string[] = [];
       const filesArr: string[] = [];
       const tipoviArr: string[] = [];
+      const exsist: string[] = [];
+      const exsistIds: number[] = [];
 
       slides.forEach((slide) => {
         const slideId = redniIdMap[slide.num];
         const content = slide.content || {};
+        
+        exsistIds.push(slideId);
 
-         if (content.backgroundImage && content.backgroundImage.startsWith("data:")) {
-          filesArr.push(content.backgroundImage);
-          tipoviArr.push("logo");
-          entityIds.push(slideId);
-          entityTypes.push("slajd");
+         if (content.backgroundImage){
+          if(content.backgroundImage.startsWith("data:")) {
+            filesArr.push(content.backgroundImage);
+            tipoviArr.push("logo");
+            entityIds.push(slideId);
+            entityTypes.push("slajd");
+          } else {
+            exsist.push(content.backgroundImage);
+          }
         }
 
         content.images?.forEach((img: string) => {
@@ -111,21 +119,28 @@ export function useSlides(offerId: string | null) {
             tipoviArr.push("slika");
             entityIds.push(slideId);
             entityTypes.push("slajd");
+          } else {
+            exsist.push(img);
           }
         });
 
       });
 
+      console.log("IIIIIIII")
+      console.log(exsistIds)
+      console.log(exsist)
+
       // 4️⃣ Pozovi batch upload funkciju
-      if (entityIds.length > 0) {
+      
         const uploadRes = await uploadMultipleEntitiesImages(
           entityIds,
           entityTypes,
           filesArr,
-          tipoviArr
+          tipoviArr,
+          exsistIds,
+          exsist
         );
         console.log("Upload slides images result:", uploadRes);
-      }
 
       console.log("Slides saved and files uploaded successfully!");
     } catch (err) {

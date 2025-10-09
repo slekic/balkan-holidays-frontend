@@ -83,6 +83,8 @@ export async function uploadMultipleEntitiesImages(
   entityTypes: string[],
   files: string[] = [], 
   tipovi: string[] = [], 
+  exsistIds: number[],
+  exsist: string[]
 ) {
   const formData = new FormData();
 
@@ -94,6 +96,11 @@ export async function uploadMultipleEntitiesImages(
     formData.append("tip_slike", tipovi[index]);
   });
 
+  exsistIds.forEach((id, index) => {
+    formData.append("postojeci_ids", id.toString());
+    formData.append("postojece_putanje", exsist[index]);
+  });
+  
   const res = await fetch(`${BACKEND_URL}/upload-multiple`, {
     method: "POST",
     body: formData

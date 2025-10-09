@@ -152,10 +152,6 @@ export default function SlidesModal({
                               {slide.content.description}
                             </p>
                             <div className="flex items-center space-x-4 text-xs text-gray-500">
-                              <span>{slide.content.numberOfRooms} soba</span>
-                              <span>
-                                {slide.content.numberOfRestaurants} restorana
-                              </span>
                             </div>
                             <div className="flex space-x-2">
                               {slide.content.images

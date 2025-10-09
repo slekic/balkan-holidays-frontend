@@ -276,6 +276,7 @@ export function mapSlajdResponseToSlide(apiSlide: SlajdResponse): Slide {
     content: {
       description: sadrzaj.opis || "",
       backgroundImage: logoObj,
+      logo: logoObj,
       images,
     },
   };

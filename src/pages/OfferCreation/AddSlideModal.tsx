@@ -47,6 +47,7 @@ export default function AddSlideModal({
                 <option value="general">Opšti slajd</option>
                 <option value="what-to-expect">What to Expect</option>
                 <option value="day">Dan slajd</option>
+                <option value="activity">Aktivnost slajd</option>
                 <option value="hotel">Hotel slajd</option>
                 <option value="restaurant">Restoran slajd</option>
                 <option value="gift">Poklon slajd</option>
@@ -60,6 +61,8 @@ export default function AddSlideModal({
                   "Fiksni šablon slajda sa informacijama o uslugama kompanije"}
                 {newSlideType === "day" &&
                   "Slajd sa planom putovanja po danima, slikama i opisom"}
+                {newSlideType === "activity" &&
+                  "Slajd sa informacijama o aktivnosti"}
                 {newSlideType === "hotel" &&
                   "Slajd sa informacijama o hotelu, pogodnostima i slikama"}
                 {newSlideType === "restaurant" &&

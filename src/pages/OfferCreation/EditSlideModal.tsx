@@ -7,8 +7,8 @@ import { useCMS } from "../../contexts/CMSContext";
 type Props = {
   slide: Slide | null;
   onClose: () => void;
-  onSave: (updated: Slide) => void;
-  dayTemplates: {
+  onSave?: (updated: Slide) => void;
+  dayTemplates?: {
     label: string;
     content: Partial<Slide["content"]>;
     title?: string;
@@ -52,113 +52,28 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
     }
   };
 
+  const isReadOnly = localSlide.type === "what-to-expect";
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            Izmeni {slideTypeLabels[localSlide.type]}
+            {isReadOnly ? "Generički slajd" : slideTypeLabels[localSlide.type]}
           </h3>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-6">
-          {localSlide.type === "day" ? (
-            <div className="space-y-4">
-              {/* Polje za naslov */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Naslov dana
-                </label>
-                <input
-                  type="text"
-                  value={localSlide.title}
-                  onChange={(e) => handleChange({ title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Select za template */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Izaberite template dana
-                </label>
-                <select
-                  value={selectedTemplate}
-                  onChange={(e) => handleSelectTemplate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">-- Izaberite --</option>
-                  {dayTemplates.map((t) => (
-                    <option key={t.title} value={t.title}>
-                      {t.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Broj dana */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Broj dana
-                </label>
-                <input
-                  type="number"
-                  value={localSlide.content.dayNumber || 1}
-                  onChange={(e) =>
-                    handleContentChange({
-                      dayNumber: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Opis */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Opis
-                </label>
-                <textarea
-                  value={localSlide.content.description || ""}
-                  onChange={(e) =>
-                    handleContentChange({ description: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Slike */}
-              <div>
-                <ImageUpload
-                  label="Pozadinska slika"
-                  value={localSlide.content.backgroundImage || ""}
-                  onChange={(value) =>
-                    handleContentChange({ backgroundImage: value })
-                  }
-                />
-              </div>
-              <div>
-                <ImageUpload
-                  label="Dodatne slike dana"
-                  multiple
-                  values={localSlide.content.images || []}
-                  onMultipleChange={(images) =>
-                    handleContentChange({ images })
-                  }
-                  maxImages={3}
-                  onChange={() => {}}
-                />
-              </div>
-            </div>
-          ) : (
-            // Ostali tipovi (hotel, restoran, aktivnost…)
+          {/* GENERAL SLIDE */}
+          {localSlide.type === "general" && (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -171,7 +86,6 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Opis
@@ -185,7 +99,55 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+              <div>
+                <ImageUpload
+                  label="Logo"
+                  value={localSlide.content.logo || ""}
+                  onChange={(value) => handleContentChange({ logo: value })}
+                />
+              </div>
+            </div>
+          )}
 
+          {/* WHAT TO EXPECT (read-only) */}
+          {isReadOnly && (
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-gray-700">
+                Naslov: {localSlide.title}
+              </p>
+              <p className="text-sm text-gray-600">
+                {localSlide.content.description}
+              </p>
+            </div>
+          )}
+
+          {/* DAY SLIDE */}
+          {["activity", "day"].includes(localSlide.type) && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Naslov
+                </label>
+                <input
+                  type="text"
+                  value={localSlide.title || ""}
+                  onChange={(e) => handleChange({ title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opis
+                </label>
+                <textarea
+                  value={localSlide.content.description || ""}
+                  onChange={(e) =>
+                    handleContentChange({ description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
               <div>
                 <ImageUpload
                   label="Pozadinska slika"
@@ -209,21 +171,114 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
               </div>
             </div>
           )}
+
+          {/* ACTIVITY / HOTEL / RESTAURANT */}
+          {["hotel", "restaurant"].includes(localSlide.type) && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Naslov
+                </label>
+                <input
+                  type="text"
+                  value={localSlide.title || ""}
+                  onChange={(e) => handleChange({ title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opis
+                </label>
+                <textarea
+                  value={localSlide.content.description || ""}
+                  onChange={(e) =>
+                    handleContentChange({ description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <ImageUpload
+                  label="Slike"
+                  multiple
+                  values={localSlide.content.images || []}
+                  onMultipleChange={(images) =>
+                    handleContentChange({ images })
+                  }
+                  maxImages={8}
+                  onChange={() => {}}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* GIFT */}
+          {localSlide.type === "gift" && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Naslov
+                </label>
+                <input
+                  type="text"
+                  value={localSlide.title || ""}
+                  onChange={(e) => handleChange({ title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opis
+                </label>
+                <textarea
+                  value={localSlide.content.description || ""}
+                  onChange={(e) =>
+                    handleContentChange({ description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <ImageUpload
+                  label="Slika poklona"
+                  value={localSlide.content.images?.[0] || ""}
+                  onChange={(value) =>
+                    handleContentChange({ images: [value] })
+                  }
+                />
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* FOOTER */}
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            Otkaži
-          </button>
-          <button
-            onClick={() => localSlide && onSave(localSlide)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Sačuvaj promene
-          </button>
+          {isReadOnly ? (
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              OK
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Otkaži
+              </button>
+              <button
+                onClick={() => localSlide && onSave?.(localSlide)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Sačuvaj promene
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ export type SlideType =
   | "day"
   | "hotel"
   | "restaurant"
+  | "activity"
   | "gift";
 
 export interface Slide {
@@ -35,6 +36,7 @@ export const slideTypeIcons = {
   hotel: Building2,
   restaurant: UtensilsCrossed,
   gift: GiftIcon,
+  activity: Calendar,
 } as const;
 
 export const slideTypeLabels: Record<SlideType, string> = {
@@ -44,6 +46,7 @@ export const slideTypeLabels: Record<SlideType, string> = {
   hotel: "Hotel slajd",
   restaurant: "Restoran slajd",
   gift: "Poklon slajd",
+  activity: "Aktivnost"
 };
 
 export const getEntityTypeColor = (entityType: string) => {
