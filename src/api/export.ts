@@ -304,3 +304,46 @@ export async function exportSelectedOffersPayments(offersIds: number[]) {
     console.error("Error exporting offers-fin:", error);
   }
 }
+
+export async function downloadOfferPresentation(ponudaId: number) {
+  if (!ponudaId) return;
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/export/prezentacija/${ponudaId}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to download presentation: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+
+    // default filename ako nije u headeru
+    let filename = `offer_${ponudaId}.pptx`;
+
+    const disposition = response.headers.get("Content-Disposition");
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+
+    // cleanup
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    console.log("Presentation downloaded successfully!");
+  } catch (error) {
+    console.error("Error downloading presentation:", error);
+  }
+}

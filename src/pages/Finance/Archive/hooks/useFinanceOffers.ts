@@ -4,7 +4,7 @@ import { FinanceFilters, FinanceOffer } from "../utils/types";
 import { getAllFinanceOffers } from "../../../../api/finances";
 import { mapPonudaFinanceToOffer } from "../../../../utils/finance_response_mappers";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 6;
 const PAGES_PER_BATCH = 5;
 const BATCH_SIZE = ITEMS_PER_PAGE * PAGES_PER_BATCH;
 

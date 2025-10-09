@@ -3,6 +3,8 @@ import { Slide, SlideType, slideTypeLabels } from "../utils/constants";
 import { getSlides, saveSlides } from "../../../api/offer";
 import { mapSlajdResponseToSlide } from "../../../utils/offer_response_mappers";
 import { uploadMultipleEntitiesImages } from "../../../api/cms";
+import { toast } from "react-toastify";
+import { downloadOfferPresentation } from "../../../api/export";
 
 export interface SlideFile {
   file: File;
@@ -148,6 +150,20 @@ export function useSlides(offerId: string | null) {
     }
   };
 
+  const exportPresentation = async (offerId: string | null) => {
+    if (!offerId) {
+      toast.error("Ponuda nije sačuvana!");
+      return;
+    }
+
+    try {
+      await downloadOfferPresentation(Number(offerId))
+    }
+    catch(err){
+      toast.error("Greška prilikom generisanja!");
+    }
+  }
+
   return {
     slides,
     setSlides,
@@ -165,5 +181,6 @@ export function useSlides(offerId: string | null) {
     handleDeleteSlide,
     addSlide,
     saveSlidesHandler, // dugme "Sačuvaj" poziva ovo
+    exportPresentation
   };
 }

@@ -14,6 +14,7 @@ type Props = {
   onDelete: (id: string) => void;
   onOpenAdd: () => void;
   onSave: () => Promise<void>;
+  onPresent: () => void;
 };
 
 export default function SlidesModal({
@@ -27,9 +28,11 @@ export default function SlidesModal({
   onEdit,
   onDelete,
   onOpenAdd,
-  onSave
+  onSave,
+  onPresent,
 }: Props) {
   if (!open) return null;
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -236,10 +239,7 @@ export default function SlidesModal({
           Sačuvaj slajdove
         </button>
           <button
-            onClick={() => {
-              console.log("Exporting PDF with slides:", slides);
-              alert("PDF export would start here!");
-            }}
+            onClick={onPresent}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
             Export PDF

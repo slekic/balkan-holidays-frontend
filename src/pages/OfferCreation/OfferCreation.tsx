@@ -79,7 +79,8 @@ export default function OfferCreation() {
     handleSlideReorder,
     handleDeleteSlide,
     addSlide,
-    saveSlidesHandler
+    saveSlidesHandler,
+    exportPresentation
   } = useSlides(editOfferId);
 
   const {
@@ -349,6 +350,7 @@ export default function OfferCreation() {
         onDelete={handleDeleteSlide}
         onOpenAdd={() => setShowAddSlideModal(true)}
         onSave={() => saveSlidesHandler()}
+        onPresent={()=> exportPresentation(editOfferId)}
       />
 
       <AddSlideModal
