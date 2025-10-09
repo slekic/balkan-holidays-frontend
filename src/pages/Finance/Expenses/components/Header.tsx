@@ -9,7 +9,7 @@ export const Header: React.FC<HeaderProps> = ({ onExportToExcel }) => {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Troškovi</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Rashodi</h1>
         <p className="text-gray-600 mt-1">
           Pratite interne troškove povezane sa ponudama i entitetima
         </p>
