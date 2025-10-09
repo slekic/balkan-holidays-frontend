@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { PaymentFilters, PaymentOffer } from "../utils/types";
+import { PaymentFilters, PaymentOffer, PaymentSummary } from "../utils/types";
 import {
   mapPonudaFinanceWithPaymentsToOffer,
 } from "../../../../utils/finance_response_mappers";
@@ -26,6 +26,11 @@ export const usePayments = () => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [summary, setSummary] = useState<PaymentSummary>({
+        totalOutstanding: 0,
+        totalReceived: 0,
+        collectionRate: 0
+    });
   const [filters, setFilters] = useState<PaymentFilters>({
         client: "",
         dateFrom: "",
@@ -52,6 +57,7 @@ export const usePayments = () => {
       setCurrentBatch(mapped);
       setFilteredOffers(mapped);
       setTotalItems(data.total);
+      setSummary(data.summary);
     } catch (err) {
       console.error("Failed to fetch finance offers with payments:", err);
       setError("Greška pri učitavanju ponuda sa plaćanjima");
@@ -129,12 +135,27 @@ export const usePayments = () => {
       setCurrentBatch((prev) =>
         prev.map((offer) => (offer.id === offerId ? mappedOffer : offer))
       );
-      setFilteredOffers((prev) =>
-        prev.map((offer) => (offer.id === offerId ? mappedOffer : offer))
+      setFilteredOffers((prev) => {
+      const updated = prev.map((offer) =>
+        offer.id === offerId ? mappedOffer : offer
       );
+      setSummary(recalculateSummary(updated));
+      return updated;
+    });
     },
     []
   );
+
+  const recalculateSummary = (offers: PaymentOffer[]) => {
+    const totalReceivable = offers.reduce((sum, offer) => sum + offer.totalPrice, 0);
+    const totalReceived = offers.reduce((sum, offer) => sum + offer.totalPaid, 0);
+    const totalOutstanding = totalReceivable - totalReceived;
+    const collectionRate =
+      totalReceivable > 0 ? Math.round((totalReceived / totalReceivable) * 100) : 0;
+
+    return { totalReceived, totalOutstanding, collectionRate };
+  };
+
 
   const updatePayment = useCallback(
     async (
@@ -148,11 +169,13 @@ export const usePayments = () => {
           offer.id === mappedOffer.id ? mappedOffer : offer
         )
       );
-      setFilteredOffers((prev) =>
-        prev.map((offer) =>
-          offer.id === mappedOffer.id ? mappedOffer : offer
-        )
+      setFilteredOffers((prev) => {
+      const updated = prev.map((offer) =>
+        offer.id === mappedOffer.id ? mappedOffer : offer
       );
+      setSummary(recalculateSummary(updated));
+      return updated;
+    });
     },
     []
   );
@@ -197,5 +220,6 @@ export const usePayments = () => {
     showFilters,
     searchTerm,
     filters,
+    summary
   };
 };

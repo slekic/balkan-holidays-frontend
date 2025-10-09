@@ -40,6 +40,7 @@ export default function Payments() {
     showFilters,
     searchTerm,
     filters,
+    summary
   } = usePayments();
 
   const {
@@ -105,7 +106,7 @@ export default function Payments() {
     <>
     <div className="space-y-6">
       <Header onExportToExcel={handleExportToExcel} />
-      <SummaryCards offers={filteredOffers} />
+      <SummaryCards summary={summary} />
 
       <UserProvider>
         <SearchAndFilters

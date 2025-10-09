@@ -155,8 +155,14 @@ export interface PaginatedFinansijePonudaPlacanja {
   page: number;
   page_size: number;
   items: FinansijePonudaPlacanjaResponse[];
+  summary: PaymentSummary;
 }
 
+export interface PaymentSummary {
+  totalReceived: number;
+  totalOutstanding: number;
+  collectionRate: number;
+} 
 export interface PaginatedRashodResponse {
   total: number;
   page: number;
