@@ -108,7 +108,7 @@ export default function FinanceOfferCard({ offer, onAction }: FinanceOfferCardPr
       {/* Invoice Actions */}
       <div className="mb-4 p-3 bg-blue-50 rounded-lg">
         <p className="text-sm font-medium text-blue-800 mb-2">
-          Akcije fakture
+          Akcije
         </p>
         <div className="flex flex-wrap gap-2">
           <button

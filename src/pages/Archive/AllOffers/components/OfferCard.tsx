@@ -125,7 +125,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       {offer.status === "Accepted" && (
         <div className="mb-4 p-3 bg-green-50 rounded-lg">
           <p className="text-sm font-medium text-green-800 mb-2">
-            Akcije fakture
+            Akcije
           </p>
           <div className="flex flex-wrap gap-2">
             <button
