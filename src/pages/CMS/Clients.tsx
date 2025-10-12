@@ -1,19 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCMS } from "../../contexts/CMSContext";
 import { Client } from "../../types/cms";
 import EntityList from "../../components/CMS/Common/EntityList";
 import EntityModal from "../../components/CMS/Common/EntityModal";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "../../config";
 
 export default function Clients() {
   const { clients, addClient, updateClient, deleteClient } = useCMS();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [banks, setBanks] = useState<{ id: number; banka: string }[]>([]);
   const [formData, setFormData] = useState<Partial<Client>>({
     name: "",
     pib: "",
     address: "",
     bill: "",
+    bank: "",
   });
 
   const resetForm = () => {
@@ -22,9 +25,23 @@ export default function Clients() {
       pib: "",
       address: "",
       bill: "",
+      bank: "",
     });
     setEditingClient(null);
   };
+
+  useEffect(() => {
+    const fetchBanks = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/cms/banke`); 
+        const data = await res.json();
+        setBanks(data);
+      } catch (error) {
+        console.error("Greška pri učitavanju banaka:", error);
+      }
+    };
+    fetchBanks();
+  }, []);
 
   const handleAdd = () => {
     resetForm();
@@ -181,6 +198,31 @@ export default function Clients() {
               placeholder="e.g., 160-123456-78"
             />
           </div>
+          {/* Banka */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Banka <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.bank || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, bank: e.target.value })
+              }
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="" disabled>
+                -- Izaberite banku --
+              </option>
+              {banks.map((banka) => (
+                <option key={banka.id} value={banka.id}>
+                  {banka.banka}
+                </option>
+              ))}
+            </select>
+          </div>
+
+
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button

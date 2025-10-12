@@ -52,6 +52,7 @@ export interface KlijentResponse {
   pib: string;
   adresa: string;
   broj_racuna: string;
+  banka: number;
   createdAt: string;
   updatedAt: string;
 }

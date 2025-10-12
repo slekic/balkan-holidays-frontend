@@ -189,7 +189,8 @@ export async function createClient(client: Omit<KlijentResponse, "id" | "created
       naziv: client.naziv,
       pib: client.pib,
       adresa: client.adresa,
-      broj_racuna: client.broj_racuna 
+      broj_racuna: client.broj_racuna,
+      banka: client.banka,
     }))
   const res = await fetch(`${BACKEND_URL}/cms/klijent`, {
     method: "POST",
@@ -198,7 +199,8 @@ export async function createClient(client: Omit<KlijentResponse, "id" | "created
       naziv: client.naziv,
       pib: client.pib,
       adresa: client.adresa,
-      broj_racuna: client.broj_racuna
+      broj_racuna: client.broj_racuna,
+      banka: client.banka,
     }),
   });
   if (!res.ok) throw new Error("Failed to create client");
@@ -211,7 +213,8 @@ export async function updateClientApi(id: number, client: Partial<KlijentRespons
       naziv: client.naziv,
       pib: client.pib,
       adresa: client.adresa,
-      broj_racuna: client.broj_racuna 
+      broj_racuna: client.broj_racuna,
+      banka: client.banka
     }))
   const res = await fetch(`${BACKEND_URL}/cms/klijent/${id}`, {
     method: "PUT",
@@ -220,7 +223,8 @@ export async function updateClientApi(id: number, client: Partial<KlijentRespons
       naziv: client.naziv,
       pib: client.pib,
       adresa: client.adresa,
-      broj_racuna: client.broj_racuna 
+      broj_racuna: client.broj_racuna,
+      banka: client.banka
     }),
   });
   if (!res.ok) throw new Error("Failed to update client");

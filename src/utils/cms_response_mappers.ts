@@ -223,7 +223,8 @@ export function mapClientToKlijentRequest(client: Omit<Client, "id" | "createdAt
     naziv: client.name,
     pib: client.pib,
     adresa: client.address,
-    broj_racuna: client.bill
+    broj_racuna: client.bill,
+    banka: Number(client.bank)
   };
 }
 
@@ -234,6 +235,7 @@ export function mapKlijentResponseToClient(klijent: KlijentResponse): Client {
     pib: klijent.pib,
     address: klijent.adresa,
     bill: klijent.broj_racuna,
+    bank: klijent.banka.toString(),
     createdAt: klijent.createdAt ? parseDate(klijent.createdAt) : new Date(),
     updatedAt: klijent.updatedAt ? parseDate(klijent.updatedAt) : new Date(),
   };

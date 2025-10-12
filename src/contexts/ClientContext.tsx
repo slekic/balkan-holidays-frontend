@@ -47,12 +47,14 @@ export function ClientProvider({ children }: BaseProviderProps) {
       pib?: string; 
       adresa?: string; 
       broj_racuna?: string 
+      banka?: number
     } = {};
 
     if (updates.name !== undefined) payload.naziv = updates.name;
     if (updates.pib !== undefined) payload.pib = updates.pib;
     if (updates.address !== undefined) payload.adresa = updates.address;
     if (updates.bill !== undefined) payload.broj_racuna = updates.bill;
+    if (updates.bank !== undefined) payload.banka = Number(updates.bank);
 
     const updated = await updateClientApi(Number(id), payload);
     const mappedClient = mapKlijentResponseToClient(updated);
