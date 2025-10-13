@@ -44,6 +44,7 @@ export interface PaginationState {
 
 export interface PaymentSummary {
   totalReceived: number;
+  totalReceivable: number;
   totalOutstanding: number;
   collectionRate: number;
 }

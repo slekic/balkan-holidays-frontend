@@ -162,6 +162,7 @@ export interface PaginatedFinansijePonudaPlacanja {
 export interface PaymentSummary {
   totalReceived: number;
   totalOutstanding: number;
+  totalReceivable: number;
   collectionRate: number;
 } 
 export interface PaginatedRashodResponse {

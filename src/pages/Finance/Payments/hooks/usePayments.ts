@@ -9,6 +9,7 @@ import {
   getAllFinanceOffersWithPayments,
   updatePaymentApi,
 } from "../../../../api/finances";
+import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 8;
 const PAGES_PER_BATCH = 5;
@@ -29,6 +30,7 @@ export const usePayments = () => {
   const [summary, setSummary] = useState<PaymentSummary>({
         totalOutstanding: 0,
         totalReceived: 0,
+        totalReceivable: 0,
         collectionRate: 0
     });
   const [filters, setFilters] = useState<PaymentFilters>({
@@ -57,6 +59,7 @@ export const usePayments = () => {
       setCurrentBatch(mapped);
       setFilteredOffers(mapped);
       setTotalItems(data.total);
+      data.summary.collectionRate = data.summary.totalReceivable > 0 ? Math.round((data.summary.totalReceived / data.summary.totalReceivable) * 100) : 0;
       setSummary(data.summary);
     } catch (err) {
       console.error("Failed to fetch finance offers with payments:", err);
@@ -153,7 +156,7 @@ export const usePayments = () => {
     const collectionRate =
       totalReceivable > 0 ? Math.round((totalReceived / totalReceivable) * 100) : 0;
 
-    return { totalReceived, totalOutstanding, collectionRate };
+    return { totalReceived, totalOutstanding, collectionRate, totalReceivable };
   };
 
 
