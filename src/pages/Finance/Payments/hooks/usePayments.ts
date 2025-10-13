@@ -135,6 +135,13 @@ export const usePayments = () => {
     ) => {
       const response = await createPayment(offerId, payment);
       const mappedOffer = mapPonudaFinanceWithPaymentsToOffer(response);
+
+      if (mappedOffer.payments.length > 0 &&
+          mappedOffer.payments[mappedOffer.payments.length - 1].amount < payment.amount) {
+         console.log("UPLATAAAAAAAAAA")
+         toast.warning("Pokušana uplata sa većim iznosom!");
+      }
+
       setCurrentBatch((prev) =>
         prev.map((offer) => (offer.id === offerId ? mappedOffer : offer))
       );
