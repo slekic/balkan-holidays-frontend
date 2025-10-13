@@ -99,6 +99,22 @@ export async function saveSlides(
   return data;
 }
 
+export async function reorderSlides(
+  renumberMap: Record<number, number>
+): Promise<any> {
+  const res = await fetch(`${BACKEND_URL}/ponuda/slides-reorder`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ renumberMap }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to reorder slides, status: ${res.status}`);
+  }
+
+  return;
+}
+
 export async function updateOfferStatusAPI({
   offerId,
   newStatus,

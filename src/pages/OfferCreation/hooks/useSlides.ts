@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { Slide, SlideType, slideTypeLabels } from "../utils/constants";
-import { getSlides, saveSlides } from "../../../api/offer";
+import { getSlides, reorderSlides, saveSlides } from "../../../api/offer";
 import { mapSlajdResponseToSlide } from "../../../utils/offer_response_mappers";
 import { uploadMultipleEntitiesImages } from "../../../api/cms";
 import { toast } from "react-toastify";
 import { downloadOfferPresentation } from "../../../api/export";
+import { BACKEND_URL } from "../../../config";
 
 export interface SlideFile {
   file: File;
@@ -37,26 +38,46 @@ export function useSlides(offerId: string | null) {
   }, [fetchSlides]);
 
   // Reorder slides i regeneri redni broj
-  const handleSlideReorder = (dragIndex: number, hoverIndex: number) => {
+  const handleSlideReorder = async (dragIndex: number, hoverIndex: number) => {
     const dragged = slides[dragIndex];
     const next = [...slides];
     next.splice(dragIndex, 1);
     next.splice(hoverIndex, 0, dragged);
 
-    // regeneriši num/index
-    next.forEach((s, idx) => {
-      s.num = idx + 1;
+    const renumberMap: Record<number, number> = {};
+    slides.forEach((s, idx) => {
+      const newNum = next.findIndex(n => n.id === s.id) + 1;
+      if (newNum > 0 && newNum !== s.num) {
+        renumberMap[s.num] = newNum;
+      }
     });
+    try {
+      await reorderSlides(renumberMap);
 
-    setSlides(next);
+      // regeneriši num/index
+      next.forEach((s, idx) => {
+        s.num = idx + 1;
+      });
+
+      setSlides(next);
+    } catch (err) {
+      toast.error("Neuspešno pomeranje slajdova")
+      console.error("Greška prilikom slanja mape renumeracije:", err);
+    }
   };
 
-  const handleDeleteSlide = (slideId: string) => {
+  const handleDeleteSlide = async (slideId: string) => {
     if (
       typeof window === "undefined" ||
-      window.confirm("Are you sure you want to delete this slide?")
+      window.confirm("Da li ste sigurni da želite da obrišete slajd?")
     ) {
-      setSlides((prev) => prev.filter((s) => s.id !== slideId));
+      try {
+        await fetch(`${BACKEND_URL}/ponuda/slides/${Number(slideId)}`, { method: "DELETE" });
+        setSlides((prev) => prev.filter((s) => s.id !== slideId));
+      } catch (err) {
+        toast.error("Neuspešno brisanje slajda");
+        console.error("Greška prilikom brisanja slajda:", err);
+      }
     }
   };
 

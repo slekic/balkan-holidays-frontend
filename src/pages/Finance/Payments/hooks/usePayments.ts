@@ -138,8 +138,8 @@ export const usePayments = () => {
 
       if (mappedOffer.payments.length > 0 &&
           mappedOffer.payments[mappedOffer.payments.length - 1].amount < payment.amount) {
-         console.log("UPLATAAAAAAAAAA")
-         toast.warning("Pokušana uplata sa većim iznosom!");
+         
+            toast.warning("Pokušana uplata sa većim iznosom!");
       }
 
       setCurrentBatch((prev) =>
