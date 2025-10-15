@@ -100,9 +100,10 @@ export async function saveSlides(
 }
 
 export async function reorderSlides(
+  offerId: string,
   renumberMap: Record<number, number>
 ): Promise<any> {
-  const res = await fetch(`${BACKEND_URL}/ponuda/slides-reorder`, {
+  const res = await fetch(`${BACKEND_URL}/ponuda/slides-reorder/${Number(offerId)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ renumberMap }),

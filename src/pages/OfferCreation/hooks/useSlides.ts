@@ -52,7 +52,11 @@ export function useSlides(offerId: string | null) {
       }
     });
     try {
-      await reorderSlides(renumberMap);
+      console.log("NOVI REDOSLED", renumberMap)
+      if(offerId)
+        await reorderSlides(offerId, renumberMap);
+      else 
+        return;
 
       // regeneriši num/index
       next.forEach((s, idx) => {
@@ -123,8 +127,6 @@ export function useSlides(offerId: string | null) {
         const slideId = redniIdMap[slide.num];
         const content = slide.content || {};
         
-        exsistIds.push(slideId);
-
          if (content.backgroundImage){
           if(content.backgroundImage.startsWith("data:")) {
             filesArr.push(content.backgroundImage);
@@ -132,6 +134,7 @@ export function useSlides(offerId: string | null) {
             entityIds.push(slideId);
             entityTypes.push("slajd");
           } else {
+            exsistIds.push(slideId);
             exsist.push(content.backgroundImage);
           }
         }
@@ -143,6 +146,7 @@ export function useSlides(offerId: string | null) {
             entityIds.push(slideId);
             entityTypes.push("slajd");
           } else {
+            exsistIds.push(slideId);
             exsist.push(img);
           }
         });
@@ -177,13 +181,27 @@ export function useSlides(offerId: string | null) {
       return;
     }
 
+    const slidesWithImagesTypes: SlideType[] = ["activity", "restaurant", "hotel", "day"];
+
+    const invalidSlides = slides.filter(
+      (s) =>
+        slidesWithImagesTypes.includes(s.type) &&
+        (!s.content.images || s.content.images.length < 3)
+    );
+
+    if (invalidSlides.length > 0) {
+      console.log("Ivalidni ", JSON.stringify(invalidSlides))
+      toast.error("Svi slideovi sa galerijom moraju imati najmanje 3 slike!");
+      return;
+    }
+
     try {
-      await downloadOfferPresentation(Number(offerId))
-    }
-    catch(err){
+      await downloadOfferPresentation(Number(offerId));
+    } catch (err) {
       toast.error("Greška prilikom generisanja!");
+      console.error(err);
     }
-  }
+  };  
 
   return {
     slides,
