@@ -3,6 +3,9 @@ import { X } from "lucide-react";
 import { Slide, slideTypeLabels } from "./utils/constants";
 import ImageUpload from "../../components/CMS/Common/ImageUpload";
 import { useCMS } from "../../contexts/CMSContext";
+import { toast } from "react-toastify";
+import { createSablon } from "../../api/cms";
+import { mapDayTemplateToSablonDanaRequest, mapSablonDanaToDayTemplate } from "../../utils/cms_response_mappers";
 
 type Props = {
   slide: Slide | null;
@@ -279,21 +282,6 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   ))}
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Broj dana
-                </label>
-                <input
-                  type="number"
-                  value={localSlide.content.dayNumber || 1}
-                  onChange={(e) =>
-                    handleContentChange({ dayNumber: parseInt(e.target.value) })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Opis
@@ -335,6 +323,25 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
           >
             Otkaži
           </button>
+          {localSlide.type === "day" && (
+        <button
+          onClick={async () => {
+            const newTemplate = {
+              title: localSlide.title,
+              description: localSlide.content.description,
+              backgroundImage: localSlide.content.backgroundImage,
+              galleryImages: localSlide.content.images,
+            };
+            console.log("Saving template:", newTemplate);
+            const dayTemp = await createSablon(mapDayTemplateToSablonDanaRequest(newTemplate))
+            dayTemplates.push(mapSablonDanaToDayTemplate(dayTemp))
+            toast.success("Šablon sačuvan!");
+          }}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        >
+          Sačuvaj šablon
+        </button>
+      )}
           {!isReadOnly && (
             <button
               onClick={() => localSlide && onSave?.(localSlide)}
