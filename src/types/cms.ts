@@ -10,6 +10,7 @@ export interface Hotel {
   vatGroup: VATGroup;
   createdAt: string;
   updatedAt: string;
+  images: string[];
 }
 
 export interface RoomType {

@@ -1,5 +1,4 @@
-import { HotelResponse, KlijentResponse, SablonDanaResponse, UslugaResponse } from '../api/responses';
-import { BACKEND_URL } from '../config';
+import { HotelResponse, KlijentResponse, SablonDanaResponse, SlikeResponse, UslugaResponse } from '../api/responses';
 import { Activity, Client, DayTemplate, Gift, Guide, Hotel, Restaurant, Translator, Transport, VATGroup } from '../types/cms';
 
 export const entityTypeMapper: Record<string, string> = {
@@ -19,6 +18,11 @@ export function mapHotelResponse(apiHotel: HotelResponse): Hotel {
       ? apiHotel.pdv_grupa
       : '20%';
 
+  const slike = apiHotel.slike ?? [];
+
+  const logoObj = slike.find((s: SlikeResponse) => s.tip === "logo");
+  const imageObjs = slike.filter((s: SlikeResponse) => s.tip !== "logo");
+
   return {
     id: apiHotel.id.toString(),   
     name: apiHotel.naziv,
@@ -33,10 +37,12 @@ export function mapHotelResponse(apiHotel: HotelResponse): Hotel {
     vatGroup: vatGroup,
     createdAt: new Date().toISOString(), 
     updatedAt: new Date().toISOString(), 
-    logo: apiHotel.slike && apiHotel.slike.length > 0 
-      ? `${apiHotel.slike[0].url}` 
-      : undefined
-  };
+    logo: logoObj?.url ?? undefined,
+    images: imageObjs
+      .filter((s) => !!s.url)
+      .slice(0, 3)
+      .map((s) => s.url),
+  }
 }
 
 export function mapHotelToRequest(

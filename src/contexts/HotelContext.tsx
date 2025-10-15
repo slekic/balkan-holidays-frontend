@@ -40,11 +40,41 @@ export function HotelProvider({ children }: BaseProviderProps) {
       const created = await createHotel(mapHotelToRequest(hotel));
       const mappedHotel = mapHotelResponse(created);
 
+      const data: File[] = [];
+      const img_types: string[] = [];
       // 2. Upload images if provided
       if (hotel.logo && hotel.logo != '') {
-        const res = await uploadImages(created.id, "hotel", [dataURLtoFile(hotel.logo, "hotel-logo"+mappedHotel.id)], ["logo"]);
-        console.log(res)
-        mappedHotel.logo=res ?? undefined
+        data.push(dataURLtoFile(hotel.logo, "hotel-logo"+mappedHotel.id));
+        img_types.push("logo"); 
+      }
+
+      if (hotel.images && hotel.images.length > 0) {
+          for (let i = 0; i < hotel.images.length; i++) {
+            const img = hotel.images[i];
+            data.push(dataURLtoFile(img, `hotel-image-${mappedHotel.id}-${i}`));
+            img_types.push("slika");  
+          }
+      }
+
+      if (data.length > 0){
+        console.log("UBACUJEM ", data.length)
+        const res = await uploadImages(
+            Number(mappedHotel.id),
+            "hotel",
+            data,
+            img_types,
+            []
+        );
+                
+        mappedHotel.logo = res.slike
+                    .filter((s: { tip: string }) => s.tip === "logo")
+                    .map((s: { putanja: string }) => s.putanja)[0] ?? mappedHotel.logo;
+      
+        if (Array.isArray(res.slike)) {
+          mappedHotel.images = res.slike
+                    .filter((s: { tip: string }) => s.tip === "slika")
+                    .map((s: { putanja: string }) => s.putanja) || mappedHotel.images;
+          }
       }
 
       setHotels(prev => [...prev, mappedHotel]);
@@ -69,27 +99,77 @@ export function HotelProvider({ children }: BaseProviderProps) {
       const hotel = hotels.find(h => h.id === id);
       if (!hotel) throw new Error("Hotel not found");
 
-      // 2. Upload logo if provided
+      const data: File[] = [];
+      const img_types: string[] = [];
+      const pathsToRemove: string[] = [];
+      
+      let logoChanged = false;
+      mappedHotel.logo = hotel.logo;
+      
       if (updates.logo !== hotel.logo) {
-        // logo is different → upload new image
-
-        const pathToRemove = [hotel.logo ? hotel.logo : undefined]
-                              .filter((p): p is string => !!p);
-        let data: File[] = [];
-        let img_type: string[] = [];
-        if (updates.logo !== undefined && updates.logo !== "") {
-          data = [dataURLtoFile(updates.logo, `hotel-logo${id}`)];
-          img_type = ["logo"];
-        }
-        const res = await uploadImages(
-          Number(id),
-          "hotel",
-          data,       
-          img_type,
-          pathToRemove
-        );
-        mappedHotel.logo = res ?? undefined;
+          // logo is different → upload new image
+          pathsToRemove.push(
+            ...[hotel.logo ? hotel.logo : undefined]
+                .filter((p): p is string => !!p)
+          );
+            
+          if (updates.logo !== undefined && updates.logo !== "") {
+              data.push(dataURLtoFile(updates.logo, `hotel-logo${id}`));
+              img_types.push("logo");
+          }else{
+              mappedHotel.logo = undefined
+          }
+          logoChanged = true;
       }
+      if (updates.images || hotel.images.length > 0) {    
+        const diff = (!updates.images || updates.images.length === 0)
+                      ? hotel.images
+                      : hotel.images.filter(existing => !updates.images?.includes(existing));
+        const keep = (!updates.images || updates.images.length === 0)
+                      ? []
+                      : hotel.images.filter(existing => updates.images?.includes(existing));
+        pathsToRemove.push(...diff);
+            
+        const toRemove = (logoChanged) ? pathsToRemove.length - 1 : pathsToRemove.length
+        if (toRemove == 0 && hotel.images.length == updates.images?.length) {
+              mappedHotel.images = hotel.images
+        } else {
+              const newImages = updates.images?.filter(img => !hotel.images.includes(img)) || [];
+              if (newImages.length > 0) {
+                  for (let i = 0; i < newImages.length; i++) {
+                    const img = newImages[i];
+                              
+                    data.push(dataURLtoFile(img, `hotel-image-${id}-${i}`));
+                    img_types.push("slika");
+                  }
+              }
+              mappedHotel.images = keep
+              console.log("Uploading images:", data, img_types, pathsToRemove);  
+        }
+      } 
+      if (data.length > 0 || pathsToRemove.length > 0) {
+          const res = await uploadImages(
+                Number(id),
+                "hotel",
+                data,
+                img_types,
+                pathsToRemove
+          );
+      
+          if (res && Array.isArray(res.slike)) {
+                mappedHotel.logo =
+                  res.slike.find((s: { tip: string }) => s.tip === "logo")?.putanja ??
+                  mappedHotel.logo;
+      
+                const newImages = res.slike
+                  .filter((s: { tip: string }) => s.tip === "slika")
+                  .map((s: { putanja: string }) => s.putanja);
+      
+                mappedHotel.images = [...(mappedHotel.images ?? []), ...newImages];
+              }
+      }
+      
+            console.log("MAPIRANO " + JSON.stringify(mappedHotel))
 
       setHotels(prev =>
         prev.map(hotel =>

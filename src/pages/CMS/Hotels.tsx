@@ -20,6 +20,7 @@ export default function Hotels() {
     numberOfRooms: 0,
     numberOfRestaurants: 0,
     vatGroup: "20%",
+    images: [],
   });
 
   const resetForm = () => {
@@ -32,6 +33,7 @@ export default function Hotels() {
       numberOfRooms: 0,
       numberOfRestaurants: 0,
       vatGroup: "20%",
+      images: [],
     });
     setEditingHotel(null);
   };
@@ -225,6 +227,17 @@ export default function Hotels() {
             value={formData.logo}
             onChange={(value) => setFormData({ ...formData, logo: value })}
           />
+
+          <ImageUpload
+            label="Slike hotela"
+            multiple
+            values={formData.images || []}
+            onMultipleChange={(images) => setFormData({ ...formData, images: images.slice(0, 3) }) // ograniči na 3
+            }
+            maxImages={3} onChange={function (value: string): void {
+              throw new Error("Function not implemented.");
+            } }          />
+
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
