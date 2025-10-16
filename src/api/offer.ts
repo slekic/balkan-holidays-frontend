@@ -103,6 +103,7 @@ export async function reorderSlides(
   offerId: string,
   renumberMap: Record<number, number>
 ): Promise<any> {
+  console.log("REQ", JSON.stringify({ renumberMap }))
   const res = await fetch(`${BACKEND_URL}/ponuda/slides-reorder/${Number(offerId)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

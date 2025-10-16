@@ -39,34 +39,41 @@ export function useSlides(offerId: string | null) {
 
   // Reorder slides i regeneri redni broj
   const handleSlideReorder = async (dragIndex: number, hoverIndex: number) => {
-    const dragged = slides[dragIndex];
-    const next = [...slides];
-    next.splice(dragIndex, 1);
-    next.splice(hoverIndex, 0, dragged);
+  const draggedSlide = slides[dragIndex];
+  const reordered = [...slides];
 
-    const renumberMap: Record<number, number> = {};
-    slides.forEach((s, idx) => {
-      const newNum = next.findIndex(n => n.id === s.id) + 1;
-      if (newNum > 0 && newNum !== s.num) {
-        renumberMap[s.num] = newNum;
-      }
+  // Ukloni slajd sa stare pozicije i ubaci ga na novu
+  reordered.splice(dragIndex, 1);
+  reordered.splice(hoverIndex, 0, draggedSlide);
+
+  // Generiši mapu stari_num → novi_num (backend koristi numeraciju od 1)
+  const renumberMap: Record<number, number> = {};
+    reordered.forEach((slide, index) => {
+      const newNum = index + 1;
+      renumberMap[slide.num] = newNum;
     });
+
+    console.log("RENUBER MAP:", renumberMap);
+
     try {
-      console.log("NOVI REDOSLED", renumberMap)
-      if(offerId)
+      if (offerId) {
         await reorderSlides(offerId, renumberMap);
-      else 
+      } else {
+        console.warn("offerId not defined, skipping reorderSlides call.");
         return;
+      }
 
-      // regeneriši num/index
-      next.forEach((s, idx) => {
-        s.num = idx + 1;
-      });
+      // Ažuriraj num vrednosti lokalno
+      const updatedSlides = reordered.map((slide, index) => ({
+        ...slide,
+        num: index + 1,
+      }));
 
-      setSlides(next);
+      setSlides(updatedSlides);
+      console.log("Novi redosled slajdova:", updatedSlides.map(s => s.num));
     } catch (err) {
-      toast.error("Neuspešno pomeranje slajdova")
-      console.error("Greška prilikom slanja mape renumeracije:", err);
+      toast.error("Neuspešno pomeranje slajdova");
+      console.error("Greška prilikom reorderovanja:", err);
     }
   };
 
