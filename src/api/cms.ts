@@ -79,6 +79,7 @@ export async function uploadImages(
 }
 
 export async function uploadMultipleEntitiesImages(
+  entity: string,
   entityIds: number[],
   entityTypes: string[],
   files: string[] = [], 
@@ -101,7 +102,7 @@ export async function uploadMultipleEntitiesImages(
     formData.append("postojece_putanje", exsist[index]);
   });
   
-  const res = await fetch(`${BACKEND_URL}/upload-multiple`, {
+  const res = await fetch(`${BACKEND_URL}/upload-multiple/${entity}`, {
     method: "POST",
     body: formData
   });

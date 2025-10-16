@@ -3,9 +3,7 @@ import { X } from "lucide-react";
 import { Slide, slideTypeLabels } from "./utils/constants";
 import ImageUpload from "../../components/CMS/Common/ImageUpload";
 import { useCMS } from "../../contexts/CMSContext";
-import { toast } from "react-toastify";
-import { createSablon } from "../../api/cms";
-import { mapDayTemplateToSablonDanaRequest, mapSablonDanaToDayTemplate } from "../../utils/cms_response_mappers";
+import { useDayTemplates } from "./hooks/useDayTemplates";
 
 type Props = {
   slide: Slide | null;
@@ -16,8 +14,9 @@ type Props = {
 export default function EditSlideModal({ slide, onClose, onSave }: Props) {
   const [localSlide, setLocalSlide] = useState<Slide | null>(slide);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const { dayTemplates } = useCMS();
+  const { saveDayTemplate } = useDayTemplates(dayTemplates);
 
-  const dayTemplates = useCMS().dayTemplates;
 
   useEffect(() => {
     setLocalSlide(slide);
@@ -324,24 +323,13 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
             Otkaži
           </button>
           {localSlide.type === "day" && (
-        <button
-          onClick={async () => {
-            const newTemplate = {
-              title: localSlide.title,
-              description: localSlide.content.description,
-              backgroundImage: localSlide.content.backgroundImage,
-              galleryImages: localSlide.content.images,
-            };
-            console.log("Saving template:", newTemplate);
-            const dayTemp = await createSablon(mapDayTemplateToSablonDanaRequest(newTemplate))
-            dayTemplates.push(mapSablonDanaToDayTemplate(dayTemp))
-            toast.success("Šablon sačuvan!");
-          }}
+            <button
+          onClick={() => localSlide && saveDayTemplate(localSlide)}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
           Sačuvaj šablon
         </button>
-      )}
+        )}
           {!isReadOnly && (
             <button
               onClick={() => localSlide && onSave?.(localSlide)}

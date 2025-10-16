@@ -150,7 +150,6 @@ export function useSlides(offerId: string | null) {
             exsist.push(img);
           }
         });
-
       });
 
       console.log("IIIIIIII")
@@ -160,6 +159,7 @@ export function useSlides(offerId: string | null) {
       // 4️⃣ Pozovi batch upload funkciju
       
         const uploadRes = await uploadMultipleEntitiesImages(
+          "slajd",
           entityIds,
           entityTypes,
           filesArr,

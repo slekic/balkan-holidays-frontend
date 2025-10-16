@@ -177,7 +177,7 @@ export default function SlidesModal({
                             </p>
                             <div className="flex space-x-2">
                               {slide.content.images
-                                ?.slice(0, 4)
+                                ?.slice(0, 3)
                                 .map((img: string, i: number) => (
                                   <img
                                     key={i}
