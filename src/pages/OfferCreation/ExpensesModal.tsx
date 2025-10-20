@@ -49,7 +49,7 @@ export default function ExpensesModal({
         rashodiToSave.push({
           ponuda_id,
           entitet_id: Number(e.entityId),
-          entitet_tip: e.entityType,
+          entitet_tip: e.entityType === "other" ? "ostalo" : e.entityType,
           cena_troska: e.costAmount || 0,
           komentar: e.comment || "",
           fajl_index,
