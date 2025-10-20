@@ -3,44 +3,49 @@ import { ExpenseEntry } from "../../../../types/offer";
 import { BACKEND_URL } from "../../../../config";
 import { createRashodiBatch } from "../../../../api/finances";
 import { toast } from "react-toastify";
+import { generateId } from "../../../OfferCreation/utils/id";
 
 
 export function useFinanceExpenses(offerId: string | null, open: boolean) {
   const [expenses, setExpenses] = useState<ExpenseEntry[]>([]);
 
   useEffect(() => {
-    if (!open || !offerId) return;
+  if (!open || !offerId) return;
 
-    const fetchExpenses = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/finansije/rashodi/ponuda/${offerId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setExpenses(
-            data.map((r: any) => ({
-              id: r.id.toString(),
-              entityType: "other",
-              entityId: "",
-              entityName: r.nazivEntiteta,
-              costAmount: r.iznos,
-              comment: r.komentar,
-              uploadedFile: undefined,
-            }))
-          );
-        }
-      } catch (err) {
-        console.error("Failed to load expenses:", err);
+  setExpenses([]);
+  const fetchExpenses = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/finansije/rashodi/ponuda/${offerId}`);
+      if (res.ok) {
+        const data = await res.json();
+        const mapped = data.map((r: any) => {
+          const id = r.id ? r.id.toString() : generateId();
+          return {
+            id,
+            entityType: r.tipEntiteta,
+            entityId: r.idEntiteta,
+            entityName: r.nazivEntiteta,
+            costAmount: r.iznos,
+            comment: r.komentar,
+            uploadedFile: undefined,
+          };
+        });
+        setExpenses(mapped);
       }
-    };
+    } catch (err) {
+      console.error("Failed to load expenses:", err);
+    }
+  };
 
-    fetchExpenses();
-  }, [open, offerId]);
+  fetchExpenses();
+}, [open, offerId]);
+
 
   const handleAddExpense = () => {
     setExpenses((prev) => [
       ...prev,
       {
-        id: `${Date.now()}`,
+        id: generateId(),
         entityType: "other",
         entityId: "",
         entityName: "",
@@ -68,8 +73,8 @@ export function useFinanceExpenses(offerId: string | null, open: boolean) {
       if (e.uploadedFile) files.push(e.uploadedFile);
       return {
         ponuda_id: Number(offerId),
-        entitet_id: 0,
-        entitet_tip: "other",
+        entitet_id: Number(e.entityId),
+        entitet_tip: e.entityType,
         cena_troska: e.costAmount || 0,
         komentar: e.comment || "",
         fajl_index: e.uploadedFile ? idx : -1,

@@ -206,6 +206,7 @@ export async function createRashodiBatch(
 ): Promise<RashodResponse[]> {
   const formData = new FormData();
 
+  console.log("rashodi", JSON.stringify(rashodi))
   formData.append("rashodi", JSON.stringify(rashodi));
 
   if (files) {
