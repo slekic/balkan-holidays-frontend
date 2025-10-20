@@ -74,7 +74,7 @@ export function useFinanceExpenses(offerId: string | null, open: boolean) {
       return {
         ponuda_id: Number(offerId),
         entitet_id: Number(e.entityId),
-        entitet_tip: e.entityType,
+        entitet_tip: e.entityType === "other" ? "ostalo" : e.entityType,
         cena_troska: e.costAmount || 0,
         komentar: e.comment || "",
         fajl_index: e.uploadedFile ? idx : -1,
