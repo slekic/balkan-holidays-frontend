@@ -176,8 +176,10 @@ export function useSlides(offerId: string | null) {
         );
         console.log("Upload slides images result:", uploadRes);
 
+      toast.success("Slajdovi uspešno sačuvani!")
       console.log("Slides saved and files uploaded successfully!");
     } catch (err) {
+      toast.error("Greška prilikom čuvanja slajdova!")
       console.error("Failed to save slides and upload files:", err);
     }
   };
