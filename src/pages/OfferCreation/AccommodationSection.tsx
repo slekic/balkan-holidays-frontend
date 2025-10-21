@@ -305,6 +305,7 @@ export default function AccommodationSection(props: Props) {
                                   type="number"
                                   min={1}
                                   value={roomType.numberOfPersons}
+                                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                                   onChange={(e) =>
                                     updateRoomType(hotel.id, roomType.id, {
                                       numberOfPersons: parseInt(e.target.value) || 1,
@@ -323,6 +324,7 @@ export default function AccommodationSection(props: Props) {
                                     type="number"
                                     min={0}
                                     step="0.01"
+                                    onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                                     value={roomType.pricePerNightPerPerson}
                                     onChange={(e) =>
                                       updateRoomType(hotel.id, roomType.id, {
@@ -372,6 +374,7 @@ export default function AccommodationSection(props: Props) {
                         <input
                           type="number"
                           min={0}
+                          onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                           step="0.01"
                           value={hotel.cityTax.pricePerPersonPerDay}
                           onChange={(e) =>

@@ -56,6 +56,7 @@ export default function FinanceExpensesModal({
                   <Euro className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
                     type="number"
+                    onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                     value={expense.costAmount || ""}
                     onChange={(e) => handleUpdateExpense(expense.id, { costAmount: parseFloat(e.target.value) || 0 })}
                     placeholder="0.00"

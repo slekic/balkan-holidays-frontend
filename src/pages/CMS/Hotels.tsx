@@ -262,6 +262,7 @@ export default function Hotels() {
               <input
                 type="number"
                 min="0"
+                onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                 value={formData.numberOfRooms || 0}
                 onChange={(e) =>
                   setFormData({
@@ -280,6 +281,7 @@ export default function Hotels() {
               <input
                 type="number"
                 min="0"
+                onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                 value={formData.numberOfRestaurants || 0}
                 onChange={(e) =>
                   setFormData({

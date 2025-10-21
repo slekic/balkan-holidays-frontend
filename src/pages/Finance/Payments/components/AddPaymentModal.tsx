@@ -35,6 +35,7 @@ export default function AddPaymentModal({
               <input
                 type="number"
                 step="0.01"
+                onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                 value={newPayment.amount}
                 onChange={(e) => onUpdatePayment('amount', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

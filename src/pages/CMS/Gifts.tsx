@@ -177,6 +177,7 @@ export default function Gifts() {
                 type="number"
                 min="0"
                 step="0.01"
+                onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                 value={formData.price || 0}
                 onChange={(e) =>
                   setFormData({

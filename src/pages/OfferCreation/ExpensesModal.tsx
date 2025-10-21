@@ -137,6 +137,7 @@ export default function ExpensesModal({
                           type="number"
                           min={0}
                           step="0.01"
+                          onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                           value={entity.costAmount || ""}
                           onChange={(e) =>
                             updateDetectedEntity(entity.id, {
@@ -273,6 +274,7 @@ export default function ExpensesModal({
                           type="number"
                           min={0}
                           step="0.01"
+                          onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                           value={expense.costAmount || ""}
                           onChange={(e) =>
                             onUpdateExpense(expense.id, {

@@ -194,6 +194,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 <input
                   type="number"
                   placeholder="Min"
+                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                   value={filters.personsMin}
                   onChange={(e) => handleFilterChange("personsMin", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -201,6 +202,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 <input
                   type="number"
                   placeholder="Maks"
+                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                   value={filters.personsMax}
                   onChange={(e) => handleFilterChange("personsMax", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -217,6 +219,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 <input
                   type="number"
                   placeholder="Min"
+                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                   value={filters.priceMin}
                   onChange={(e) => handleFilterChange("priceMin", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -224,6 +227,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 <input
                   type="number"
                   placeholder="Maks"
+                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                   value={filters.priceMax}
                   onChange={(e) => handleFilterChange("priceMax", e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

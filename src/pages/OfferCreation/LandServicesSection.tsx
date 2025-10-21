@@ -276,6 +276,7 @@ export default function LandServicesSection(props: Props) {
                                 <input
                                   type="number"
                                   min={1}
+                                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                                   value={service.quantityPersons}
                                   onChange={(e) =>
                                     updateService(day.id, service.id, {
@@ -295,6 +296,7 @@ export default function LandServicesSection(props: Props) {
                                 <input
                                   type="number"
                                   min={1}
+                                  onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                                   value={service.quantityDays}
                                   onChange={(e) =>
                                     updateService(day.id, service.id, {
@@ -317,6 +319,7 @@ export default function LandServicesSection(props: Props) {
                                     type="number"
                                     min={0}
                                     step="0.01"
+                                    onWheelCapture={(e) => (e.currentTarget as HTMLInputElement).blur()}
                                     value={service.pricePerDayPerPerson}
                                     onChange={(e) =>
                                       updateService(day.id, service.id, {
