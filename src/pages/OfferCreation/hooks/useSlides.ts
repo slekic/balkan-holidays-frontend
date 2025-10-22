@@ -21,6 +21,7 @@ export function useSlides(offerId: string | null) {
   const [newSlideType, setNewSlideType] = useState<SlideType>("general");
   const [draggedSlide, setDraggedSlide] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchSlides = useCallback(async () => {
     if (!offerId) return;
@@ -109,6 +110,10 @@ export function useSlides(offerId: string | null) {
   const saveSlidesHandler = async () => {
     if (!offerId) return;
 
+    if (isSaving) return;
+
+    setIsSaving(true);
+
     try {
       const slajdoviPayload = slides.map((slide) => ({
         naslov: slide.title,
@@ -182,6 +187,8 @@ export function useSlides(offerId: string | null) {
     } catch (err) {
       toast.error("Greška prilikom čuvanja slajdova!")
       console.error("Failed to save slides and upload files:", err);
+    }finally {
+      setIsSaving(false); 
     }
   };
 
@@ -236,5 +243,6 @@ export function useSlides(offerId: string | null) {
     saveSlidesHandler, 
     exportPresentation,
     isGenerating,
+    isSaving
   };
 }

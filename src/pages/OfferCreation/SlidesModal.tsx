@@ -16,6 +16,7 @@ type Props = {
   onSave: () => Promise<void>;
   onPresent: () => void;
   isGenerating: boolean; 
+  isSaving: boolean;
 };
 
 export default function SlidesModal({
@@ -32,6 +33,7 @@ export default function SlidesModal({
   onSave,
   onPresent,
   isGenerating, 
+  isSaving,
 }: Props) {
   if (!open) return null;
 
@@ -235,10 +237,39 @@ export default function SlidesModal({
             Otkaži
           </button>
          <button
-          onClick={onSave} 
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          onClick={onSave}
+          disabled={isSaving} 
+          className={`px-4 py-2 rounded-lg text-white flex items-center justify-center transition-colors ${
+            isSaving ? "bg-green-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+          }`}
         >
-          Sačuvaj slajdove
+          {isSaving ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-white mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                ></path>
+              </svg>
+              Čuvanje...
+            </>
+          ) : (
+            "Sačuvaj slajdove"
+          )}
         </button>
           <button
             onClick={onPresent}

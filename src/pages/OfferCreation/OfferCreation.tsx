@@ -82,6 +82,7 @@ export default function OfferCreation() {
     saveSlidesHandler,
     exportPresentation,
     isGenerating,
+    isSaving
   } = useSlides(editOfferId);
 
   const {
@@ -353,6 +354,7 @@ export default function OfferCreation() {
         onSave={() => saveSlidesHandler()}
         onPresent={()=> exportPresentation(editOfferId)}
         isGenerating={isGenerating}
+        isSaving={isSaving}
       />
 
       <AddSlideModal
