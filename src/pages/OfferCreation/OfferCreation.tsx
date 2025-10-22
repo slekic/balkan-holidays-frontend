@@ -80,7 +80,8 @@ export default function OfferCreation() {
     handleDeleteSlide,
     addSlide,
     saveSlidesHandler,
-    exportPresentation
+    exportPresentation,
+    isGenerating,
   } = useSlides(editOfferId);
 
   const {
@@ -351,6 +352,7 @@ export default function OfferCreation() {
         onOpenAdd={() => setShowAddSlideModal(true)}
         onSave={() => saveSlidesHandler()}
         onPresent={()=> exportPresentation(editOfferId)}
+        isGenerating={isGenerating}
       />
 
       <AddSlideModal
@@ -367,7 +369,7 @@ export default function OfferCreation() {
         onSave={(updated) => {
           setSlides(slides.map((s) => (s.id === updated.id ? updated : s)));
           setEditingSlide(null);
-        } } dayTemplates={[]}      />
+        } }      />
 
       <NewClientModal
         open={showNewClientModal}

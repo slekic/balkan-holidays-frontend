@@ -20,6 +20,7 @@ export function useSlides(offerId: string | null) {
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [newSlideType, setNewSlideType] = useState<SlideType>("general");
   const [draggedSlide, setDraggedSlide] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const fetchSlides = useCallback(async () => {
     if (!offerId) return;
@@ -205,12 +206,16 @@ export function useSlides(offerId: string | null) {
     }
 
     try {
+      setIsGenerating(true); 
       await downloadOfferPresentation(Number(offerId));
+      toast.success("Prezentacija uspešno generisana!");
     } catch (err) {
       toast.error("Greška prilikom generisanja!");
       console.error(err);
+    } finally {
+      setIsGenerating(false); 
     }
-  };  
+  };
 
   return {
     slides,
@@ -228,7 +233,8 @@ export function useSlides(offerId: string | null) {
     handleSlideReorder,
     handleDeleteSlide,
     addSlide,
-    saveSlidesHandler, // dugme "Sačuvaj" poziva ovo
-    exportPresentation
+    saveSlidesHandler, 
+    exportPresentation,
+    isGenerating,
   };
 }
