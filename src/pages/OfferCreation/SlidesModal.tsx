@@ -118,13 +118,6 @@ export default function SlidesModal({
                             <p className="text-sm text-gray-600">
                               {slide.content.description}
                             </p>
-                            {slide.content.logo && (
-                              <img
-                                src={slide.content.logo}
-                                alt="Logo"
-                                className="w-16 h-12 object-cover rounded"
-                              />
-                            )}
                           </div>
                         )}
                         {slide.type === "what-to-expect" && (
@@ -198,10 +191,6 @@ export default function SlidesModal({
                             <p className="text-sm text-gray-600">
                               {slide.content.description}
                             </p>
-                            <div className="flex items-center space-x-4 text-xs text-gray-500">
-                              <span>€{slide.content.price}</span>
-                              <span>{slide.content.whatsIncluded}</span>
-                            </div>
                           </div>
                         )}
                       </div>

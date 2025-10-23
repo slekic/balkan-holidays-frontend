@@ -63,7 +63,8 @@ export const useDayTemplates = (dayTemplates: any[]) => {
       filesArr,
       tipoviArr,
       exsistIds,
-      exsist
+      exsist,
+      exsistIds
     );
     console.log("Upload slides images result:", uploadRes);
 

@@ -111,8 +111,8 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
               </div>
               <ImageUpload
                 label="Logo"
-                value={localSlide.content.logo || ""}
-                onChange={(value) => handleContentChange({ logo: value })}
+                value={localSlide.content.backgroundImage || ""}
+                onChange={(value) => handleContentChange({ backgroundImage: value })}
               />
             </div>
           )}
@@ -237,15 +237,14 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <div>
-                <ImageUpload
-                  label="Slika poklona"
-                  value={localSlide.content.images?.[0] || ""}
-                  onChange={(value) =>
-                    handleContentChange({ images: [value] })
-                  }
-                />
-              </div>
+              <ImageUpload
+                label="Slika"
+                multiple
+                values={localSlide.content.images || []}
+                onMultipleChange={(images) => handleContentChange({ images })}
+                maxImages={1}
+                onChange={() => {}}
+              />
             </div>
           )}
 

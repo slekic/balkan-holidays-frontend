@@ -135,10 +135,13 @@ export function useSlides(offerId: string | null) {
       const tipoviArr: string[] = [];
       const exsist: string[] = [];
       const exsistIds: number[] = [];
+      const allIds: number[] = [];
 
       slides.forEach((slide) => {
         const slideId = redniIdMap[slide.num];
         const content = slide.content || {};
+
+        allIds.push(slideId);
         
          if (content.backgroundImage){
           if(content.backgroundImage.startsWith("data:")) {
@@ -178,7 +181,8 @@ export function useSlides(offerId: string | null) {
           filesArr,
           tipoviArr,
           exsistIds,
-          exsist
+          exsist,
+          allIds,
         );
         console.log("Upload slides images result:", uploadRes);
 

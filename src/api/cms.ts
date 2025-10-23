@@ -85,7 +85,8 @@ export async function uploadMultipleEntitiesImages(
   files: string[] = [], 
   tipovi: string[] = [], 
   exsistIds: number[],
-  exsist: string[]
+  exsist: string[],
+  allIds: number[],
 ) {
   const formData = new FormData();
 
@@ -95,6 +96,10 @@ export async function uploadMultipleEntitiesImages(
 
     formData.append("files", dataURLtoFile(files[index], `slide-image-${id}-${index}`));
     formData.append("tip_slike", tipovi[index]);
+  });
+
+  allIds.forEach((id, index) => {
+    formData.append("svi_ids", id.toString());
   });
 
   exsistIds.forEach((id, index) => {
