@@ -201,6 +201,8 @@ export function useSlides(offerId: string | null) {
       toast.error("Ponuda nije sačuvana!");
       return;
     }
+    
+    await saveSlidesHandler();
 
     const slidesWithImagesTypes: SlideType[] = ["activity", "restaurant", "hotel", "day"];
 
