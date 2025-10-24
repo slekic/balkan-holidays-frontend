@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "../config";
-import { OfferFilters, OfferResponse, OfferStats, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
+import { OfferFilters, OfferResponse, OfferStats, PaginatedOffers, SlajdGenerateRequest, SlajdIdRedniMap, SlajdResponse, SlideResponse, UpdateStatusParams, UpdateStatusResponse } from "./responses";
 
 export const STATUS_MAP_REQ_RES: Record<string, string> = {
   "Sent": "poslato",
@@ -115,6 +115,29 @@ export async function reorderSlides(
   }
 
   return;
+}
+
+export async function addSlideApi(
+  ponudaId: string,
+  slajd: SlajdGenerateRequest
+): Promise<SlideResponse> {
+  const res = await fetch(
+    `${BACKEND_URL}/ponuda/add-slide/${Number(ponudaId)}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(slajd),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to add slide");
+  }
+
+  const data: SlideResponse = await res.json();
+  return data;
 }
 
 export async function updateOfferStatusAPI({

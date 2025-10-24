@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Slide, SlideType, slideTypeLabels } from "../utils/constants";
-import { getSlides, reorderSlides, saveSlides } from "../../../api/offer";
+import { addSlideApi, getSlides, reorderSlides, saveSlides } from "../../../api/offer";
 import { mapSlajdResponseToSlide } from "../../../utils/offer_response_mappers";
 import { uploadMultipleEntitiesImages } from "../../../api/cms";
 import { toast } from "react-toastify";
@@ -106,18 +106,41 @@ export function useSlides(offerId: string | null) {
     }
   };
 
-  const addSlide = () => {
+  const addSlide = async () => {
+  console.log("Sad dodaje!!!!");
+
+  if(!offerId){
+    return
+  }
+
+  const newSlideRequest = {
+    redni_broj: slides.length + 1,
+    tip: newSlideType,
+    naslov: `New ${slideTypeLabels[newSlideType]}`,
+    sadrzaj: {},
+  };
+
+  console.log("REQ ", JSON.stringify(newSlideRequest))
+
+  try {
+    const response = await addSlideApi(offerId, newSlideRequest);
+
     const newSlide: Slide = {
-      id: Date.now().toString(),
+      id: response.id.toString(),
       type: newSlideType,
-      title: `New ${slideTypeLabels[newSlideType]}`,
-      content: {},
-      num: slides.length + 1,
+      title: response.naslov,
+      content: response.sadrzaj || {},
+      num: response.redni_broj,
     };
+
     setSlides((prev) => [...prev, newSlide]);
     setShowAddSlideModal(false);
     setEditingSlide(newSlide);
-  };
+  } catch (error) {
+    console.error("Greška pri dodavanju slajda:", error);
+    toast.error("Neuspešno dodavanje slajda");
+  }
+};
 
   const saveSlidesHandler = async () => {
     if (!offerId) return;

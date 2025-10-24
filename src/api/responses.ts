@@ -353,3 +353,13 @@ export interface PaymentFilters {
   dateTo?: string;
   paymentStatus?: string;
 }
+
+export interface SlideResponse {
+  id: number;
+  ponuda_id: number;
+  redni_broj: number;
+  tip: string;
+  naslov: string;
+  sadrzaj: Record<string, any> | null;
+  opis?: string | null;
+}
