@@ -79,18 +79,30 @@ export function useSlides(offerId: string | null) {
     }
   };
 
-  const handleDeleteSlide = async (slideId: string) => {
+  const handleDeleteSlide = async (slideNum: number) => {
     if (
       typeof window === "undefined" ||
       window.confirm("Da li ste sigurni da želite da obrišete slajd?")
     ) {
       try {
-        await fetch(`${BACKEND_URL}/ponuda/slides/${Number(slideId)}`, { method: "DELETE" });
-        setSlides((prev) => prev.filter((s) => s.id !== slideId));
-      } catch (err) {
-        toast.error("Neuspešno brisanje slajda");
-        console.error("Greška prilikom brisanja slajda:", err);
-      }
+        if (offerId) {
+          console.log("Tu je offer", offerId)
+          console.log("Slajd", slideNum)
+          await fetch(`${BACKEND_URL}/ponuda/${Number(offerId)}/slides/${slideNum}`, { method: "DELETE" });
+        }
+
+        const remainingSlides = slides.filter((s) => s.num !== slideNum);
+        console.log("SLAJDOVI NAKON BRISANJA ", JSON.stringify(remainingSlides))
+        const reorderedSlides = remainingSlides.map((slide, index) => ({
+          ...slide,
+          num: index + 1,
+        }));
+        console.log("SLAJDOVI NAKON BRISANJA ", JSON.stringify(reorderedSlides))
+        setSlides(reorderedSlides);
+        } catch (err) {
+          toast.error("Neuspešno brisanje slajda");
+          console.error("Greška prilikom brisanja slajda:", err);
+        }
     }
   };
 

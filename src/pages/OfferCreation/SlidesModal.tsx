@@ -11,7 +11,7 @@ type Props = {
   setDraggedSlide: (id: string | null) => void;
   onReorder: (dragIndex: number, hoverIndex: number) => void;
   onEdit: (slide: Slide) => void;
-  onDelete: (id: string) => void;
+  onDelete: (num: number) => void;
   onOpenAdd: () => void;
   onSave: () => Promise<void>;
   onPresent: () => void;
@@ -204,7 +204,7 @@ export default function SlidesModal({
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onDelete(slide.id)}
+                        onClick={() => onDelete(slide.num)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete slide"
                       >
