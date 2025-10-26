@@ -170,7 +170,9 @@ export default function Restaurants() {
               placeholder="Opis restorana za PDF prezentacije"
             />
           </div>
-
+          <p className="text-sm text-gray-500 mb-2">
+            Za slike preporuka je koristiti kvadratni format.
+          </p>
           <ImageUpload
             label="Slike restorana"
             multiple

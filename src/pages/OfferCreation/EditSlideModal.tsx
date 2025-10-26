@@ -109,6 +109,9 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+              <p className="text-sm text-gray-500 mb-2">
+                Za logo preporuka je koristiti pravougaoni format.
+              </p>
               <ImageUpload
                 label="Logo"
                 value={localSlide.content.backgroundImage || ""}
@@ -156,6 +159,9 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+              <p className="text-sm text-gray-500 mb-2">
+                Za pozadinske slike ili logoe preporuka je koristiti pravougaoni format, ostale slike kvadratne.
+              </p>
               <ImageUpload
                 label="Pozadinska slika"
                 value={localSlide.content.backgroundImage || ""}
@@ -200,6 +206,9 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+            <p className="text-sm text-gray-500 mb-2">
+              Za slike preporuka je koristiti kvadratni oblik.
+            </p>
             <ImageUpload
               label="Slike"
               multiple
@@ -237,6 +246,9 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+              <p className="text-sm text-gray-500 mb-2">
+                Za sliku preporuka je koristiti vertikalni pravougaoni format.
+              </p>
               <ImageUpload
                 label="Slika"
                 multiple
@@ -293,7 +305,9 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
+              <p className="text-sm text-gray-500 mb-2">
+                Za pozadinske slike preporuka je koristiti pravougaoni format, ostale slike kvadratne.
+              </p>
               <ImageUpload
                 label="Pozadinska slika"
                 value={localSlide.content.backgroundImage || ""}

@@ -221,7 +221,9 @@ export default function Hotels() {
               placeholder="https://example.com"
             />
           </div>
-
+          <p className="text-sm text-gray-500 mb-2">
+            Za logo preporuka je koristiti pravougaoni format, ostale slike kvadratne.
+          </p>
           <ImageUpload
             label="Logo hotela"
             value={formData.logo}

@@ -167,7 +167,9 @@ export default function DayTemplates() {
               placeholder="Description for the day template slide"
             />
           </div>
-
+          <p className="text-sm text-gray-500 mb-2">
+            Za pozadinske slike preporuka je koristiti pravougaoni format, ostale slike kvadratne.
+          </p>
           <ImageUpload
             label="Pozadinska slika"
             value={formData.backgroundImage}
