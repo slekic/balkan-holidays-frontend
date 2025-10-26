@@ -152,10 +152,22 @@ export default function OfferCreation() {
   console.log("PONUDA HOTEL " + JSON.stringify(formData.hotels))
 
   console.log("FORM " + JSON.stringify(formData))
+
+  const userString = localStorage.getItem('user'); 
+  let userId = -1;
+  if (userString) {
+    const user = JSON.parse(userString); 
+    userId = user.id; 
+    console.log(userId); 
+  }
+
+  if (userId === -1){
+    return
+  }
   const payload = {
     naziv: formData.offerName,
     klijent_id: formData.clientId,
-    korisnik_id: 1,
+    korisnik_id: userId,
     lokacija: formData.location ?? null,
     broj_osoba: formData.numberOfPersons ?? null,
     datum_od: formData.startDate ?? null,
