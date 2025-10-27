@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { NewClientFormData } from "../../types/offer";
 import { useCMS } from "../../contexts/CMSContext";
 import { Client } from "../../types/cms";
+import { BACKEND_URL } from "../../config";
+import { mapKlijentResponseToClient } from "../../utils/cms_response_mappers";
 
 type Props = {
   open: boolean;
@@ -11,22 +13,63 @@ type Props = {
 };
 
 export default function NewClientModal({ open, onClose, onCreated }: Props) {
-  const { addClient } = useCMS();
-  const [form, setForm] = useState<NewClientFormData>({ name: "", address:"", pib: "", bill: ""});
+  const { addExClients } = useCMS();
+  const [banks, setBanks] = useState<{ id: number; banka: string }[]>([]);
+  const [form, setForm] = useState<NewClientFormData>({
+    name: "",
+    address: "",
+    pib: "",
+    bill: "",
+    bank: "",
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    const fetchBanks = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/cms/banke`);
+        const data = await res.json();
+        setBanks(data);
+      } catch (error) {
+        console.error("Greška pri učitavanju banaka:", error);
+      }
+    };
+    fetchBanks();
+  }, [open]);
 
   if (!open) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.address.trim()) return;
-    const created = addClient({ name: form.name, address: form.address, pib: form.pib, bill: form.bill } as Omit<
-      Client,
-      "id" | "createdAt" | "updatedAt"
-    >) as unknown as Client;
-    // Context's addClient returns Client per provider setup
-    onCreated(created);
-    setForm({ name: "", address:"", pib: "", bill: ""});
-    onClose();
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/cms/klijent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          naziv: form.name,
+          adresa: form.address,
+          pib: form.pib,
+          tekuci_racun: form.bill,
+          banka: Number(form.bank),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Greška prilikom kreiranja klijenta");
+      const resp = await res.json();
+      const created: Client = mapKlijentResponseToClient(resp);
+
+      addExClients(created);
+
+      onCreated(created);
+
+      setForm({ name: "", address: "", pib: "", bill: "", bank: "" });
+      onClose();
+    } catch (error) {
+      console.error("Greška prilikom dodavanja klijenta:", error);
+      alert("Došlo je do greške prilikom dodavanja klijenta.");
+    }
   };
 
   return (
@@ -43,7 +86,9 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Naziv */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Naziv klijenta <span className="text-red-500">*</span>
@@ -59,6 +104,8 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
               required
             />
           </div>
+
+          {/* Adresa */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Adresa <span className="text-red-500">*</span>
@@ -74,9 +121,33 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
               required
             />
           </div>
-           <div>
+
+          {/* Banka */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              PIB (poreski broj) 
+              Banka <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={form.bank}
+              onChange={(e) => setForm((p) => ({ ...p, bank: e.target.value }))}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="" disabled>
+                -- Izaberite banku --
+              </option>
+              {banks.map((banka) => (
+                <option key={banka.id} value={banka.id}>
+                  {banka.banka}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* PIB */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              PIB (poreski broj)
             </label>
             <input
               type="text"
@@ -88,9 +159,11 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
               placeholder="npr. 123456789"
             />
           </div>
-           <div>
+
+          {/* Tekući račun */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tekući račun 
+              Tekući račun
             </label>
             <input
               type="text"
@@ -102,6 +175,8 @@ export default function NewClientModal({ open, onClose, onCreated }: Props) {
               placeholder="npr. 160-123456-78"
             />
           </div>
+
+          {/* Dugmad */}
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
               type="button"

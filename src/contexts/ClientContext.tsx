@@ -7,6 +7,7 @@ import { mapClientToKlijentRequest, mapKlijentResponseToClient } from '../utils/
 interface ClientContextType extends BaseEntityContext<Client> {
   clients: Client[];
   addClient: (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Client>;
+  addExClient: (client: Client) => void;
   updateClient: (id: string, client: Partial<Client>) => Promise<void>;
   deleteClient: (id: string) => Promise<void>;
 }
@@ -25,7 +26,6 @@ export function ClientProvider({ children }: BaseProviderProps) {
     try {
       setLoading(true);
       const data = await fetchClients();
-      console.log("DATA klijenti" + JSON.stringify(data))
       const mapped = data.items.map(mapKlijentResponseToClient);
       setClients(mapped);
     } catch (err) {
@@ -35,10 +35,17 @@ export function ClientProvider({ children }: BaseProviderProps) {
     }
   };
 
+  // Calls backend and adds the returned client to state
   const addClient = async (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => {
     const res = await createClient(mapClientToKlijentRequest(client));
-    setClients(prev => [...prev, mapKlijentResponseToClient(res)]);
-    return mapKlijentResponseToClient(res);
+    const mapped = mapKlijentResponseToClient(res);
+    setClients(prev => [...prev, mapped]);
+    return mapped;
+  };
+
+  // Adds a client directly to the state without backend call
+  const addExClient = (client: Client) => {
+    setClients(prev => [...prev, client]);
   };
 
   const updateClient = async (id: string, updates: Partial<Client>) => {
@@ -46,8 +53,8 @@ export function ClientProvider({ children }: BaseProviderProps) {
       naziv?: string; 
       pib?: string; 
       adresa?: string; 
-      broj_racuna?: string 
-      banka?: number
+      broj_racuna?: string; 
+      banka?: number 
     } = {};
 
     if (updates.name !== undefined) payload.naziv = updates.name;
@@ -62,7 +69,6 @@ export function ClientProvider({ children }: BaseProviderProps) {
     setClients(prev => prev.map(c => (c.id === id ? mappedClient : c)));
   };
 
-
   const deleteClient = async (id: string) => {
     await deleteClientApi(Number(id));
     setClients(prev => prev.filter(c => c.id !== id));
@@ -74,6 +80,7 @@ export function ClientProvider({ children }: BaseProviderProps) {
       items: clients,
       addClient,
       addItem: addClient,
+      addExClient,
       updateClient,
       updateItem: updateClient,
       deleteClient,

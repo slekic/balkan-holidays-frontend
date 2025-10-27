@@ -72,6 +72,7 @@ export interface NewClientFormData {
   address: string;
   pib: string;
   bill: string;
+  bank: string;
 }
 
 export interface ExpenseEntry {

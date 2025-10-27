@@ -86,6 +86,7 @@ export function useCMS() {
     // Clients
     clients: clients.clients,
     addClient: clients.addClient,
+    addExClients: clients.addExClient,
     updateClient: clients.updateClient,
     deleteClient: clients.deleteClient,
     
