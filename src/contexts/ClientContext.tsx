@@ -26,6 +26,7 @@ export function ClientProvider({ children }: BaseProviderProps) {
     try {
       setLoading(true);
       const data = await fetchClients();
+      console.log("CLIENTS ", JSON.stringify(data))
       const mapped = data.items.map(mapKlijentResponseToClient);
       setClients(mapped);
     } catch (err) {
