@@ -4,6 +4,7 @@ import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './bas
 import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
 import { mapRestaurantToRequest, mapUslugaToRestaurant } from '../utils/cms_response_mappers';
 import { dataURLtoFile } from '../utils/image_converter';
+import { toast } from 'react-toastify';
 
 
 interface RestaurantContextType extends BaseEntityContext<Restaurant> {
@@ -58,7 +59,10 @@ export function RestaurantProvider({ children }: BaseProviderProps) {
           mapped.images = res.slike.map((s: { putanja: string }) => s.putanja) ?? mapped.images;
       } 
       setRestaurants(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+          toast.error(err.message)
+      }
       console.error("Failed to add restaurant:", err);
     }
   };
@@ -127,7 +131,10 @@ export function RestaurantProvider({ children }: BaseProviderProps) {
       setRestaurants(prev =>
         prev.map(r => r.id === id ? { ...mappedRestaurant, updatedAt: getCurrentTimestamp() } : r)
       );
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+          toast.error(err.message)
+      }
       console.error("Failed to update restaurant:", err);
     }
   };

@@ -4,6 +4,7 @@ import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './bas
 import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
 import { mapUslugaToActivity, mapActivityToRequest } from '../utils/cms_response_mappers';
 import { dataURLtoFile } from '../utils/image_converter';
+import { toast } from 'react-toastify';
 
 interface ActivityContextType extends BaseEntityContext<Activity> {
   activities: Activity[];
@@ -69,7 +70,10 @@ export function ActivityProvider({ children }: BaseProviderProps) {
           
       }
       setActivities(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+        toast.error(err.message)
+      }
       console.error("Failed to add activity:", err);
     }
   };
@@ -172,7 +176,10 @@ export function ActivityProvider({ children }: BaseProviderProps) {
           )
         );
 
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+        toast.error(err.message)
+      }
       console.error("Failed to update activity:", err);
     }
   };

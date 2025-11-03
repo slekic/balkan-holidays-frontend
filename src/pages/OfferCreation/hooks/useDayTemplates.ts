@@ -56,17 +56,23 @@ export const useDayTemplates = (dayTemplates: any[]) => {
       }
     });
 
-    const uploadRes = await uploadMultipleEntitiesImages(
-      "sablon",
-      entityIds,
-      entityTypes,
-      filesArr,
-      tipoviArr,
-      exsistIds,
-      exsist,
-      exsistIds
-    );
-    console.log("Upload slides images result:", uploadRes);
+    try{
+      const uploadRes = await uploadMultipleEntitiesImages(
+        "sablon",
+        entityIds,
+        entityTypes,
+        filesArr,
+        tipoviArr,
+        exsistIds,
+        exsist,
+        exsistIds
+      );
+      console.log("Upload slides images result:", uploadRes);
+  } catch(err: any){
+    if (err.message.includes("Nepodržani tip")){
+        toast.error(err.message)
+    }
+  }
 
     toast.success("Šablon sačuvan!");
 

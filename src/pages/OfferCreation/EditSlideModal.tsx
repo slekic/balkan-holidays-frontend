@@ -163,7 +163,7 @@ export default function EditSlideModal({ slide, onClose, onSave }: Props) {
                 Za pozadinske slike ili logoe preporuka je koristiti pravougaoni format, ostale slike kvadratne.
               </p>
               <ImageUpload
-                label="Pozadinska slika"
+                label="Pozadinska slika/Logo"
                 value={localSlide.content.backgroundImage || ""}
                 onChange={(value) =>
                   handleContentChange({ backgroundImage: value })

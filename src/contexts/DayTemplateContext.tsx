@@ -4,6 +4,7 @@ import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './bas
 import { mapDayTemplateToSablonDanaRequest, mapSablonDanaToDayTemplate } from '../utils/cms_response_mappers';
 import { dataURLtoFile } from '../utils/image_converter';
 import { createSablon, deleteSablonApi, getAllSabloni, updateSablonApi, uploadImages } from '../api/cms';
+import { toast } from 'react-toastify';
 
 interface DayTemplateContextType extends BaseEntityContext<DayTemplate> {
   dayTemplates: DayTemplate[];
@@ -63,7 +64,10 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
       }
 
       setDayTemplates(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+        toast.error(err.message)
+      }
       console.error("Failed to add day template:", err);
     }
   };
@@ -133,7 +137,10 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
       }
 
       setDayTemplates(prev => prev.map(t => t.id === id ? { ...mapped, updatedAt: getCurrentTimestamp() } : t));
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+          toast.error(err.message)
+      }
       console.error("Failed to update day template:", err);
     }
   };

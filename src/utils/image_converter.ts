@@ -7,6 +7,14 @@ export function dataURLtoFile(dataurl: string, filename: string) {
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
-  return new File([u8arr], filename + "." + mime.split('/')[1], { type: mime });
-}
 
+  let ext = mime.split('/')[1];
+  if (ext.includes('+')) ext = ext.split('+')[0]; // svg+xml -> svg
+
+  const allowed = ['jpeg', 'jpg', 'png', 'svg'];
+  if (!allowed.includes(ext)) {
+    throw new Error(`Nepodržani tip slike: ${ext}. Dozvoljeno: ${allowed.join(', ')}`);
+  }
+
+  return new File([u8arr], `${filename}.${ext}`, { type: mime });
+}

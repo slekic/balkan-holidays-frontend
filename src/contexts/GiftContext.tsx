@@ -4,6 +4,7 @@ import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './bas
 import { createUsluga, deleteUslugaApi, getAllUsluge, updateUslugaApi, uploadImages } from '../api/cms';
 import { mapUslugaToGift, mapGiftToRequest } from '../utils/cms_response_mappers';
 import { dataURLtoFile } from '../utils/image_converter';
+import { toast } from 'react-toastify';
 
 interface GiftContextType extends BaseEntityContext<Gift> {
   gifts: Gift[];
@@ -41,7 +42,10 @@ export function GiftProvider({ children }: BaseProviderProps) {
       }
 
       setGifts(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes("Nepodržani tip")){
+          toast.error(err.message)
+      }
       console.error("Failed to add gift:", err);
     }
   };

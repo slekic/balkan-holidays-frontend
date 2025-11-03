@@ -4,6 +4,7 @@ import { BaseEntityContext, BaseProviderProps, generateId, getCurrentTimestamp }
 import { createHotel, deleteHotelApi, getAllHotels, updateHotelApi, uploadImages } from '../api/cms';
 import { mapHotelResponse, mapHotelToRequest, mapPartialHotelToRequest } from '../utils/cms_response_mappers';
 import { dataURLtoFile } from '../utils/image_converter';
+import { toast } from 'react-toastify';
 
 
 interface HotelContextType extends BaseEntityContext<Hotel> {
@@ -80,7 +81,10 @@ export function HotelProvider({ children }: BaseProviderProps) {
       setHotels(prev => [...prev, mappedHotel]);
 
       return mappedHotel;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message.includes("Nepodržani tip")){
+        toast.error(error.message)
+      }
       console.error("Failed to add hotel:", error);
       throw error;
     }
@@ -178,7 +182,10 @@ export function HotelProvider({ children }: BaseProviderProps) {
       );
 
       return mappedHotel;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message.includes("Nepodržani tip")){
+        toast.error(error.message)
+      }
       console.error("Failed to update hotel:", error);
       throw error;
     }

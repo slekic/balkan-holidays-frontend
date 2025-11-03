@@ -223,8 +223,11 @@ export function useSlides(offerId: string | null) {
 
       toast.success("Slajdovi uspešno sačuvani!")
       console.log("Slides saved and files uploaded successfully!");
-    } catch (err) {
+    } catch (err: any) {
       toast.error("Greška prilikom čuvanja slajdova!")
+      if (err.message.includes("Nepodržani tip")){
+          toast.error(err.message)
+      }
       console.error("Failed to save slides and upload files:", err);
     }finally {
       setIsSaving(false); 
