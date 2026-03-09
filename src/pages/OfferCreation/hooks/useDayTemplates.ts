@@ -2,8 +2,11 @@
 import { toast } from "react-toastify";
 import { mapDayTemplateToSablonDanaRequest, mapSablonDanaToDayTemplate } from "../../../utils/cms_response_mappers";
 import { createSablon, getAllSabloni, uploadMultipleEntitiesImages } from "../../../api/cms";
+ import { DayTemplate } from "../../../types/cms";
 
-export const useDayTemplates = (dayTemplates: any[]) => {
+export const useDayTemplates = (
+  setDayTemplates: React.Dispatch<React.SetStateAction<DayTemplate[]>>
+) => {
   const saveDayTemplate = async (templateData: any) => {
     const newTemplate = {
       title: templateData.title,
@@ -12,11 +15,11 @@ export const useDayTemplates = (dayTemplates: any[]) => {
       galleryImages: templateData.content.images,
     };
 
-    if(!newTemplate.backgroundImage || newTemplate.backgroundImage == ""){
+    if(!newTemplate.backgroundImage){
       toast.error("Fali pozadinska slika");
       return;
     }
-    if(newTemplate.galleryImages.length < 3) {
+    if (!newTemplate.galleryImages || newTemplate.galleryImages.length < 3) { 
       toast.error("Morate uneti tri slike");
       return;
     }
@@ -56,6 +59,9 @@ export const useDayTemplates = (dayTemplates: any[]) => {
       }
     });
 
+    console.log(filesArr.length)
+    console.log(exsistIds)
+
     try{
       const uploadRes = await uploadMultipleEntitiesImages(
         "sablon",
@@ -77,8 +83,7 @@ export const useDayTemplates = (dayTemplates: any[]) => {
     toast.success("Šablon sačuvan!");
 
     const sabloni = await getAllSabloni();
-    dayTemplates.length = 0;
-    dayTemplates.push(...sabloni.items.map(mapSablonDanaToDayTemplate));
+    setDayTemplates(sabloni.items.map(mapSablonDanaToDayTemplate));
   };
 
   return { saveDayTemplate };

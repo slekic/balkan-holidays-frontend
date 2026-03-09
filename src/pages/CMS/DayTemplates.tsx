@@ -7,7 +7,7 @@ import ImageUpload from "../../components/CMS/Common/ImageUpload";
 import { toast } from "react-toastify";
 
 export default function DayTemplates() {
-  const { dayTemplates, addDayTemplate, updateDayTemplate, deleteDayTemplate } =
+  const { dayTemplates, addDayTemplate, updateDayTemplate, deleteDayTemplate, activities } =
     useCMS();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<DayTemplate | null>(
@@ -45,6 +45,18 @@ export default function DayTemplates() {
     if (confirm(`Are you sure you want to delete "${template.title}"?`)) {
       deleteDayTemplate(template.id);
     }
+  };
+
+  const handleImportActivity = (activityId: string) => {
+    const activity = activities.find(a => a.id === activityId);
+    if (!activity) return;
+
+    setFormData({
+      title: activity.name,
+      description: activity.description,
+      backgroundImage: activity.backgroundImage,
+      galleryImages: activity.images || []
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -137,6 +149,23 @@ export default function DayTemplates() {
         title={editingTemplate ? "Izmeni šablon" : "Dodaj šablon"}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Preuzmi iz aktivnosti
+            </label>
+
+            <select
+              onChange={(e) => handleImportActivity(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value="">-- Izaberi aktivnost --</option>
+              {activities.map(activity => (
+                <option key={activity.id} value={activity.id}>
+                  {activity.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Naslov šablona <span className="text-red-500">*</span>

@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { DayTemplate } from '../types/cms';
 import { BaseEntityContext, BaseProviderProps, getCurrentTimestamp } from './base';
-import { mapDayTemplateToSablonDanaRequest, mapSablonDanaToDayTemplate } from '../utils/cms_response_mappers';
+import { mapSablonDanaToDayTemplate } from '../utils/cms_response_mappers';
 import { dataURLtoFile } from '../utils/image_converter';
-import { createSablon, deleteSablonApi, getAllSabloni, updateSablonApi, uploadImages } from '../api/cms';
+import { deleteSablonApi, getAllSabloni, updateSablonApi, uploadImages } from '../api/cms';
 import { toast } from 'react-toastify';
+import { useDayTemplates as useDayTemplatesHook } from '../pages/OfferCreation/hooks/useDayTemplates';
 
 interface DayTemplateContextType extends BaseEntityContext<DayTemplate> {
   dayTemplates: DayTemplate[];
@@ -17,6 +18,7 @@ const DayTemplateContext = createContext<DayTemplateContextType | undefined>(und
 
 export function DayTemplateProvider({ children }: BaseProviderProps) {
   const [dayTemplates, setDayTemplates] = useState<DayTemplate[]>([]);
+  const { saveDayTemplate } = useDayTemplatesHook(setDayTemplates);
 
   useEffect(() => {
     (async () => {
@@ -29,45 +31,20 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
     })();
   }, []);
 
-  const addDayTemplate = async (template: Omit<DayTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
+ const addDayTemplate = async (
+    template: Omit<DayTemplate, 'id' | 'createdAt' | 'updatedAt'>
+  ) => {
     try {
-      const created = await createSablon(mapDayTemplateToSablonDanaRequest(template));
-      const mapped = mapSablonDanaToDayTemplate(created);
+      await saveDayTemplate({
+        title: template.title,
+        content: {
+          description: template.description,
+          backgroundImage: template.backgroundImage,
+          images: template.galleryImages ?? []
+        }
+      });
 
-      const data: File[] = [];
-      const img_types: string[] = [];
-
-      if (template.backgroundImage && template.backgroundImage !== '') {
-        data.push(dataURLtoFile(template.backgroundImage, `day-template-logo${mapped.id}`));
-        img_types.push('logo');
-      }
-
-      if (template.galleryImages && template.galleryImages.length > 0) {
-        template.galleryImages.forEach((img, i) => {
-          data.push(dataURLtoFile(img, `day-template-image-${mapped.id}-${i}`));
-          img_types.push('slika');
-        });
-      }
-
-      if (data.length > 0) {
-        const res = await uploadImages(Number(mapped.id), 'sablon', data, img_types, []);
-
-        mapped.backgroundImage = res.slike
-              .filter((s: { tip: string }) => s.tip === "logo")
-              .map((s: { putanja: string }) => s.putanja)[0] ?? mapped.backgroundImage;
-
-        if (Array.isArray(res.slike)) {
-            mapped.galleryImages = mapped.galleryImages.concat(res.slike
-              .filter((s: { tip: string }) => s.tip === "slika")
-              .map((s: { putanja: string }) => s.putanja)) || mapped.galleryImages;
-          }
-      }
-
-      setDayTemplates(prev => [...prev, { ...mapped, createdAt: getCurrentTimestamp(), updatedAt: getCurrentTimestamp() }]);
-    } catch (err: any) {
-      if (err.message.includes("Nepodržani tip")){
-        toast.error(err.message)
-      }
+    } catch (err) {
       console.error("Failed to add day template:", err);
     }
   };
@@ -89,7 +66,6 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
       const pathsToRemove: string[] = [];
 
       // handle background image
-      let logoChanged = false;
       mapped.backgroundImage = template.backgroundImage;
       if (updates.backgroundImage !== template.backgroundImage) {
         if (template.backgroundImage) pathsToRemove.push(template.backgroundImage);
@@ -99,7 +75,6 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
         } else {
           mapped.backgroundImage = undefined;
         }
-        logoChanged = true;
       }
 
       // handle gallery images
@@ -153,6 +128,7 @@ export function DayTemplateProvider({ children }: BaseProviderProps) {
       console.error("Failed to delete day template:", err);
     }
   };
+
 
   return (
     <DayTemplateContext.Provider value={{
